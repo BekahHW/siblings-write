@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Our Work';
+const description = 'Discover our projects and stories.';
+const permalink = `${Astro.site.href}work`;
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="work">
+  <div class="container">
+    <h1>Our Work</h1>
+    <figure class="work-image">
+      <img src="/assets/work-illustration.webp" alt="Illustration of teamwork" width="330">
+      <figcaption>
+        Illustration by
+        <a href="https://icons8.com/illustrations/author/5c07e68d82bcbc0092519bb6" target="_blank" rel="noopener">Icons 8</a>
+        from
+        <a href="https://icons8.com/illustrations" target="_blank" rel="noopener">Ouch!</a>
+      </figcaption>
+    </figure>
+    <p>
+      We’re passionate about creating adventurous stories, that spark your imagination and bring joy to our readers. Here's a look at some of the work we’ve done and what we’re currently working on.
+    </p>
+
+    <!-- Book Section -->
+    <h2>Featured Work: The Battle for Christmas</h2>
+    <div class="book-section">
+      <img src="/assets/battle-for-christmas-cover.webp" alt="The Battle for Christmas: Reign of the Nutcrackers" width="200">
+      <div>
+        <p><strong>The Battle for Christmas: Reign of the Nutcrackers</strong> is an adventurous story of magic, identity, and the spirit of Christmas. Experience an enchanting tale that will delight readers of all ages.</p>
+        <a href="https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1/ref=sr_1_2?crid=I5DWDTES3YWX&dib=eyJ2IjoiMSJ9.DmJrhZrdQtB7pGWH9IvAZKZKTx1gMCkYEPuD3R0WX61de458GtTsEU7eVXeBvtgq-ikR04xVMyItbmk5eu2hRwvXcnlkuTGBT1NyUZ0ZiYjxhNrhle14RDmzfNmve3CsJ0KaCLfWQA8qGiy2wjFdAU6Y-SUqDtIbFA6B3i7DVTkGbbHQNdBib5hfzkTbU-XqEhoNi52bsDk4GLZ95oosu4Wmi-HMtR3h5A-MGwG9Esw.j8WZZczBoKaGv4glN4hzV_Iu_NbsDX8-O58knWrr9Qo&dib_tag=se&keywords=battle+for+christmas&qid=1737934190&sprefix=battle+for+christ%2Caps%2C123&sr=8-2" target="_blank" rel="noopener" class="buy-button">Buy Now on Amazon</a>
+      </div>
+    </div>
+
+    <h2>Other Projects</h2>
+    <ul>
+      <li><strong>Project 1:</strong> A collaborative novel exploring the magic of family.</li>
+      <li><strong>Project 2:</strong> Community storytelling workshops for aspiring writers.</li>
+      <li><strong>Project 3:</strong> Seasonal stories celebrating traditions and togetherness.</li>
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .work-image {
+    float: right;
+    margin: -3em -7em 2em 2em;
+    max-width: 300px;
+  }
+
+  .work-image img {
+    border-radius: 8px;
+    margin-bottom: 1.5em;
+  }
+
+  .book-section {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    margin: 2em 0;
+  }
+
+  .book-section img {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .buy-button {
+    display: inline-block;
+    margin-top: 1em;
+    padding: 0.8em 1.5em;
+    background-color: #007acc;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+
+  .buy-button:hover {
+    background-color: #005fa3;
+  }
+
+  @media (max-width: 1020px) {
+    .work-image {
+      float: none;
+      margin: 0 auto 2em;
+    }
+
+    .book-section {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .book-section img {
+      width: 100%;
+      max-width: 250px;
+    }
+  }
+</style>
