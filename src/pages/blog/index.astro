@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const title = 'Blog';
 const description = 'Latest articles.';
 const permalink = `${Astro.site.href}blog`;
+import { authors } from '../../data/blogposts/authors';
 
 let allPosts = await Astro.glob('../../data/blog-posts/*.md');
 allPosts = allPosts.sort((a, b) => new Date(b.frontmatter.publishDate).valueOf() - new Date(a.frontmatter.publishDate).valueOf());
@@ -23,6 +24,11 @@ allPosts = allPosts.sort((a, b) => new Date(b.frontmatter.publishDate).valueOf()
             </h2>
             <p>{post.frontmatter.description}</p>
             <div class="post-item-footer">
+              {author && (
+                <span class="post-item-author">
+                  By <a href={author.link}>{author.name}</a>
+                </span>
+              )}
               <span class="post-item-date">— {post.frontmatter.publishDate}</span>
             </div>
           </div>
