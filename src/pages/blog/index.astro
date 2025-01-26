@@ -24,11 +24,8 @@ allPosts = allPosts.sort((a, b) => new Date(b.frontmatter.publishDate).valueOf()
             </h2>
             <p>{post.frontmatter.description}</p>
             <div class="post-item-footer">
-              {author && (
-                <span class="post-item-author">
-                  By <a href={author.link}>{author.name}</a>
-                </span>
-              )}
+            <span class="post-item-author">By {post.frontmatter.author}</span>
+
               <span class="post-item-date">— {post.frontmatter.publishDate}</span>
             </div>
           </div>
