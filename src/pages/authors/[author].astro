@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { authors } from '../../data/blog-posts/authors';
+
+// 🚀 Required for dynamic routes
+export async function getStaticPaths() {
+  // Get all author keys from the authors.js file
+  const authorKeys = Object.keys(authors);
+
+  return authorKeys.map((author) => ({
+    params: { author },
+  }));
+}
+
+const { author } = Astro.params;
+const authorData = authors[author];
+
+// Get all blog posts written by this author
+const posts = await Astro.glob('../../data/blog-posts/*.md');
+const authorPosts = posts.filter((post) => post.frontmatter.author === author);
+---
+
+<BaseLayout title={`Posts by ${authorData ? authorData.name : author}`} description={`All posts by ${authorData ? authorData.name : author}`}>
+  <div class="container">
+    <h1>Posts by {authorData ? authorData.name : author}</h1>
+    
+    {authorData && (
+      <div class="author-info">
+        <img src={authorData.avatar} alt={`Avatar of ${authorData.name}`} width="100" />
+        <p>{authorData.bio}</p>
+      </div>
+    )}
+
+    <h2>Articles</h2>
+    <ul>
+      {authorPosts.length > 0 ? (
+        authorPosts.map((post) => (
+          <li>
+            <a href={`/blog/${post.file.split('/').pop().replace('.md', '')}`}>
+              {post.frontmatter.title}
+            </a> - {post.frontmatter.publishDate}
+          </li>
+        ))
+      ) : (
+        <p>No posts found for this author.</p>
+      )}
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .author-info img {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+  }
+
+  .author-info p {
+    max-width: 600px;
+  }
+</style>
