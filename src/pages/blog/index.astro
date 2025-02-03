@@ -22,7 +22,9 @@ allPosts = allPosts.sort((a, b) => new Date(b.frontmatter.publishDate).valueOf()
             </h2>
             <p>{post.frontmatter.description}</p>
             <div class="post-item-footer">
-            <span class="post-item-author">By {post.frontmatter.author}</span>
+              <span class="post-item-author">
+  By <a href={`/authors/${post.frontmatter.author}`}>{post.frontmatter.author}</a>
+</span>
 
               <span class="post-item-date">— {post.frontmatter.publishDate}</span>
             </div>
