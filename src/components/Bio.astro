@@ -1,10 +1,25 @@
+---
+const { name, bio, avatar, links } = Astro.props;
+---
+
 <div>
-  <img src="/assets/profile-pic.webp" alt="Headshot of Maxi Ferreira">
+  <img src={avatar} alt={`Headshot of ${name}`} />
   <p>
-    Hi, I'm <strong>Maxi</strong>. I'm a software engineer and data scientist based in Los Angeles.
-    You can follow me on <a href="https://www.twitter.com/Charca" target="_blank">Twitter</a>,
-    see some of my work on <a href="https://www.github.com/Charca" target="_blank">GitHub</a>,
-    or read more about me on <a href="https://www.maxiferreira.com" target="_blank">my website</a>.
+    Hi, I'm <strong>{name}</strong>. {bio}
+    {links && (
+      <>
+        <br />
+        {links.twitter && (
+          <a href={links.twitter} target="_blank">X</a>
+        )}
+        {links.github && (
+          <> | <a href={links.github} target="_blank">GitHub</a></>
+        )}
+        {links.website && (
+          <> | <a href={links.website} target="_blank">Website</a></>
+        )}
+      </>
+    )}
   </p>
 </div>
 
