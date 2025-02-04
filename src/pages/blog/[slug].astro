@@ -2,6 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import getPostData from '../../utils/getPostData';
+import { authors } from '../../data/blog-posts/authors';
+
 
 export async function getStaticPaths() {
   const posts = await Astro.glob('../../data/blog-posts/*.md');
@@ -12,9 +14,11 @@ export async function getStaticPaths() {
 }
 
 const { Content, frontmatter } = Astro.props.post;
-const { title, description, publishDate } = frontmatter;
+const { title, description, publishDate, author: authorKey } = frontmatter;
 const { slug, readingTime } = getPostData(Astro.props.post);
 const permalink = `${Astro.site.href}blog/${slug}`;
+const author = authors[authorKey];
+
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="blog">
@@ -28,8 +32,9 @@ const permalink = `${Astro.site.href}blog/${slug}`;
       <Content />
     </article>
     <hr />
-    <Bio />
-  </div>
+    {author && (
+      <Bio name={author.name} bio={author.bio} avatar={author.avatar} links={author.links} />
+    )}  </div>
 </BaseLayout>
 
 <style>

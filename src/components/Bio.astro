@@ -1,25 +1,11 @@
 ---
-const { name, bio, avatar, links } = Astro.props;
+const { name, bio, avatar } = Astro.props;
 ---
 
 <div>
   <img src={avatar} alt={`Headshot of ${name}`} />
   <p>
     Hi, I'm <strong>{name}</strong>. {bio}
-    {links && (
-      <>
-        <br />
-        {links.twitter && (
-          <a href={links.twitter} target="_blank">X</a>
-        )}
-        {links.github && (
-          <> | <a href={links.github} target="_blank">GitHub</a></>
-        )}
-        {links.website && (
-          <> | <a href={links.website} target="_blank">Website</a></>
-        )}
-      </>
-    )}
   </p>
 </div>
 
