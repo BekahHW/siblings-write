@@ -1,0 +1,40 @@
+---
+import { library, icon } from "@fortawesome/fontawesome-svg-core";
+import { faXTwitter, faFacebook, faLinkedin } from "@fortawesome/free-brands-svg-icons";
+import { faLink } from "@fortawesome/free-solid-svg-icons";
+
+const { url, platform } = Astro.props;
+
+library.add(faXTwitter, faFacebook, faLinkedin, faLink);
+
+// Ensure we only use the first index (SVG string)
+const icons = {
+  twitter: icon(faXTwitter).html[0], 
+  facebook: icon(faFacebook).html[0],
+  linkedin: icon(faLinkedin).html[0],
+  copy: icon(faLink).html[0],
+};
+---
+
+<a href={url} target="_blank" class="icon-link" aria-label={`Share on ${platform}`} set:html={icons[platform]}>
+</a>
+
+<style>
+  .icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: 0 10px;
+  }
+  .icon-link svg {
+    width: 24px;
+    height: 24px;
+    fill: #007acc;
+    transition: fill 0.2s ease-in-out;
+  }
+  .icon-link:hover svg {
+    fill: #005a99;
+  }
+</style>

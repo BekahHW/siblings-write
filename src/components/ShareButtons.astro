@@ -1,0 +1,57 @@
+---
+import SocialIcons from './SocialIcons.astro';
+
+const { title, permalink } = Astro.props;
+const encodedTitle = encodeURIComponent(title);
+const encodedURL = encodeURIComponent(permalink);
+
+const shareLinks = {
+  twitter: `https://x.com/intent/tweet?text=${encodedTitle}&url=${encodedURL}`,
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedURL}`,
+  linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedURL}`,
+};
+---
+
+<div class="share-buttons">
+  <p>Share this post:</p>
+  <SocialIcons url={shareLinks.twitter} platform="twitter" />
+  <SocialIcons url={shareLinks.facebook} platform="facebook" />
+  <SocialIcons url={shareLinks.linkedin} platform="linkedin" />
+  <button class="copy-link" id="copy-button" data-url={permalink}>
+    <SocialIcons platform="copy" />
+  </button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const copyButton = document.getElementById("copy-button");
+
+    copyButton.addEventListener("click", function () {
+      const urlToCopy = copyButton.getAttribute("data-url");
+
+      navigator.clipboard.writeText(urlToCopy).catch(err => 
+        console.error("Error copying to clipboard:", err)
+      );
+    });
+  });
+</script>
+
+<style>
+  .share-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid #ccc;
+  }
+
+  .share-buttons a, .share-buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+</style>

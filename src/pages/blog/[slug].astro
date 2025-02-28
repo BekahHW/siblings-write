@@ -18,6 +18,7 @@ const { title, description, publishDate, author: authorKey } = frontmatter;
 const { slug, readingTime } = getPostData(Astro.props.post);
 const permalink = `${Astro.site.href}blog/${slug}`;
 const author = authors[authorKey];
+import ShareButtons from '../../components/ShareButtons.astro';
 
 ---
 
@@ -34,7 +35,9 @@ const author = authors[authorKey];
     <hr />
     {author && (
       <Bio name={author.name} bio={author.bio} avatar={author.avatar} links={author.links} />
-    )}  </div>
+    )}  
+    <ShareButtons title={title} permalink={permalink} />
+  </div>
 </BaseLayout>
 
 <style>
