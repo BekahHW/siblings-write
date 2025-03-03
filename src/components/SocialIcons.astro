@@ -1,22 +1,20 @@
 ---
-import { library, icon } from "@fortawesome/fontawesome-svg-core";
+import FontAwesomeIcon from "./FontAwesomeIcon.astro";
 import { faXTwitter, faFacebook, faLinkedin } from "@fortawesome/free-brands-svg-icons";
 import { faLink } from "@fortawesome/free-solid-svg-icons";
 
 const { url, platform } = Astro.props;
 
-library.add(faXTwitter, faFacebook, faLinkedin, faLink);
-
-// Ensure we only use the first index (SVG string)
 const icons = {
-  twitter: icon(faXTwitter).html[0], 
-  facebook: icon(faFacebook).html[0],
-  linkedin: icon(faLinkedin).html[0],
-  copy: icon(faLink).html[0],
+  twitter: faXTwitter,
+  facebook: faFacebook,
+  linkedin: faLinkedin,
+  copy: faLink,
 };
 ---
 
-<a href={url} target="_blank" class="icon-link" aria-label={`Share on ${platform}`} set:html={icons[platform]}>
+<a href={url} target="_blank" class="icon-link" aria-label={`Share on ${platform}`}>
+  <FontAwesomeIcon iconName={icons[platform]} />
 </a>
 
 <style>
@@ -36,5 +34,11 @@ const icons = {
   }
   .icon-link:hover svg {
     fill: #005a99;
+  }
+  @media (prefers-color-scheme: dark) {
+    .icon-link svg {
+      color: white !important;
+      fill: white !important;
+    }
   }
 </style>
