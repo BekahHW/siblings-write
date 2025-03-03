@@ -1,0 +1,19 @@
+---
+import { icon } from "@fortawesome/fontawesome-svg-core";
+
+const { iconName } = Astro.props;
+
+const svgHtml = icon(iconName, { attributes: { width: "24", height: "24", fill: "currentColor" } }).html[0];
+---
+<span class="icon-wrapper" aria-hidden="true" set:html={svgHtml}></span>
+
+<style>
+  .icon-wrapper svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    display: block;
+    visibility: visible;
+    opacity: 1;
+  }
+</style>

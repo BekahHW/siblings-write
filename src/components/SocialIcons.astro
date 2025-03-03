@@ -16,7 +16,17 @@ const icons = {
 };
 ---
 
-<a href={url} target="_blank" class="icon-link" aria-label={`Share on ${platform}`} set:html={icons[platform]}>
+<!-- <a href={url} target="_blank" class="icon-link" aria-label={`Share on ${platform}`} set:html={icons[platform]}>
+</a> -->
+
+<!-- <a href={url} target="_blank" class="icon-link" aria-label={`Share on ${platform}`}>
+  {icons[platform] ? <span set:html={icons[platform]} /> : '⚠️'}
+</a> -->
+
+<a href={url} target="_blank" class="icon-link" aria-label={`Share on ${platform}`}>
+  <svg width="24" height="24" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" fill="blue" />
+  </svg>
 </a>
 
 <style>
