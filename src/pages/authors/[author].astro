@@ -1,44 +1,49 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { authors } from '../../data/blog-posts/authors';
+import Bio from '../../components/Bio.astro';
+import { getCollection } from 'astro:content';
 
-// 🚀 Required for dynamic routes
+// Get static paths from authors collection
 export async function getStaticPaths() {
-  // Get all author keys from the authors.js file
-  const authorKeys = Object.keys(authors);
+  const authorEntries = await getCollection('authors');
 
-  return authorKeys.map((author) => ({
-    params: { author },
+  return authorEntries.map((author) => ({
+    params: { author:author.id },
+    props: { author }
   }));
 }
 
-const { author } = Astro.params;
-const authorData = authors[author];
+//Get author data from props
+const { author } = Astro.props;
+const authorData = author.data;
 
 // Get all blog posts written by this author
-const posts = await Astro.glob('../../data/blog-posts/*.md');
-const authorPosts = posts.filter((post) => post.frontmatter.author === author);
+const allPosts = await getCollection('blog');
+const authorPosts = allPosts.filter((post) => post.data.author === author.id);
 ---
 
-<BaseLayout title={`Posts by ${authorData ? authorData.name : author}`} description={`All posts by ${authorData ? authorData.name : author}`}>
+<BaseLayout title={`Posts by ${authorData.name}`} description={`All posts by ${authorData.name}`}   permalink={`${Astro.site.href}authors/${author.id}`}>
   <div class="container">
-    <h1>Posts by {authorData ? authorData.name : author}</h1>
+    <h1>Posts by {authorData.name}</h1>
     
     {authorData && (
       <div class="author-info">
-        <img src={authorData.avatar} alt={`Avatar of ${authorData.name}`} width="100" />
-        <p>{authorData.bio}</p>
+              <Bio 
+        name={authorData.name}
+        bio={authorData.bio}
+        avatar={authorData.avatar}
+      />
       </div>
     )}
 
-    <h2>Articles</h2>
+    <h2>Stories</h2>
     <ul>
       {authorPosts.length > 0 ? (
         authorPosts.map((post) => (
           <li>
-            <a href={`/blog/${post.file.split('/').pop().replace('.md', '')}`}>
-              {post.frontmatter.title}
-            </a> - {post.frontmatter.publishDate}
+            <a href={`/blog/${post.slug}`}>
+              {post.data.title}
+            </a> - {post.data.publishDate}
           </li>
         ))
       ) : (
