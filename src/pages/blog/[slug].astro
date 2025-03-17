@@ -1,31 +1,41 @@
----
+<!-- ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Bio from '../../components/Bio.astro';
-import getPostData from '../../utils/getPostData';
-import { authors } from '../../data/blog-posts/authors';
+import Bio from '../../components/Bio.astro'
+import { getCollection, getEntry } from 'astro:content';
 
 
 export async function getStaticPaths() {
-  const posts = await Astro.glob('../../data/blog-posts/*.md');
-  return posts.map(p => ({
-    params: { slug: p.file.split('/').pop().split('.').shift() },
-    props: { post: p },
+  const blogEntries = await getCollection('blog');
+  
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
   }));
 }
 
-const { Content, frontmatter } = Astro.props.post;
-const { title, description, publishDate, author: authorKey } = frontmatter;
-const { slug, readingTime } = getPostData(Astro.props.post);
-const permalink = `${Astro.site.href}blog/${slug}`;
-const author = authors[authorKey];
+// Get blog post data from props
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+// Get author data safely
+let author;
+try {
+  if (entry.data.author) {
+    author = await getEntry('authors', entry.data.author);
+    console.log('Author found:', author ? author.id : 'Not found');
+  } else {
+    console.log('No author specified in blog post');
+  }
+} catch (error) {
+  console.error('Error fetching author:', error.message);
+}
 import ShareButtons from '../../components/ShareButtons.astro';
-
+const permalink = `${Astro.site.href}blog/${entry.slug}`;
 ---
 
-<BaseLayout title={title} description={description} permalink={permalink} current="blog">
+<BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="blog">
   <header>
-    <p>{publishDate} ~ {readingTime}</p>
-    <h1>{title}</h1>
+    <p>{entry.data.publishDate} ~ {entry.data.readingTime}</p>
+    <h1>{entry.data.title}</h1>
     <hr />
   </header>
   <div class="container">
@@ -34,9 +44,15 @@ import ShareButtons from '../../components/ShareButtons.astro';
     </article>
     <hr />
     {author && (
-      <Bio name={author.name} bio={author.bio} avatar={author.avatar} links={author.links} />
-    )}  
-    <ShareButtons title={title} permalink={permalink} />
+    <div class="author-bio">
+      <h3>About the Author</h3>
+     <Bio 
+        name={author.data.name}
+        bio={author.data.bio}
+        avatar={author.data.avatar}
+      />  
+    </div>)}
+    <ShareButtons title={entry.data.title} permalink={permalink} />
   </div>
 </BaseLayout>
 
@@ -59,5 +75,115 @@ import ShareButtons from '../../components/ShareButtons.astro';
   header hr {
     min-width: 100px;
     width: 30%;
+  }
+    
+  .author-bio {
+    margin-top: 2rem;
+    padding-top: 1rem;
+  }
+  
+  .author-bio h3 {
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+  }
+</style> -->
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Bio from '../../components/Bio.astro';
+import { getCollection, getEntry } from 'astro:content';
+import ShareButtons from '../../components/ShareButtons.astro';
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog');
+  
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+// Get blog post data from props
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+// Get author data by searching for an entry with matching ID
+let author;
+try {
+  // Get all author entries
+  const allAuthors = await getCollection('authors');
+  
+  if (entry.data.author) {
+    // Find the author whose ID (with .md stripped) matches the entry.data.author
+    author = allAuthors.find(a => a.id.replace(/\.md$/, '') === entry.data.author);
+    
+    if (author) {
+      console.log(`Found author for ${entry.data.author}`);
+    } else {
+      console.error(`Author not found: ${entry.data.author}`);
+    }
+  }
+} catch (error) {
+  console.error('Error fetching author:', error);
+}
+
+const permalink = `${Astro.site.href}blog/${entry.slug}`;
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="blog">
+  <header>
+    <p>{entry.data.publishDate} ~ {entry.data.readingTime}</p>
+    <h1>{entry.data.title}</h1>
+    <hr />
+  </header>
+  <div class="container">
+    <article class="content">
+      <Content />
+    </article>
+    <hr />
+    
+    {author && (
+      <div class="author-bio">
+        <h3>About the Author</h3>
+        <Bio 
+          name={author.data.name}
+          bio={author.data.bio}
+          avatar={author.data.avatar}
+        />
+      </div>
+    )}
+    
+    <ShareButtons title={entry.data.title} permalink={permalink} />
+  </div>
+</BaseLayout>
+
+<style>
+  header {
+    text-align: center;
+  }
+
+  header h1 {
+    margin-bottom: 0.7em;
+  }
+
+  header p {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+  }
+
+  header hr {
+    min-width: 100px;
+    width: 30%;
+  }
+    
+  .author-bio {
+    margin-top: 2rem;
+    padding-top: 1rem;
+  }
+  
+  .author-bio h3 {
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
   }
 </style>
