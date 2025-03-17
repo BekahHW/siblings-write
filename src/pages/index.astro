@@ -9,7 +9,9 @@ const permalink = Astro.site.href;
 <BaseLayout title={title} description={description} permalink={permalink}>
   <div class="home-container">
     <div class="home-copy">
-      <h1>Welcome to the Hawrot Siblings Blog</h1>
+      <h1>Welcome to the Hawrot Siblings Blog</h1><div class="about-content">
+        <p>Josh, Bekah, and Zach grew up in Steubenville, Ohio, where our adventurous childhoods shaped our love for storytelling and community. Now raising families of our own, with a combined thirteen children, the siblings draw on our diverse experiences in counseling, tech, and entrepreneurship to craft stories that celebrate the magic of family, tradition, and the enduring spirit of Christmas.</p>
+      </div>
     </div>
 
     <div class="hero-image-container">
@@ -69,10 +71,22 @@ const permalink = Astro.site.href;
     max-width: 550px;
     margin-bottom: 1em;
   }
+  .about-content {
+    margin-top: 1.5em;
+  }
+
+  .about-content p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 1em;
+  }
 
   @media (max-width: 1200px) {
     p {
       font-size: 1.2em;
+    }
+    .about-content p {
+      font-size: 1em;
     }
 
     .hero-image {
@@ -89,6 +103,21 @@ const permalink = Astro.site.href;
       flex: 0;
       padding-bottom: 2em;
       text-align: center;
+    }
+    @media (max-width: 800px) {
+    .home-container {
+      flex-direction: column;
+    }
+
+    .home-copy {
+      flex: 0;
+      padding-bottom: 1em;
+      text-align: center;
+    }
+    
+    .about-content {
+      max-width: 600px;
+      margin: 0 auto;
     }
   }
 </style>
