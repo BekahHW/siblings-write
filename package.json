@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^2.0.0",
-    "@astrojs/svelte": "^5.0.0",
+    "@astrojs/svelte": "^5.7.3",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
@@ -21,6 +21,8 @@
     "rehype-external-links": "^3.0.0",
     "remark-gfm": "^4.0.0",
     "remark-smartypants": "^2.0.0",
+    "svelte": "^5.23.1",
+    "typescript": "^5.8.2",
     "zod": "^3.24.2"
   }
 }
