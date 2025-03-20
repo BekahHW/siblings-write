@@ -1,8 +1,9 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection, reference, z } from 'astro:content';
+import { glob, file } from 'astro/loaders';
 
 // Define the schema for the authors collection
-const authorsCollection = defineCollection({
-  type: 'content', // 'content' for Markdown files with frontmatter
+const authors = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/authors" }),
   schema: z.object({
     name: z.string(),
     bio: z.string(),
@@ -11,18 +12,15 @@ const authorsCollection = defineCollection({
 });
 
 // Define the schema for the blog collection
-const blogCollection = defineCollection({
-  type: 'content',
+const blog = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
     publishDate: z.string(),
-    author: z.string(), // References an author ID
+    author: reference("authors"),
   }),
 });
 
 // Export the collections
-export const collections = {
-  'authors': authorsCollection,
-  'blog': blogCollection,
-};
+export const collections = { authors, blog };

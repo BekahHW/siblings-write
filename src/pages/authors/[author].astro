@@ -1,86 +1,65 @@
----
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Bio from '../../components/Bio.astro';
-import { getCollection } from 'astro:content';
-
-// Get static paths with proper handling of author IDs
-export async function getStaticPaths() {
-  const authorEntries = await getCollection('authors');
-  
-  return authorEntries.map((author) => {
-    // Strip .md from the ID for URL paths to match what would be expected
-    const urlPath = author.id.replace(/\.md$/, '');
-    
-    return {
-      params: { author: urlPath },
-      props: { authorEntry: author },
-    };
-  });
-}
-
-//Get author data from props
-const { authorEntry } = Astro.props;
-const authorData = authorEntry.data;
-
-// Get all blog posts written by this author
-const allPosts = await getCollection('blog');
-const authorId = authorEntry.id.replace(/\.md$/, '');
-
-// Find posts that match the author ID (without .md)
-const authorPosts = allPosts.filter((post) => 
-  post.data.author === authorId
-);
-const permalink = `${Astro.site.href}authors/${authorId}`;
-
----
-
-<BaseLayout title={`Posts by ${authorData.name}`} description={`All posts by ${authorData.name}`}   permalink={permalink}>
-  <div class="container">
-    <h1>Posts by {authorData.name}</h1>
-    
-    {authorData && (
-      <div class="author-info">
-              <Bio 
-        name={authorData.name}
-        bio={authorData.bio}
-        avatar={authorData.avatar}
-      />
-      </div>
-    )}
-
-    <h2>Stories</h2>
-    <ul>
-      {authorPosts.length > 0 ? (
-        authorPosts.map((post) => (
-          <li>
-            <a href={`/blog/${post.slug}`}>
-              {post.data.title}
-            </a> - {post.data.publishDate}
-          </li>
-        ))
-      ) : (
-        <p>No posts found for this author.</p>
-      )}
-    </ul>
-  </div>
-</BaseLayout>
-
-<style>
-  .author-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .author-info img {
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-  }
-
-  .author-info p {
-    max-width: 600px;
-  }
-</style> 
-
+ ---
+ import BaseLayout from '../../layouts/BaseLayout.astro';
+ import Bio from '../../components/Bio.astro';
+ import { getCollection, getEntry } from 'astro:content';
+ 
+ // Debugging: Log all authors retrieved
+ export async function getStaticPaths() {
+ 
+   const authors = await getCollection('authors');
+ 
+   return authors.map(author => {
+ 
+     return {
+       params: { author: author.id }, // Make sure author.id is a string
+       props: { authorId: author.id },
+     };
+   });
+ }
+ 
+ // Retrieve the author entry
+ const { authorId } = Astro.props;
+ 
+ const authorEntry = await getEntry('authors', authorId); 
+ if (!authorEntry) {
+   console.error(`Author ${authorId} not found!`);
+   return Astro.redirect('/404');
+ }
+ 
+ // Fetch all blog posts
+ const allPosts = await getCollection('blog');
+ 
+ // Correctly filter posts by author ID
+ const authorPosts = allPosts.filter(post => post.data.author.id === authorEntry.id);
+ 
+ const permalink = `${Astro.site.href}authors/${authorEntry.id}`;
+ ---
+ 
+ <BaseLayout title={`Posts by ${authorEntry.data.name}`} description={`All posts by ${authorEntry.data.name}`} permalink={permalink}>
+   <div class="container">
+     <h1>Posts by {authorEntry.data.name}</h1>
+     
+     <div class="author-info">
+       <Bio 
+         name={authorEntry.data.name}
+         bio={authorEntry.data.bio}
+         avatar={authorEntry.data.avatar}
+       />
+     </div>
+ 
+     <h2>Stories</h2>
+     <ul>
+       {authorPosts.length > 0 ? (
+         authorPosts.map((post) => (
+           <li>
+             <a href={`/blog/${post.id}`}>
+               {post.data.title}
+             </a> - {post.data.publishDate}
+           </li>
+         ))
+       ) : (
+         <p>No posts found for this author.</p>
+       )}
+     </ul>
+   </div>
+ </BaseLayout>

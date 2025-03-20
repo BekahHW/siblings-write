@@ -1,14 +1,20 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 
-const title = 'Blog';
+const title = 'Stories';
 const description = 'Latest stories.';
 const permalink = `${Astro.site.href}blog`;
 const allPosts = await getCollection('blog');
 const sortedPosts = allPosts.sort((a, b) => 
   new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
 );
+// Fetch all author entries
+const authorEntries = await getCollection('authors');
+const getAuthorName = (authorId) => {
+  const author = authorEntries.find(a => a.id === authorId);
+  return author ? author.data.name : authorId; // Fallback to ID if author not found
+};
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="blog">
@@ -20,18 +26,16 @@ const sortedPosts = allPosts.sort((a, b) =>
           { index !== 0 && <hr /> }
           <div class="post-item">
             <h2>
-              <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+              <a href={`/blog/${post.id}`}>{post.data.title}</a>
             </h2>
             <p>{post.data.description}</p>
-            <div class="post-item-footer">
               <span class="post-item-author">
-  By <a href={`/authors/${post.data.author}`}>{post.data.author}</a>
+  By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a>
 </span>
 
               <span class="post-item-date">— {post.data.publishDate}</span>
             </div>
           </div>
-        </div>
       )
     })}
   </div>

@@ -9,13 +9,13 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^2.0.0",
-    "@astrojs/svelte": "^5.7.3",
+    "@astrojs/mdx": "^4.2.1",
+    "@astrojs/svelte": "^7.0.6",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "astro": "^4.0.1",
+    "astro": "^5.5.3",
     "react-icons": "^5.5.0",
     "reading-time": "^1.5.0",
     "rehype-external-links": "^3.0.0",
