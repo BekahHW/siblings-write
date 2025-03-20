@@ -30,7 +30,6 @@ const getAuthorName = (authorId) => {
             </h2>
             <p>{post.data.description}</p>
               <span class="post-item-author">
-                {console.log('name', post.data)}
   By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a>
 </span>
 
