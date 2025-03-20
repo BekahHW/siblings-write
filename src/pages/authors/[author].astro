@@ -8,8 +8,7 @@ export async function getStaticPaths() {
   const authorEntries = await getCollection('authors');
   
   return authorEntries.map((author) => {
-    // Strip .md from the ID for URL paths to match what would be expected
-    const urlPath = author.id.replace(/\.md$/, '');
+    const urlPath = author.id 
     
     return {
       params: { author: urlPath },
@@ -24,7 +23,7 @@ const authorData = authorEntry.data;
 
 // Get all blog posts written by this author
 const allPosts = await getCollection('blog');
-const authorId = authorEntry.id.replace(/\.md$/, '');
+const authorId = authorEntry.id
 
 // Find posts that match the author ID (without .md)
 const authorPosts = allPosts.filter((post) => 
