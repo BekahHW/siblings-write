@@ -1,30 +1,26 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
-
-// export async function getStaticPaths() {
-//   const blogEntries = await getCollection('blog');
-//       console.log(`Found ${blogEntries.length} blog entries`);
-
-//   return blogEntries.map(entry => ({
-//     params: { slug: entry.slug },
-//     props: { entry },
-//   }));
-// }
 
 export async function getStaticPaths() {
   console.log("Starting getStaticPaths...");
-  
-  try {
+try {
     const blogEntries = await getCollection('blog');
+    console.log(`Found ${blogEntries.length} blog entries`);
     
-    return blogEntries.map(entry => {
-      // Always use the ID for routing
+    // Debug each entry
+    blogEntries.forEach((post, index) => {
+      console.log(`Entry ${index}: id=${post.id}`);
+    });
+    
+    // Create routes using entry ID
+    return blogEntries.map(post => {
+      console.log(`Creating route for ${post.id}`);
       return {
-        params: { slug: entry.id },
-        props: { entry },
+        params: { slug: post.id },
+        props: { entryId: post.id },  // Just pass the ID
       };
     });
   } catch (error) {
@@ -34,8 +30,15 @@ export async function getStaticPaths() {
 }
 
 // Get blog post data from props
-const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { entryId } = Astro.props;
+const entry = await getEntry('blog', entryId);
+
+if (!entry) {
+  return Astro.redirect('/404');
+}
+
+// Render the content
+const { Content } = await render(entry);
 
 let author;
 if (entry.data.author) {
