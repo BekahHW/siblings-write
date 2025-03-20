@@ -1,4 +1,4 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection, reference, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 
 // Define the schema for the authors collection
@@ -18,7 +18,7 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string(),
     publishDate: z.string(),
-    author: z.string(), // References an author ID
+    author: reference('authors'),
   }),
 });
 

@@ -25,7 +25,6 @@ const authorData = authorEntry.data;
 const allPosts = await getCollection('blog');
 const authorId = authorEntry.id
 
-// Find posts that match the author ID (without .md)
 const authorPosts = allPosts.filter((post) => 
   post.data.author === authorId
 );

@@ -39,15 +39,17 @@ if (!entry) {
 
 // Render the content
 const { Content } = await render(entry);
+const allAuthors = await getCollection('authors');
+console.log("Available authors:", allAuthors.map(a => a.id));
 
 let author;
-if (entry.data.author) {
+if (entry.data.author?.id) {
   try {
-    author = await getEntry('authors', entry.data.author);
+    author = await getEntry('authors', entry.data.author.id);
     if (author) {
-      console.log(`Found author for ${entry.data.author}`);
+      console.log(`Found author for ${entry.data.author.id}`);
     } else {
-      console.error(`Author not found: ${entry.data.author}`);
+      console.error(`Author not found: ${entry.data.author.id}`);
     }
   } catch (error) {
     console.error(`Error fetching author: ${error.message}`);
