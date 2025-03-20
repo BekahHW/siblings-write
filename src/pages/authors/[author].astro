@@ -52,7 +52,7 @@ const permalink = `${Astro.site.href}authors/${authorId}`;
       {authorPosts.length > 0 ? (
         authorPosts.map((post) => (
           <li>
-            <a href={`/blog/${post.slug}`}>
+            <a href={`/blog/${post.id}`}>
               {post.data.title}
             </a> - {post.data.publishDate}
           </li>

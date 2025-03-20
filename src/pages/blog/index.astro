@@ -20,7 +20,7 @@ const sortedPosts = allPosts.sort((a, b) =>
           { index !== 0 && <hr /> }
           <div class="post-item">
             <h2>
-              <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+              <a href={`/blog/${post.id}`}>{post.data.title}</a>
             </h2>
             <p>{post.data.description}</p>
             <div class="post-item-footer">
