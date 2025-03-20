@@ -5,16 +5,9 @@ import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
 
 export async function getStaticPaths() {
-  console.log("Starting getStaticPaths...");
 try {
     const blogEntries = await getCollection('blog');
-    console.log(`Found ${blogEntries.length} blog entries`);
-    
-    // Debug each entry
-    blogEntries.forEach((post, index) => {
-      console.log(`Entry ${index}: id=${post.id}`);
-    });
-    
+
     // Create routes using entry ID
     return blogEntries.map(post => {
       console.log(`Creating route for ${post.id}`);
@@ -40,8 +33,6 @@ if (!entry) {
 // Render the content
 const { Content } = await render(entry);
 const allAuthors = await getCollection('authors');
-console.log("Available authors:", allAuthors.map(a => a.id));
-
 let author;
 if (entry.data.author?.id) {
   try {
