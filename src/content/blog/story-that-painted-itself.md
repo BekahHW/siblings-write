@@ -1,7 +1,7 @@
 ---
 title: "The Story that Painted Itself"
 publishDate: 4 April 2025
-description: Every conspiracy theory has a hometown tale.
+description: What's painted on the surface might lead to what's buried beneath.
 author: bekah
 ---
 
