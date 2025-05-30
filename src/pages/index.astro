@@ -1,16 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 
 const title = 'Siblings Write';
 const description = 'The Hawrot Siblings Writing Blog.';
 const permalink = Astro.site.href;
+// Get all blog posts and sort by date (descending)
+const allPosts = await getCollection('blog');
+const latestPosts = allPosts
+  .sort((a, b) => {
+  return new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime();
+})
+  .slice(0, 3); // Show latest 3 posts
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink}>
   <div class="home-container">
     <div class="home-copy">
-      <h1>Welcome to the Hawrot Siblings Blog</h1><div class="about-content">
-        <p>Josh, Bekah, and Zach grew up in Steubenville, Ohio, where our adventurous childhoods shaped our love for storytelling and community. Now raising families of our own, with a combined thirteen children, the siblings draw on our diverse experiences in counseling, tech, and entrepreneurship to craft stories that celebrate the magic of family, tradition, and the enduring spirit of Christmas.</p>
+      <h1>The Hawrot Siblings</h1><div class="about-content">
+        <h2>Stories from the Siblings Who Never Outgrew Wonder</h2>
+        <p>Josh, Bekah, and Zach grew up chasing fireflies and building snow forts in Steubenville, Ohio. Now we’re raising kids of our own (13 total!) and writing stories that capture the magic of our childhood.</p>
       </div>
     </div>
 
@@ -19,20 +28,126 @@ const permalink = Astro.site.href;
         <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
         <img class="hero-image" alt="the Hawrot Siblings" src="/assets/Hawrot-Siblings.png" width="550" height="466">
       </picture>
-
-      </p>
+       </p>
     </div>
   </div>
+<section class="latest-section-wrapper">
+    <h2 class="section-title">Latest Works</h2>
+    <hr/>
+    <ul class="post-list">
+      {latestPosts.map((post, index) => (
+        <li class="post-item" style={`animation-delay: ${index * 0.2}s`}>
+          <a href={`/blog/${post.id}/`} class="post-link">
+            <div class="post-content">
+              <h3>{post.data.title}</h3>
+              <p class="post-description">{post.data.description}</p>
+              <p class="post-date">
+                {new Date(post.data.publishDate).toLocaleDateString(undefined, {
+                  year: 'numeric', month: 'short', day: 'numeric'
+                })}
+              </p>
+              <p class="read-more"><a href={`/blog/${post.id}/`}>Read more →</a></p>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</div>
+
 </BaseLayout>
 
 <style>
-  .home-container {
-    align-items: center;
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    margin: 2em 0;
-    min-height: 400px;
+  
+
+@import url('https://fonts.googleapis.com/css2?family=Limelight&family=Playwrite+HU:wght@100..400&display=swap');
+
+.latest-section-wrapper {
+  background: #f9f9f9;
+  padding: 4em 2em;
+  border-radius: 12px;
+}
+
+.section-title {
+  font-family: "Playwrite HU", cursive;
+  font-size: 2.2em;
+  margin-bottom: 0.8em;
+
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 2em 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.post-item {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5em;
+  animation: fadeUp 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.post-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-content h3 {
+  margin: 0;
+  font-family: var(--font-family-serif, serif);
+  font-size: 1.5em;
+  color: #333;
+}
+
+.post-description {
+  margin: 0.6em 0;
+  font-family: var(--font-family-sans, sans-serif);
+  font-size: 1.1em;
+  color: #555;
+  line-height: 1.6;
+}
+
+.post-date {
+  font-size: 0.9em;
+  color: #777;
+  margin-bottom: 0.5em;
+}
+
+.read-more a {
+  font-weight: bold;
+  color: var(--primary-color, #548e9b);
+  text-decoration: none;
+}
+
+.read-more a:hover {
+  text-decoration: underline;
+}
+
+.home-container {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  min-height: 400px;
+  background-color: rgb(190, 214, 221, 0.5);
+  padding: 2rem;
+  margin: 2rem auto;
+  border-radius: 16px;
+  text-align: center;
   }
 
   .home-copy {
@@ -70,6 +185,8 @@ const permalink = Astro.site.href;
     width: 100%;
     max-width: 550px;
     margin-bottom: 1em;
+    border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
   .about-content {
     margin-top: 1.5em;
@@ -94,16 +211,6 @@ const permalink = Astro.site.href;
     }
   }
 
-  @media (max-width: 800px) {
-    .home-container {
-      flex-direction: column;
-    }
-
-    .home-copy {
-      flex: 0;
-      padding-bottom: 2em;
-      text-align: center;
-    }
     @media (max-width: 800px) {
     .home-container {
       flex-direction: column;
@@ -120,4 +227,5 @@ const permalink = Astro.site.href;
       margin: 0 auto;
     }
   }
-</style>
+</style> 
+
