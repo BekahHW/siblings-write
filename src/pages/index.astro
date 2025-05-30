@@ -1,16 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
+import { getCollection } from 'astro:content';
 const title = 'Siblings Write';
 const description = 'The Hawrot Siblings Writing Blog.';
 const permalink = Astro.site.href;
+
+// Get all blog posts and sort by date (descending)
+const allPosts = await getCollection('blog');
+const latestPosts = allPosts
+  .sort((a, b) => {
+  return new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime();
+})
+  .slice(0, 3); // Show latest 3 posts
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink}>
   <div class="home-container">
     <div class="home-copy">
-      <h1>Welcome to the Hawrot Siblings Blog</h1><div class="about-content">
-        <p>Josh, Bekah, and Zach grew up in Steubenville, Ohio, where our adventurous childhoods shaped our love for storytelling and community. Now raising families of our own, with a combined thirteen children, the siblings draw on our diverse experiences in counseling, tech, and entrepreneurship to craft stories that celebrate the magic of family, tradition, and the enduring spirit of Christmas.</p>
+      <h1>Stories from the Siblings Who Never Outgrew Wonder
+</h1><div class="about-content">
+        <p>Josh, Bekah, and Zach grew up chasing fireflies and building snow forts in Steubenville, Ohio. Now we’re raising kids of our own (13 total!) and writing stories that capture the magic of our childhood.</p>
       </div>
     </div>
 
@@ -19,13 +28,101 @@ const permalink = Astro.site.href;
         <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
         <img class="hero-image" alt="the Hawrot Siblings" src="/assets/Hawrot-Siblings.png" width="550" height="466">
       </picture>
-
+<script async data-uid="775bb3f6cc" src="https://siblings-write.kit.com/775bb3f6cc/index.js"></script>
       </p>
     </div>
+    <section class="latest-work">
+  <h2>📝 Latest Work</h2>
+  <ul class="post-list">
+  {latestPosts.map((post) => (
+    <li class="post-item">
+      <a href={`/blog/${post.id}/`} class="post-link">
+        {post.data.coverImage && (
+          <img src={post.data.coverImage} alt={post.data.title} class="post-image" />
+        )}
+        <div class="post-content">
+          <h3>{post.data.title}</h3>
+          <p class="post-description">{post.data.description}</p>
+          <p class="post-date">{new Date(post.data.publishDate).toLocaleDateString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric'
+          })}</p>
+        </div>
+      </a>
+    </li>
+  ))}
+</ul>
+</section>
   </div>
 </BaseLayout>
 
 <style>
+  .post-list {
+  list-style: none;
+  padding: 0;
+  margin: 2em 0;
+}
+
+.post-item {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5em;
+  margin-bottom: 2.5em;
+  align-items: flex-start;
+}
+
+.post-link {
+  display: flex;
+  flex-direction: row;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+.post-image {
+  width: 160px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.post-content {
+  flex: 1;
+}
+
+.post-content h2 {
+  margin-top: 0;
+  margin-bottom: 0.4em;
+  font-size: 1.4rem;
+}
+
+.post-description {
+  margin-bottom: 0.8em;
+  color: #444;
+  line-height: 1.4;
+}
+
+.post-meta {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.post-content h3 {
+  margin: 0;
+  font-size: 1.3em;
+}
+
+/* .post-description {
+  margin: 0.5em 0;
+  font-size: 1em;
+  line-height: 1.4;
+  color: #444;
+} */
+
+.post-date {
+  font-size: 0.9em;
+  color: #777;
+}
   .home-container {
     align-items: center;
     display: flex;
