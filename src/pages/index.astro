@@ -92,6 +92,23 @@ const latestPosts = allPosts
   animation: fadeUp 0.6s ease forwards;
   opacity: 0;
   transform: translateY(20px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.post-item:hover,
+.post-item:focus-within {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.post-item:hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(123, 172, 245, 0.4);
+  pointer-events: none;
 }
 
 @keyframes fadeUp {
