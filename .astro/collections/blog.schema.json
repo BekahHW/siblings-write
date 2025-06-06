@@ -52,6 +52,9 @@
             }
           ]
         },
+        "hidden": {
+          "type": "boolean"
+        },
         "$schema": {
           "type": "string"
         }
