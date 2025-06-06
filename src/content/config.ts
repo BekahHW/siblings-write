@@ -19,6 +19,7 @@ const blog = defineCollection({
     description: z.string(),
     publishDate: z.string(),
     author: reference("authors"),
+    hidden: z.boolean().optional(),
   }),
 });
 
