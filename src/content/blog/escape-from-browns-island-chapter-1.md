@@ -96,7 +96,7 @@ Over the next few hours of his trek, he noticed that a seam split the island in 
 
 This area was freckled with trees, wildflowers, and overgrowth. Kaleb’s book mentioned that there used to be a home and a small lighthouse at the top of the island. It said that people would have weddings and large parties here during the warmer months. So when Tommy stumbled upon a few rows of struggling apple trees, he knew he must be near where the old house used to be. The trees had only a few shriveled apples, but the whole area smelled rotten. It was as if an entire harvest had spoiled. He looked at the ground but saw no apples. Strange. Maybe there was a dead animal carcass nearby, but when he looked around him, he had a realization: he had not seen one sign of life here. There were no traces of animals anywhere on the ground or above. When a flock of birds flew near the island, they split. One group flew on the left side of the river as the others flew around the right side—no bird flew directly over the island. He even spotted a bald eagle on the West Virginia riverbank—but not one bird could be seen on this island. 
 
-    Strange.
+Strange.
 
 *Maybe the island’s contaminated from the mills, Tommy thought. Which means I’ll probably become a mutant after spending a night here.*
 
@@ -164,7 +164,7 @@ His speed increased, and soon enough, he was once again standing. And it was a c
 
 Tommy let out a long sigh. He had done it. He did something his friends wouldn’t dare to do. And he knew that if they were done here now, they also wouldn't do this—
 
-	CLICK!
+CLICK!
 
 He turned his flashlight off. Darkness engulfed him. It might have been thirty seconds or five minutes. His body felt so disoriented that he couldn't tell. As he went to turn on his flashlight again, he stopped.
 
