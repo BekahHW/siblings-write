@@ -8,6 +8,8 @@ hidden: true
 
 ## Chapter 1: The Island Beckons 
 
+> No man ever steps in the same river twice, for it is not the same river and he is not the same man.” — Heraclitus
+
 “You really don’t have to do this.”
 
 “A bet’s a bet,” Tommy replied as he dragged his kayak out of the back of a small truck. 
