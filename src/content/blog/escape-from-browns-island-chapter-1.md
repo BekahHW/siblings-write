@@ -1,5 +1,5 @@
 ---
-title: "Escape from Browns Island"
+title: "Escape from Browns Island: The Island Beckons"
 publishDate: 08 June 2025
 description: “No man ever steps in the same river twice, for it is not the same river and he is not the same man.” — Heraclitus
 author: zach
