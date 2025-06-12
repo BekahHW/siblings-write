@@ -29,8 +29,9 @@
  // Fetch all blog posts
  const allPosts = await getCollection('blog');
  
- // Correctly filter posts by author ID
- const authorPosts = allPosts.filter(post => post.data.author.id === authorEntry.id);
+ const authorPosts = allPosts
+  .filter(post => post.data.author.id === authorEntry.id)
+  .sort((a, b) => new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf());
  
  const permalink = `${Astro.site.href}authors/${authorEntry.id}`;
  ---
