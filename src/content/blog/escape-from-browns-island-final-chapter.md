@@ -173,7 +173,9 @@ Tommy bear hugged the man.
 The man then asked, “What do you need?”
 
 Tommy smiled, then looked him straight in the eye. “I need to talk to your captain.”
-Homecoming
+
+## Homecoming
+
 When Tommy’s eyes adjusted, he was back at the bottom of the well. He took his time climbing to the top, delaying the moment of truth. He squinted, praying the hawk wasn’t there. Check! No hawk—and no well cover. He quickly climbed over the top brick. Check number two! The area around the well was hidden in dense overgrowth. Little doubt was left, but he needed one last confirmation. 
 
 He closed his eyes and begged out loud, “Please, please, please,” right before he ran his hands over his head. 
