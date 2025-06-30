@@ -1,7 +1,72 @@
 ---
 import ThemeToggleButton from './ThemeToggleButton.svelte';
-const { current = '' } = Astro.props;
+
+// Define the current variable from props
+const { current = "" } = Astro.props;
 ---
+<nav>
+  <div class="mobile-controls">
+    <div class="theme-toggle-container">
+    <ThemeToggleButton client:load />
+  </div>
+  </div>
+
+  <div class="nav-links">
+    <a class={current === "" ? "selected" : ""} href='/'>home</a>
+    <a class={current === "blog" ? "selected" : ""} href='/blog'>shorts</a>
+    <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
+    <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
+    <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
+  </div>
+
+  <div class="hamburger">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+</nav>
+
+<script>
+  // Function to initialize the hamburger menu
+  function setupHamburgerMenu() {
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (hamburger && navLinks) {
+      // Remove any existing event listeners (to prevent duplicates)
+      hamburger.replaceWith(hamburger.cloneNode(true));
+      const newHamburger = document.querySelector('.hamburger');
+
+      // Add click event listener to the hamburger
+      newHamburger.addEventListener('click', function() {
+        newHamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+      document.body.classList.toggle('menu-open');
+    });
+
+    // Close the menu when a link is clicked
+    const links = document.querySelectorAll('.nav-links a');
+    links.forEach(link => {
+      link.addEventListener('click', function() {
+          newHamburger.classList.remove('active');
+        navLinks.classList.remove('active');
+        document.body.classList.remove('menu-open');
+      });
+    });
+    }
+  }
+
+  // Run the setup function when the DOM is loaded
+  document.addEventListener('DOMContentLoaded', setupHamburgerMenu);
+
+  // Also run the setup function when the Astro page changes
+  document.addEventListener('astro:page-load', setupHamburgerMenu);
+
+  // Initialize immediately if the document is already loaded
+  if (document.readyState === 'complete') {
+    setupHamburgerMenu();
+  }
+</script>
 
 <style>
   nav {
@@ -12,6 +77,11 @@ const { current = '' } = Astro.props;
     font-weight: 700;
     justify-content: flex-end;
     text-transform: uppercase;
+    position: relative;
+  }
+
+  .mobile-controls {
+  display: none;
   }
 
   a {
@@ -49,26 +119,99 @@ const { current = '' } = Astro.props;
   .selected::before {
     background: var(--primary-color);
   }
-
   .theme-toggle-container {
     width: 75px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+    margin-left: 20px;
+    margin-right: 20px;
+
+}
+
+  .hamburger div {
+    width: 100%;
+    height: 3px;
+    background: var(--text-main);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+}
+
+  @media screen and (max-width: 768px) {
+    nav {
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .mobile-controls {
+      display: flex;
+      align-items: center;
+      order: 1;
+    }
+
+    .hamburger {
+      display: flex;
+      z-index: 30;
+      order: 3;
+    }
+
+    .nav-links {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: 70%;
+      background: var(--background-body);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 2rem;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 20;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      order: 2;
+    }
+
+    .nav-links.active {
+      transform: translateX(0);
+    }
+
+    .nav-links a {
+      margin: 1rem 0;
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .hamburger.active div:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    .hamburger.active div:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active div:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
   }
 
   @media screen and (max-width: 520px) {
     .theme-toggle-container {
-      margin-right: 1em;
+      margin-left: 0;
     }
   }
-
 </style>
-
-<nav>
-  <a class={current === "" ? "selected" : ""} href='/'>home</a>
-  <a class={current === "blog" ? "selected" : ""} href='/blog'>shorts</a>
-  <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
-  <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
-  <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
-  <div class="theme-toggle-container">
-    <ThemeToggleButton client:load />
-  </div>
-</nav>
