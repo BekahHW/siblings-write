@@ -60,6 +60,7 @@ const { current = '' } = Astro.props;
     align-items: center;
   }
 
+  /* Hide only the links on mobile, not the entire nav */
   @media screen and (max-width: 768px) {
     .nav-links {
       display: none;
