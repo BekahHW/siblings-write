@@ -1,5 +1,6 @@
 ---
 import ThemeToggleButton from './ThemeToggleButton.svelte';
+import MobileNav from './MobileNav.svelte';
 const { current = '' } = Astro.props;
 ---
 
@@ -54,21 +55,131 @@ const { current = '' } = Astro.props;
     width: 75px;
   }
 
+  .nav-links {
+    display: flex;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .nav-links {
+      display: none;
+    }
+  }
+
   @media screen and (max-width: 520px) {
     .theme-toggle-container {
       margin-right: 1em;
     }
   }
-
 </style>
 
+<!-- Navigation -->
 <nav>
+  <div class="nav-links">
   <a class={current === "" ? "selected" : ""} href='/'>home</a>
   <a class={current === "blog" ? "selected" : ""} href='/blog'>shorts</a>
   <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
   <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
   <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
+  </div>
   <div class="theme-toggle-container">
     <ThemeToggleButton client:load />
   </div>
+  <MobileNav client:load current={current} />
 </nav>
+
+<!-- Mobile overlay -->
+<div id="mobile-overlay"></div>
+<script is:inline>
+  // Using is:inline to ensure this runs on every page load
+  document.addEventListener('astro:page-load', function() {
+    console.log('Setting up mobile menu'); // Debug log
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobile-nav');
+  const mobileOverlay = document.getElementById('mobile-overlay');
+
+    if (hamburger && mobileNav && mobileOverlay) {
+      console.log('Found all elements'); // Debug log
+
+  function toggleMenu() {
+        console.log('Toggle menu clicked'); // Debug log
+    hamburger.classList.toggle('active');
+    mobileNav.classList.toggle('active');
+    mobileOverlay.classList.toggle('active');
+
+    if (mobileNav.classList.contains('active')) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+      // Remove any existing event listeners (just in case)
+      const newHamburger = hamburger.cloneNode(true);
+      hamburger.parentNode.replaceChild(newHamburger, hamburger);
+
+      // Add event listeners to the new elements
+      newHamburger.addEventListener('click', toggleMenu);
+  mobileOverlay.addEventListener('click', toggleMenu);
+
+      console.log('Event listeners added'); // Debug log
+    } else {
+      console.error('Could not find one or more elements'); // Debug log
+      if (!hamburger) console.error('hamburger missing');
+      if (!mobileNav) console.error('mobileNav missing');
+      if (!mobileOverlay) console.error('mobileOverlay missing');
+    }
+  });
+
+  // Also run immediately for the first page load
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired'); // Debug log
+
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobile-nav');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+
+    if (hamburger && mobileNav && mobileOverlay) {
+      function toggleMenu() {
+        hamburger.classList.toggle('active');
+        mobileNav.classList.toggle('active');
+        mobileOverlay.classList.toggle('active');
+
+        if (mobileNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+
+      hamburger.addEventListener('click', toggleMenu);
+      mobileOverlay.addEventListener('click', toggleMenu);
+    }
+  });
+
+  // In case the page is already loaded
+  if (document.readyState === 'complete') {
+    console.log('Document already complete, running setup directly'); // Debug log
+
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobile-nav');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+
+    if (hamburger && mobileNav && mobileOverlay) {
+      function toggleMenu() {
+        hamburger.classList.toggle('active');
+        mobileNav.classList.toggle('active');
+        mobileOverlay.classList.toggle('active');
+
+        if (mobileNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+
+      hamburger.addEventListener('click', toggleMenu);
+      mobileOverlay.addEventListener('click', toggleMenu);
+    }
+  }
+</script>
