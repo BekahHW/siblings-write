@@ -47,9 +47,25 @@ if (entry.data.author?.id) {
   }
 }
 
+// Get all blog posts that are not hidden
+const allBlogPosts = await getCollection('blog', (post) => !post.data.hidden);
+
+// Sort by publish date (newest first)
+allBlogPosts.sort((a, b) => {
+  return new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf();
+});
+
+// Find the current post index
+const currentIndex = allBlogPosts.findIndex(post => post.id === entryId);
+
+// For reverse chronological order:
+// "Next" means an older post (next in array)
+// "Previous" means a newer post (previous in array)
+const nextPost = currentIndex < allBlogPosts.length - 1 ? allBlogPosts[currentIndex + 1] : null;
+const prevPost = currentIndex > 0 ? allBlogPosts[currentIndex - 1] : null;
+
 const permalink = `${Astro.site.href}blog/${entry.id}`;
 ---
-
 <BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="blog">
   <header>
     <p>{entry.data.publishDate} ~ {entry.data.readingTime}</p>
@@ -60,8 +76,24 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
     <article class="content">
       <Content />
     </article>
-    <hr />
     
+    <div class="post-navigation">
+      {prevPost && (
+      <a href={`/blog/${prevPost.id}`} class="nav-button prev-button">
+        <span class="nav-arrow">←</span>
+        <span class="nav-text">Previous Post</span>
+      </a>
+      )}
+
+      {nextPost && (
+      <a href={`/blog/${nextPost.id}`} class="nav-button next-button">
+        <span class="nav-text">Next Post</span>
+        <span class="nav-arrow">→</span>
+      </a>
+      )}
+    </div>
+    
+    <hr />
     {author && (
       <div class="author-bio">
         <h3>About the Author</h3>
@@ -74,7 +106,8 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
     )}
     
     <ShareButtons title={entry.data.title} permalink={permalink} />
-  </div>
+</div>
+    
 </BaseLayout>
 
 <style>
@@ -106,5 +139,69 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
   .author-bio h3 {
     margin-bottom: 1rem;
     font-size: 1.4rem;
+  }
+
+  .post-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .nav-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: var(--background);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    font-family: var(--font-family-sans);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .nav-button:hover {
+    background-color: var(--background-secondary);
+    border-color: var(--text-color);
+  }
+
+  .prev-button {
+    margin-right: auto;
+  }
+
+  .next-button {
+    margin-left: auto;
+  }
+
+  .nav-arrow {
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .prev-button .nav-arrow {
+    margin-right: 0.5rem;
+  }
+
+  .next-button .nav-arrow {
+    margin-left: 0.5rem;
+  }
+
+  .nav-text {
+    font-size: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .post-navigation {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .nav-button {
+      width: 100%;
+      justify-content: center;
+    }
   }
 </style>
