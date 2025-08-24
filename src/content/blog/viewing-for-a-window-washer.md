@@ -2,7 +2,7 @@
 title: "Viewing for a Window Washer"
 publishDate: 24 August 2025
 description: The crowd who showed up for Earl’s viewing wasn’t what Jacob expected.
-author: Fr. Michael
+author: frmichael
 ---
 
 ![Illustration of man washing a window](/assets/blog/window-washer.jpg)
