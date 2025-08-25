@@ -12,6 +12,11 @@ const latestPosts = allPosts
   return new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime();
 })
   .slice(0, 3); // Show latest 3 posts
+const authorEntries = await getCollection('authors');
+const getAuthorName = (authorId) => {
+  const author = authorEntries.find(a => a.id === authorId);
+  return author ? author.data.name : authorId; // Fallback to ID if author not found
+};
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink}>
@@ -40,18 +45,23 @@ const latestPosts = allPosts
           <a href={`/blog/${post.id}/`} class="post-link">
             <div class="post-content">
               <h3>{post.data.title}</h3>
-              <p class="post-description">{post.data.description}</p>
-              <p class="post-date">
+          <div class="post-meta">
+            <span class="post-item-author">
+  By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a> | 
+</span>
+            <span class="post-date">
                 {new Date(post.data.publishDate).toLocaleDateString(undefined, {
                   year: 'numeric', month: 'short', day: 'numeric'
                 })}
-              </p>
-              <p class="read-more"><a href={`/blog/${post.id}/`}>Read more →</a></p>
+            </span>
             </div>
-          </a>
-        </li>
-      ))}
-    </ul>
+          <p class="post-description">{post.data.description}</p>
+          <p class="read-more"><a href={`/blog/${post.id}/`}>Read more →</a></p>
+        </div>
+      </a>
+    </li>
+  ))}
+</ul>
   </section>
 </div>
 
