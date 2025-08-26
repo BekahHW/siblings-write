@@ -37,6 +37,14 @@ if (!fs.existsSync(IMAGE_DOWNLOAD_DIR)) {
 }
 
 /**
+ * Check if a newsletter subject contains the required identifier
+ */
+function isValidNewsletterSubject(subject) {
+  if (!subject) return false;
+  return subject.toLowerCase().includes('a hawrot siblings micro-monthly');
+}
+
+/**
  * Fetch recent broadcasts (newsletters) from Kit V4 API
  */
 async function fetchNewsletters() {
@@ -74,10 +82,16 @@ async function fetchNewsletters() {
     const data = await response.json();
     console.log(`Found ${data.data?.length || 0} broadcasts`);
     
-    // Get full content for each broadcast
+    // Get full content for each broadcast and filter by subject
     const newsletters = [];
     for (const broadcast of (data.data || [])) {
       try {
+        // First check if the subject contains the required text
+        if (!isValidNewsletterSubject(broadcast.subject)) {
+          console.log(`Skipping broadcast "${broadcast.subject}" - does not contain "A Hawrot Siblings Micro-Monthly"`);
+          continue;
+        }
+        
         const detailResponse = await fetch(
           `https://api.kit.com/v4/broadcasts/${broadcast.id}`,
           {
@@ -94,12 +108,14 @@ async function fetchNewsletters() {
         }
         
         const detailData = await detailResponse.json();
+        console.log(`Including valid newsletter: "${detailData.data.subject}"`);
         newsletters.push(detailData.data);
       } catch (error) {
         console.error(`Error fetching details for broadcast ${broadcast.id}:`, error.message);
       }
     }
     
+    console.log(`Found ${newsletters.length} valid "A Hawrot Siblings Micro-Monthly" newsletters`);
     return newsletters;
   } catch (error) {
     console.error('Error fetching newsletters:', error.message);
@@ -228,6 +244,25 @@ function postExists(title) {
 }
 
 /**
+ * Check if a newsletter should be processed (has valid subject and doesn't already exist)
+ */
+function shouldProcessNewsletter(newsletter) {
+  // Check subject line requirement
+  if (!isValidNewsletterSubject(newsletter.subject)) {
+    console.log(`Skipping newsletter with subject: "${newsletter.subject}" - missing required text`);
+    return false;
+  }
+  
+  // Check if post already exists
+  if (postExists(newsletter.name || newsletter.subject)) {
+    console.log(`Post already exists for "${newsletter.name || newsletter.subject}". Skipping.`);
+    return false;
+  }
+  
+  return true;
+}
+
+/**
  * Create or update blog post file
  */
 function createBlogPost(newsletter, content) {
@@ -320,11 +355,11 @@ async function main() {
   
   // Process each newsletter
   for (const newsletter of newsletters) {
-    console.log(`Processing: ${newsletter.name || 'Untitled broadcast'}`);
+    console.log(`Processing: ${newsletter.name || newsletter.subject || 'Untitled broadcast'}`);
+    console.log(`Subject: ${newsletter.subject}`);
     
-    // Skip if post already exists
-    if (postExists(newsletter.name)) {
-      console.log(`Post already exists for "${newsletter.name}". Skipping.`);
+    // Check if this newsletter should be processed
+    if (!shouldProcessNewsletter(newsletter)) {
       continue;
     }
     

@@ -110,6 +110,11 @@ function testBlogPost(filepath) {
       return false;
     }
     
+    // Test 1.5: Check if this is a newsletter post (optional warning)
+    if (frontmatter.title && !frontmatter.title.toLowerCase().includes('micro-monthly')) {
+      console.log('ℹ️  Note: Title does not contain "micro-monthly" - may not be a newsletter post');
+    }
+    
     // Test 2: Check required frontmatter fields
     const requiredFields = [
       { name: 'title', validator: (v) => typeof v === 'string' && v.length > 0 },

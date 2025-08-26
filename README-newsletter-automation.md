@@ -7,6 +7,7 @@ This system automatically imports recent newsletters from Kit into your blog on 
 1. **Monthly Automated Import**: GitHub Actions runs the import script on the 28th of each month
 2. **Smart Import Logic**: 
    - Fetches the 3 most recent newsletters from Kit
+   - Filters for newsletters with "A Hawrot Siblings Micro-Monthly" in the subject line
    - Checks if they already exist in the blog
    - Only imports newsletters that aren't already in the blog
    - Automatically extracts author information from the content
@@ -52,6 +53,7 @@ If the import creates a PR with issues:
 
 ## Implementation Details
 
+- **Subject Line Filtering**: Only processes newsletters with "A Hawrot Siblings Micro-Monthly" in the subject
 - **Author Extraction**: The script looks for "By: Author Name" in the HTML content
 - **File Naming**: Uses the newsletter title converted to kebab-case
 - **Duplicate Prevention**: Checks existing files to avoid creating duplicates

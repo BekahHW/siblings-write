@@ -43,9 +43,10 @@ npm run import-newsletter
 
 This will:
 1. Fetch recent broadcasts from Kit V4 API
-2. Download and save any images
-3. Create markdown files in your blog content directory
-4. Map authors correctly
+2. Filter for newsletters with "A Hawrot Siblings Micro-Monthly" in the subject line
+3. Download and save any images
+4. Create markdown files in your blog content directory
+5. Map authors correctly
 
 ## Customization
 

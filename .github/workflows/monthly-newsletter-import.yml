@@ -34,7 +34,9 @@ jobs:
       - name: Import newsletters
         env:
           KIT_API_KEY: ${{ secrets.KIT_API_KEY }}
-        run: node scripts/newsletter-import.js
+        run: |
+          echo "Looking for newsletters with 'A Hawrot Siblings Micro-Monthly' in the subject..."
+          node scripts/newsletter-import.js
       
       - name: Run comprehensive tests on imported files
         id: test_imports
@@ -91,6 +93,7 @@ jobs:
             - Missing or invalid frontmatter fields
             - Problems with image references
             - Content structure issues
+            - Newsletter subject line validation
             
             Please review the imported content and make necessary adjustments.
             
