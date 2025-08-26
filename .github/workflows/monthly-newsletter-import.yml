@@ -1,0 +1,134 @@
+name: Monthly Newsletter Import
+
+on:
+  schedule:
+    # Run on the 28th of each month at 9am UTC
+    - cron: '0 9 28 * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  import-newsletters:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Create branch for potential changes
+        run: |
+          BRANCH_NAME="newsletter-import-$(date +'%Y-%m')"
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+      
+      - name: Import newsletters
+        env:
+          KIT_API_KEY: ${{ secrets.KIT_API_KEY }}
+        run: node scripts/newsletter-import.js
+      
+      - name: Run comprehensive tests on imported files
+        id: test_imports
+        continue-on-error: true
+        run: |
+          # First run our custom validation script
+          node scripts/test-newsletter-import.js
+          SCRIPT_RESULT=$?
+          
+          # Then run Vitest tests specifically for blog content
+          # Install test dependencies first
+          npm install -D vitest jsdom
+          npm run test:blog
+          TEST_RESULT=$?
+          
+          # Set output based on both test results
+          if [ $SCRIPT_RESULT -eq 0 ] && [ $TEST_RESULT -eq 0 ]; then
+            echo "tests_passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "tests_passed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if [[ -z $(git status -s) ]]; then
+            echo "No changes to commit"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit and push changes if any
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add .
+          git commit -m "Monthly newsletter import $(date +'%B %Y')"
+          git push --set-upstream origin $BRANCH_NAME
+      
+      - name: Create PR if tests failed
+        if: steps.test_imports.outputs.tests_passed == 'false' && steps.check_changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Newsletter import with validation issues"
+          title: "Review newsletter import issues - $(date +'%B %Y')"
+          body: |
+            @BekahHW 
+            
+            The automated newsletter import process completed, but some validation tests failed.
+            
+            Issues detected include:
+            - Missing or invalid frontmatter fields
+            - Problems with image references
+            - Content structure issues
+            
+            Please review the imported content and make necessary adjustments.
+            
+            The workflow run that created this PR can be found [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+          branch: ${{ env.BRANCH_NAME }}
+          base: main
+          labels: requires-review,newsletter-import-issues
+      
+      - name: Create PR if other issues occurred
+        if: failure() && steps.check_changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Newsletter import failed with issues"
+          title: "Fix newsletter import issues - $(date +'%B %Y')"
+          body: |
+            @BekahHW 
+            
+            There were issues during the automated newsletter import process.
+            Please review the changes and make any necessary adjustments.
+            
+            The workflow run that created this PR can be found [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+          branch: ${{ env.BRANCH_NAME }}
+          base: main
+          labels: bug,newsletter-import-failed
+      
+      - name: Merge PR if successful
+        if: steps.test_imports.outputs.tests_passed == 'true' && steps.check_changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Monthly newsletter import $(date +'%B %Y')"
+          title: "Monthly newsletter import - $(date +'%B %Y')"
+          body: |
+            This PR contains automatically imported newsletters from Kit.
+            
+            The import was successful and all tests passed.
+            This PR can be safely merged.
+          branch: ${{ env.BRANCH_NAME }}
+          base: main
+          labels: automated,newsletter

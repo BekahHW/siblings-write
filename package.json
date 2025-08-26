@@ -6,7 +6,13 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "import-newsletter": "node scripts/newsletter-import.js",
+    "import-newsletter:dry": "node scripts/newsletter-import.js --dry-run",
+    "test": "vitest run --config vitest.config.mjs",
+    "test:watch": "vitest --config vitest.config.mjs",
+    "test:blog": "vitest run --config vitest.config.mjs tests/blog-content.test.js",
+    "test:components": "vitest run --config vitest.config.mjs tests/component/*.test.js"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.2.1",
@@ -16,6 +22,10 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "astro": "^5.5.3",
+    "date-fns": "^2.30.0",
+    "dotenv": "^16.3.1",
+    "js-yaml": "^4.1.0",
+    "node-fetch": "^2.7.0",
     "react-icons": "^5.5.0",
     "reading-time": "^1.5.0",
     "rehype-external-links": "^3.0.0",
@@ -24,5 +34,10 @@
     "svelte": "^5.23.1",
     "typescript": "^5.8.2",
     "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@testing-library/svelte": "^5.2.8",
+    "jsdom": "^26.1.0",
+    "vitest": "^3.2.4"
   }
 }

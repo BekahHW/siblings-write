@@ -1,0 +1,384 @@
+#!/usr/bin/env node
+
+/**
+ * Newsletter Content Import Script
+ * 
+ * This script fetches newsletter content from Kit V4 API and creates/updates
+ * corresponding blog posts in the Astro project.
+ * 
+ * Usage: node newsletter-import.js [--dry-run]
+ */
+
+const fs = require('fs');
+const path = require('path');
+const fetch = require('node-fetch');
+const yaml = require('js-yaml');
+const dotenv = require('dotenv');
+const { formatISO, subDays } = require('date-fns');
+
+// Load environment variables
+dotenv.config();
+
+// Debug environment variables
+console.log('Environment loaded:', process.env.KIT_API_KEY ? 'API Key exists' : 'API Key missing');
+console.log('API Key length:', process.env.KIT_API_KEY ? process.env.KIT_API_KEY.length : 0);
+console.log('API Key first 4 chars:', process.env.KIT_API_KEY ? process.env.KIT_API_KEY.substring(0, 4) : 'none');
+
+// Configuration
+const KIT_API_KEY = process.env.KIT_API_KEY; // V4 API key from Kit developer settings
+const TARGET_BLOG_DIR = path.join(process.cwd(), 'src/content/blog');
+const IMAGE_DOWNLOAD_DIR = path.join(process.cwd(), 'public/assets/blog');
+const DRY_RUN = process.argv.includes('--dry-run');
+const MAX_POSTS = 3; // Only check the 3 most recent posts
+
+// Ensure directories exist
+if (!fs.existsSync(IMAGE_DOWNLOAD_DIR)) {
+  fs.mkdirSync(IMAGE_DOWNLOAD_DIR, { recursive: true });
+}
+
+/**
+ * Fetch recent broadcasts (newsletters) from Kit V4 API
+ */
+async function fetchNewsletters() {
+  try {
+    // Log request details for debugging
+    console.log(`Making API request to: https://api.kit.com/v4/broadcasts?limit=${MAX_POSTS}`);
+    console.log('Using Authorization header with format: Bearer [API_KEY]');
+    
+    // Use Kit V4 API to fetch most recent broadcasts (newsletters)
+    const response = await fetch(
+      `https://api.kit.com/v4/broadcasts?limit=${MAX_POSTS}`,
+      {
+        headers: {
+          'X-Kit-Api-Key': KIT_API_KEY,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    // Log response status
+    console.log(`API Response status: ${response.status} ${response.statusText}`);
+    
+    if (!response.ok) {
+      // Try to get response body for more error details
+      try {
+        const errorBody = await response.text();
+        console.error('Error response body:', errorBody);
+      } catch (e) {
+        console.error('Could not read error response body');
+      }
+      
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`Found ${data.data?.length || 0} broadcasts`);
+    
+    // Get full content for each broadcast
+    const newsletters = [];
+    for (const broadcast of (data.data || [])) {
+      try {
+        const detailResponse = await fetch(
+          `https://api.kit.com/v4/broadcasts/${broadcast.id}`,
+          {
+            headers: {
+              'Authorization': `${KIT_API_KEY}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        if (!detailResponse.ok) {
+          console.error(`Error fetching details for broadcast ${broadcast.id}`);
+          continue;
+        }
+        
+        const detailData = await detailResponse.json();
+        newsletters.push(detailData.data);
+      } catch (error) {
+        console.error(`Error fetching details for broadcast ${broadcast.id}:`, error.message);
+      }
+    }
+    
+    return newsletters;
+  } catch (error) {
+    console.error('Error fetching newsletters:', error.message);
+    return [];
+  }
+}
+
+/**
+ * Download an image from a URL
+ */
+async function downloadImage(imageUrl, filename) {
+  try {
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
+    
+    const buffer = await response.buffer();
+    const filepath = path.join(IMAGE_DOWNLOAD_DIR, filename);
+    
+    if (DRY_RUN) {
+      console.log(`[DRY RUN] Would download image to: ${filepath}`);
+      return filename;
+    }
+    
+    fs.writeFileSync(filepath, buffer);
+    console.log(`Image downloaded to: ${filepath}`);
+    return filename;
+  } catch (error) {
+    console.error(`Error downloading image: ${error.message}`);
+    return null;
+  }
+}
+
+/**
+ * Convert Kit content to Astro markdown
+ */
+function convertToAstroMarkdown(newsletter) {
+  // Extract HTML content first to get author
+  const htmlContent = newsletter.html_content || newsletter.text_content || '';
+  
+  // Extract author from the content
+  const authorId = extractAndMapAuthor(htmlContent);
+  
+  // Create frontmatter
+  const frontmatter = {
+    title: newsletter.name || 'Untitled Newsletter',
+    description: newsletter.preview_text || newsletter.subject || '',
+    publishDate: formatISO(new Date(newsletter.sent_at || newsletter.created_at || new Date())),
+    author: { id: authorId },
+    featured: false,
+    draft: false,
+  };
+  
+  // Handle featured image if present
+  if (newsletter.thumbnail_url) {
+    const imageFilename = path.basename(newsletter.thumbnail_url).split('?')[0]; // Remove query params
+    frontmatter.image = {
+      src: `/assets/blog/${imageFilename}`,
+      alt: newsletter.name || 'Newsletter image'
+    };
+    
+    // Download the image
+    downloadImage(newsletter.thumbnail_url, imageFilename).catch(console.error);
+  }
+  
+  // Convert frontmatter to YAML
+  const frontmatterYaml = yaml.dump(frontmatter);
+  
+  // Extract and use the HTML content
+  const content = newsletter.html_content || newsletter.text_content || '';
+  
+  // Combine with content
+  return `---
+${frontmatterYaml}---
+
+${content}`;
+}
+
+/**
+ * Extract author from newsletter content and map to author ID
+ */
+function extractAndMapAuthor(htmlContent) {
+  try {
+    // Try to find "By: Author Name" pattern in the HTML content
+    const byMatch = htmlContent.match(/By:\s*([^<,]+)/i);
+    if (byMatch && byMatch[1]) {
+      const authorName = byMatch[1].trim();
+      console.log(`Found author in content: "${authorName}"`); 
+      return mapAuthorNameToId(authorName);
+    }
+    
+    // Fallback
+    return 'bekah';
+  } catch (error) {
+    console.error('Error extracting author:', error.message);
+    return 'bekah'; // Default to Bekah if there's an error
+  }
+}
+
+/**
+ * Map author name to author ID
+ */
+function mapAuthorNameToId(authorName) {
+  // Handle partial matches and variations
+  if (authorName.includes('Bekah')) return 'bekah';
+  if (authorName.includes('Michael') || authorName.includes('Fr.')) return 'frmichael';
+  if (authorName.includes('Josh')) return 'josh';
+  if (authorName.includes('Zach')) return 'Zach';
+  
+  // Default
+  return 'bekah';
+}
+
+/**
+ * Check if a post already exists in the blog directory
+ */
+function postExists(title) {
+  const slug = (title || 'untitled')
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-');
+  
+  const filename = `${slug}.md`;
+  const filepath = path.join(TARGET_BLOG_DIR, filename);
+  
+  return fs.existsSync(filepath);
+}
+
+/**
+ * Create or update blog post file
+ */
+function createBlogPost(newsletter, content) {
+  // Generate filename from title
+  const slug = (newsletter.name || 'untitled')
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-');
+  
+  const filename = `${slug}.md`;
+  const filepath = path.join(TARGET_BLOG_DIR, filename);
+  
+  if (DRY_RUN) {
+    console.log(`[DRY RUN] Would ${fs.existsSync(filepath) ? 'update' : 'create'} blog post: ${filepath}`);
+    console.log('Content preview:');
+    console.log(content.substring(0, 200) + '...');
+    return { created: false, filepath: null };
+  }
+  
+  fs.writeFileSync(filepath, content);
+  console.log(`${fs.existsSync(filepath) ? 'Updated' : 'Created'} blog post: ${filepath}`);
+  return { created: true, filepath };
+}
+
+/**
+ * Test if the created file has all required components
+ */
+async function testCreatedPost(filepath) {
+  try {
+    // Read the created file
+    const content = fs.readFileSync(filepath, 'utf8');
+    
+    // Check for required elements
+    const hasTitle = content.includes('title:');
+    const hasAuthor = content.includes('author:');
+    const hasPublishDate = content.includes('publishDate:');
+    const hasDescription = content.includes('description:');
+    const hasContent = content.split('---').length > 2 && content.split('---')[2].trim().length > 0;
+    
+    // Check if all elements are present
+    const allElementsPresent = hasTitle && hasAuthor && hasPublishDate && hasDescription && hasContent;
+    
+    console.log(`Test results for ${path.basename(filepath)}:`);
+    console.log(`- Title: ${hasTitle ? '✅' : '❌'}`);
+    console.log(`- Author: ${hasAuthor ? '✅' : '❌'}`);
+    console.log(`- Publish Date: ${hasPublishDate ? '✅' : '❌'}`);
+    console.log(`- Description: ${hasDescription ? '✅' : '❌'}`);
+    console.log(`- Content: ${hasContent ? '✅' : '❌'}`);
+    
+    return allElementsPresent;
+  } catch (error) {
+    console.error(`Error testing file ${filepath}:`, error.message);
+    return false;
+  }
+}
+
+/**
+ * Create a GitHub PR if there are issues
+ */
+async function createGitHubPR(issueDetails) {
+  try {
+    // If running in a GitHub Actions environment, create a PR
+    if (process.env.GITHUB_TOKEN) {
+      console.log('Creating GitHub PR for issue...');
+      // GitHub API logic would go here
+      // For now, just log the issue
+      console.log('Issue details:', issueDetails);
+    } else {
+      console.log('GITHUB_TOKEN not found. Would create PR with issue:');
+      console.log(issueDetails);
+    }
+  } catch (error) {
+    console.error('Error creating PR:', error.message);
+  }
+}
+
+/**
+ * Main execution function
+ */
+async function main() {
+  console.log('Starting newsletter import...');
+  console.log(DRY_RUN ? 'DRY RUN MODE - no files will be modified' : 'LIVE MODE - files will be created/updated');
+  
+  // Fetch newsletters
+  const newsletters = await fetchNewsletters();
+  console.log(`Found ${newsletters.length} newsletters`);
+  
+  let createdFiles = [];
+  let issues = [];
+  
+  // Process each newsletter
+  for (const newsletter of newsletters) {
+    console.log(`Processing: ${newsletter.name || 'Untitled broadcast'}`);
+    
+    // Skip if post already exists
+    if (postExists(newsletter.name)) {
+      console.log(`Post already exists for "${newsletter.name}". Skipping.`);
+      continue;
+    }
+    
+    // Convert to markdown
+    const markdownContent = convertToAstroMarkdown(newsletter);
+    
+    // Create or update blog post
+    const result = createBlogPost(newsletter, markdownContent);
+    
+    if (result.created && result.filepath) {
+      createdFiles.push(result.filepath);
+    }
+  }
+  
+  // Test created files
+  if (!DRY_RUN && createdFiles.length > 0) {
+    console.log('\nTesting created files...');
+    
+    for (const filepath of createdFiles) {
+      const passed = await testCreatedPost(filepath);
+      
+      if (!passed) {
+        issues.push({
+          file: path.basename(filepath),
+          error: 'Missing required elements in the created file'
+        });
+      }
+    }
+  }
+  
+  // Handle any issues
+  if (issues.length > 0) {
+    console.log('\n⚠️ Issues found during import:');
+    issues.forEach(issue => console.log(`- ${issue.file}: ${issue.error}`));
+    
+    // Create a PR for issues
+    await createGitHubPR({
+      title: 'Fix newsletter import issues',
+      body: 'Issues were found during automatic newsletter import:\n\n' + 
+            issues.map(i => `- ${i.file}: ${i.error}`).join('\n') + 
+            '\n\n@BekahHW Please review these issues.',
+      issues
+    });
+  } else if (createdFiles.length > 0) {
+    console.log('\n✅ All newsletters imported successfully!');
+  } else {
+    console.log('\n📝 No new newsletters to import.');
+  }
+  
+  console.log('Newsletter import complete!');
+}
+
+// Execute script
+main().catch(error => {
+  console.error('Error in main execution:', error);
+  process.exit(1);
+});
