@@ -136,12 +136,14 @@ function convertHtmlToMarkdown(htmlContent, title = '', featuredImageUrl = null)
     if (featuredImageUrl && src === featuredImageUrl) {
       return '';
     }
-    
+    // Skip Kit CDN images (only allow them at the top)
+    if (/https:\/\/embed\.filekitcdn\.com\//i.test(src)) {
+      return '';
+    }
     // Skip Kit branding images
     if (src.includes('convertkit.com') || src.includes('kit-badge')) {
       return '';
     }
-    
     // Extract alt text if present
     const altMatch = match.match(/alt="([^"]*)"/i);
     const alt = altMatch ? altMatch[1] : 'Image';
@@ -261,31 +263,37 @@ function convertToAstroMarkdown(newsletter) {
   const extractedTitle = extractTitleFromContent(htmlContent);
   const authorId = extractAndMapAuthor(htmlContent);
   
-  // Create frontmatter
+  // Create frontmatter (only the required fields)
   const frontmatter = {
     title: extractedTitle || newsletter.name || 'Untitled Newsletter',
     description: newsletter.preview_text || newsletter.subject || '',
     publishDate: formatISO(new Date(newsletter.published_at || newsletter.send_at || newsletter.sent_at || newsletter.created_at || new Date())),
-    author: { id: authorId },
-    featured: false,
-    draft: false,
+    author: { id: authorId }
   };
   
-  // Extract featured image from content instead of thumbnail_url
+  // Extract featured image from content
   const featuredImageUrl = extractFeaturedImageUrl(htmlContent);
   
   // Convert frontmatter to YAML
   const frontmatterYaml = yaml.dump(frontmatter);
-  
-  // Extract and clean the HTML content
-  const rawContent = newsletter.content || newsletter.html_content || newsletter.text_content || '';
-  const cleanContent = convertHtmlToMarkdown(rawContent, extractedTitle, featuredImageUrl);
-  
-  // Combine with content
-  return `---
-${frontmatterYaml}---
 
-${cleanContent}`;
+  // Extract and clean the HTML content (do not add featured image in content)
+  const rawContent = newsletter.content || newsletter.html_content || newsletter.text_content || '';
+  const cleanContent = convertHtmlToMarkdown(rawContent, extractedTitle, featuredImageUrl); // Pass featuredImageUrl to skip it in content
+
+  // Create the final markdown with image right after frontmatter
+  let finalContent = `---\n${frontmatterYaml}---\n`;
+
+  // Add the featured image as markdown right after frontmatter if we have one
+  if (featuredImageUrl) {
+    const imageAlt = extractedTitle ? `${extractedTitle} image` : 'Newsletter image';
+    finalContent += `![${imageAlt}](${featuredImageUrl})\n\n`;
+  }
+
+  // Add the rest of the content
+  finalContent += cleanContent;
+
+  return finalContent;
 }
 
 /**
