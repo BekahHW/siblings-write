@@ -108,6 +108,45 @@ async function fetchNewsletters() {
 }
 
 /**
+ * Convert HTML content to cleaner markdown format
+ */
+function convertHtmlToMarkdown(htmlContent) {
+  if (!htmlContent) return '';
+  
+  let content = htmlContent;
+  
+  // Convert HTML images to markdown images
+  content = content.replace(/<img[^>]+src="([^"]+)"[^>]*\/?>(?:<\/img>)?/gi, (match, src) => {
+    // Extract alt text if present
+    const altMatch = match.match(/alt="([^"]*)"/i);
+    const alt = altMatch ? altMatch[1] : 'Image';
+    return `![${alt}](${src})`;
+  });
+  
+  // Remove email-specific styles and HTML tags
+  content = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  content = content.replace(/<(?:table|tbody|tr|td)[^>]*>/gi, '');
+  content = content.replace(/<\/(?:table|tbody|tr|td)>/gi, '');
+  content = content.replace(/cellPadding="[^"]*"/gi, '');
+  content = content.replace(/cellSpacing="[^"]*"/gi, '');
+  content = content.replace(/bgcolor="[^"]*"/gi, '');
+  
+  // Convert basic HTML tags to markdown
+  content = content.replace(/<strong[^>]*>([^<]+)<\/strong>/gi, '**$1**');
+  content = content.replace(/<em[^>]*>([^<]+)<\/em>/gi, '*$1*');
+  content = content.replace(/<hr[^>]*\/?>/gi, '---');
+  
+  // Remove remaining HTML tags but keep content
+  content = content.replace(/<[^>]+>/g, '');
+  
+  // Clean up excessive whitespace
+  content = content.replace(/\n\s*\n\s*\n/g, '\n\n');
+  content = content.trim();
+  
+  return content;
+}
+
+/**
  * Extract title from newsletter HTML content
  */
 function extractTitleFromContent(htmlContent) {
@@ -179,27 +218,24 @@ function convertToAstroMarkdown(newsletter) {
   
   // Handle featured image if present
   if (newsletter.thumbnail_url) {
-    const imageFilename = path.basename(newsletter.thumbnail_url).split('?')[0]; // Remove query params
     frontmatter.image = {
-      src: `/assets/blog/${imageFilename}`,
-      alt: newsletter.name || 'Newsletter image'
+      src: newsletter.thumbnail_url,
+      alt: extractedTitle || newsletter.name || 'Newsletter image'
     };
-    
-    // Download the image
-    downloadImage(newsletter.thumbnail_url, imageFilename).catch(console.error);
   }
   
   // Convert frontmatter to YAML
   const frontmatterYaml = yaml.dump(frontmatter);
   
-  // Extract and use the HTML content
-  const content = newsletter.content || newsletter.html_content || newsletter.text_content || '';
+  // Extract and clean the HTML content
+  const rawContent = newsletter.content || newsletter.html_content || newsletter.text_content || '';
+  const cleanContent = convertHtmlToMarkdown(rawContent);
   
   // Combine with content
   return `---
 ${frontmatterYaml}---
 
-${content}`;
+${cleanContent}`;
 }
 
 /**
