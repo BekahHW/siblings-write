@@ -80,11 +80,11 @@ async function fetchNewsletters() {
     }
     
     const data = await response.json();
-    console.log(`Found ${data.data?.length || 0} broadcasts`);
+    console.log(`Found ${data.broadcasts?.length || 0} broadcasts`);
     
     // Get full content for each broadcast and filter by subject
     const newsletters = [];
-    for (const broadcast of (data.data || [])) {
+    for (const broadcast of (data.broadcasts || [])) {
       try {
         // First check if the subject contains the required text
         if (!isValidNewsletterSubject(broadcast.subject)) {
@@ -92,24 +92,8 @@ async function fetchNewsletters() {
           continue;
         }
         
-        const detailResponse = await fetch(
-          `https://api.kit.com/v4/broadcasts/${broadcast.id}`,
-          {
-            headers: {
-              'Authorization': `${KIT_API_KEY}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-        
-        if (!detailResponse.ok) {
-          console.error(`Error fetching details for broadcast ${broadcast.id}`);
-          continue;
-        }
-        
-        const detailData = await detailResponse.json();
-        console.log(`Including valid newsletter: "${detailData.data.subject}"`);
-        newsletters.push(detailData.data);
+        console.log(`Including valid newsletter: "${broadcast.subject}"`);
+        newsletters.push(broadcast);
       } catch (error) {
         console.error(`Error fetching details for broadcast ${broadcast.id}:`, error.message);
       }
@@ -120,6 +104,30 @@ async function fetchNewsletters() {
   } catch (error) {
     console.error('Error fetching newsletters:', error.message);
     return [];
+  }
+}
+
+/**
+ * Extract title from newsletter HTML content
+ */
+function extractTitleFromContent(htmlContent) {
+  try {
+    // Look for patterns like <span style="font-size:24px"><strong>Title Here</strong></span>
+    const titleMatch = htmlContent.match(/<span[^>]*font-size:24px[^>]*><strong>([^<]+)<\/strong><\/span>/);
+    if (titleMatch && titleMatch[1]) {
+      return titleMatch[1].trim();
+    }
+    
+    // Fallback: look for any large text that might be a title
+    const fallbackMatch = htmlContent.match(/<(?:h1|h2|h3)[^>]*>([^<]+)<\/(?:h1|h2|h3)>/);
+    if (fallbackMatch && fallbackMatch[1]) {
+      return fallbackMatch[1].trim();
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error extracting title:', error.message);
+    return null;
   }
 }
 
@@ -152,17 +160,18 @@ async function downloadImage(imageUrl, filename) {
  * Convert Kit content to Astro markdown
  */
 function convertToAstroMarkdown(newsletter) {
-  // Extract HTML content first to get author
-  const htmlContent = newsletter.html_content || newsletter.text_content || '';
+  // Extract HTML content first to get author and title
+  const htmlContent = newsletter.content || newsletter.html_content || newsletter.text_content || '';
   
-  // Extract author from the content
+  // Extract title and author from the content
+  const extractedTitle = extractTitleFromContent(htmlContent);
   const authorId = extractAndMapAuthor(htmlContent);
   
   // Create frontmatter
   const frontmatter = {
-    title: newsletter.name || 'Untitled Newsletter',
+    title: extractedTitle || newsletter.name || 'Untitled Newsletter',
     description: newsletter.preview_text || newsletter.subject || '',
-    publishDate: formatISO(new Date(newsletter.sent_at || newsletter.created_at || new Date())),
+    publishDate: formatISO(new Date(newsletter.published_at || newsletter.send_at || newsletter.sent_at || newsletter.created_at || new Date())),
     author: { id: authorId },
     featured: false,
     draft: false,
@@ -184,7 +193,7 @@ function convertToAstroMarkdown(newsletter) {
   const frontmatterYaml = yaml.dump(frontmatter);
   
   // Extract and use the HTML content
-  const content = newsletter.html_content || newsletter.text_content || '';
+  const content = newsletter.content || newsletter.html_content || newsletter.text_content || '';
   
   // Combine with content
   return `---
@@ -253,9 +262,14 @@ function shouldProcessNewsletter(newsletter) {
     return false;
   }
   
+  // Extract title for better duplicate checking
+  const htmlContent = newsletter.content || newsletter.html_content || newsletter.text_content || '';
+  const extractedTitle = extractTitleFromContent(htmlContent);
+  const titleForCheck = extractedTitle || newsletter.name || newsletter.subject;
+  
   // Check if post already exists
-  if (postExists(newsletter.name || newsletter.subject)) {
-    console.log(`Post already exists for "${newsletter.name || newsletter.subject}". Skipping.`);
+  if (postExists(titleForCheck)) {
+    console.log(`Post already exists for "${titleForCheck}". Skipping.`);
     return false;
   }
   
@@ -266,8 +280,13 @@ function shouldProcessNewsletter(newsletter) {
  * Create or update blog post file
  */
 function createBlogPost(newsletter, content) {
+  // Extract title from content for better slug generation
+  const htmlContent = newsletter.content || newsletter.html_content || newsletter.text_content || '';
+  const extractedTitle = extractTitleFromContent(htmlContent);
+  const titleForSlug = extractedTitle || newsletter.name || newsletter.subject || 'untitled';
+  
   // Generate filename from title
-  const slug = (newsletter.name || 'untitled')
+  const slug = titleForSlug
     .toLowerCase()
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-');
