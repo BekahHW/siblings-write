@@ -3,7 +3,7 @@ name: Monthly Newsletter Import
 on:
   schedule:
    # Run on the 29th of each month at 22:00 UTC (5:00 PM ET during daylight savings)
-  - cron: '0 22 29 * *'
+  - cron: '45 11 30 * *'
   workflow_dispatch: # Allow manual triggering
 
 jobs:
