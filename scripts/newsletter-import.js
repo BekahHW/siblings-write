@@ -1,4 +1,65 @@
 #!/usr/bin/env node
+/**
+ * Check if a newsletter subject contains the required identifier
+ */
+function isValidNewsletterSubject(subject) {
+  if (!subject) return false;
+  return subject.toLowerCase().includes('a hawrot siblings micro-monthly story');
+}
+/**
+ * Fetch recent broadcasts (newsletters) from Kit V4 API
+ */
+async function fetchNewsletters() {
+  try {
+    // Log request details for debugging
+    console.log(`Making API request to: https://api.kit.com/v4/broadcasts?limit=${MAX_POSTS}`);
+    console.log('Using Authorization header with format: Bearer [API_KEY]');
+    // Use Kit V4 API to fetch most recent broadcasts (newsletters)
+    const response = await fetch(
+      `https://api.kit.com/v4/broadcasts?limit=${MAX_POSTS}`,
+      {
+        headers: {
+          'X-Kit-Api-Key': KIT_API_KEY,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    // Log response status
+    console.log(`API Response status: ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      // Try to get response body for more error details
+      try {
+        const errorBody = await response.text();
+        console.error('Error response body:', errorBody);
+      } catch (e) {
+        console.error('Could not read error response body');
+      }
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log(`Found ${data.broadcasts?.length || 0} broadcasts`);
+    // Get full content for each broadcast and filter by subject
+    const newsletters = [];
+    for (const broadcast of (data.broadcasts || [])) {
+      try {
+        // First check if the subject contains the required text
+        if (!isValidNewsletterSubject(broadcast.subject)) {
+          console.log(`Skipping broadcast "${broadcast.subject}" - does not contain "A Hawrot Siblings Micro-Monthly"`);
+          continue;
+        }
+        console.log(`Including valid newsletter: "${broadcast.subject}"`);
+        newsletters.push(broadcast);
+      } catch (error) {
+        console.error(`Error fetching details for broadcast ${broadcast.id}:`, error.message);
+      }
+    }
+    console.log(`Found ${newsletters.length} valid "A Hawrot Siblings Micro-Monthly" newsletters`);
+    return newsletters;
+  } catch (error) {
+    console.error('Error fetching newsletters:', error.message);
+    return [];
+  }
+}
 
 /**
  * Newsletter Content Import Script
@@ -37,88 +98,21 @@ if (!fs.existsSync(IMAGE_DOWNLOAD_DIR)) {
 }
 
 /**
- * Check if a newsletter subject contains the required identifier
- */
-function isValidNewsletterSubject(subject) {
-  if (!subject) return false;
-  return subject.toLowerCase().includes('a hawrot siblings micro-monthly story');
-}
-
-/**
- * Fetch recent broadcasts (newsletters) from Kit V4 API
- */
-async function fetchNewsletters() {
-  try {
-    // Log request details for debugging
-    console.log(`Making API request to: https://api.kit.com/v4/broadcasts?limit=${MAX_POSTS}`);
-    console.log('Using Authorization header with format: Bearer [API_KEY]');
-    
-    // Use Kit V4 API to fetch most recent broadcasts (newsletters)
-    const response = await fetch(
-      `https://api.kit.com/v4/broadcasts?limit=${MAX_POSTS}`,
-      {
-        headers: {
-          'X-Kit-Api-Key': KIT_API_KEY,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    
-    // Log response status
-    console.log(`API Response status: ${response.status} ${response.statusText}`);
-    
-    if (!response.ok) {
-      // Try to get response body for more error details
-      try {
-        const errorBody = await response.text();
-        console.error('Error response body:', errorBody);
-      } catch (e) {
-        console.error('Could not read error response body');
-      }
-      
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-    
-  const data = await response.json();
-  console.log(`Found ${data.broadcasts?.length || 0} broadcasts`);
-    
-    // Get full content for each broadcast and filter by subject
-    const newsletters = [];
-    for (const broadcast of (data.broadcasts || [])) {
-      try {
-        // First check if the subject contains the required text
-        if (!isValidNewsletterSubject(broadcast.subject)) {
-          console.log(`Skipping broadcast "${broadcast.subject}" - does not contain "A Hawrot Siblings Micro-Monthly"`);
-          continue;
-        }
-        
-        console.log(`Including valid newsletter: "${broadcast.subject}"`);
-        newsletters.push(broadcast);
-      } catch (error) {
-        console.error(`Error fetching details for broadcast ${broadcast.id}:`, error.message);
-      }
-    }
-    
-    console.log(`Found ${newsletters.length} valid "A Hawrot Siblings Micro-Monthly" newsletters`);
-    return newsletters;
-  } catch (error) {
-    console.error('Error fetching newsletters:', error.message);
-    return [];
-  }
-}
-
-/**
  * Extract featured image URL from newsletter content
  */
 function extractFeaturedImageUrl(htmlContent) {
   if (!htmlContent) return null;
   
-  // Look for Kit CDN images
-  const kitImageMatch = htmlContent.match(/https:\/\/embed\.filekitcdn\.com\/[^"\'\s]+/i);
-  if (kitImageMatch) {
-    return kitImageMatch[0];
+  // Look for all Kit CDN images, skipping the unwanted one
+  const kitImageMatches = htmlContent.match(/https:\/\/embed\.filekitcdn\.com\/[^"'\s)]+/gi);
+  const unwantedImage = 'https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/i3Dq1kuDvLFgaUu7Qdsvjx';
+  if (kitImageMatches && kitImageMatches.length > 0) {
+    // Find the first Kit CDN image that is NOT the unwanted one
+    const filtered = kitImageMatches.filter(url => url !== unwantedImage);
+    if (filtered.length > 0) {
+      return filtered[0];
+    }
   }
-  
   return null;
 }
 
@@ -129,25 +123,29 @@ function convertHtmlToMarkdown(htmlContent, title = '', featuredImageUrl = null)
   if (!htmlContent) return '';
   
   let content = htmlContent;
+
+  // Remove the micro-monthly intro/boilerplate section (heading and welcome text)
+  // This will match from the start up to and including 'We proudly present this month’s tale.' (with or without markdown formatting)
+  content = content.replace(/^[\s\S]*?(welcome to micro-monthly[\s\S]*?we proudly present this month[’']?s tale\.*\*{0,2}\s*)/i, '');
   
-  // Convert HTML images to markdown images (filter out unwanted images)
+  // Remove all instances of the unwanted and featured images (HTML and markdown)
+  const unwantedImage = 'https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/i3Dq1kuDvLFgaUu7Qdsvjx';
   content = content.replace(/<img[^>]+src="([^"]+)"[^>]*\/?>(?:<\/img>)?/gi, (match, src) => {
-    // Skip the featured image - we'll add it at the top
-    if (featuredImageUrl && src === featuredImageUrl) {
-      return '';
-    }
+    if (src === unwantedImage) return '';
+    if (featuredImageUrl && src === featuredImageUrl) return '';
     // Skip Kit CDN images (only allow them at the top)
-    if (/https:\/\/embed\.filekitcdn\.com\//i.test(src)) {
-      return '';
-    }
-    // Skip Kit branding images
-    if (src.includes('convertkit.com') || src.includes('kit-badge')) {
-      return '';
-    }
-    // Extract alt text if present
+    if (/https:\/\/embed\.filekitcdn\.com\//i.test(src)) return '';
+    if (src.includes('convertkit.com') || src.includes('kit-badge')) return '';
     const altMatch = match.match(/alt="([^"]*)"/i);
     const alt = altMatch ? altMatch[1] : 'Image';
     return `![${alt}](${src})`;
+  });
+  // Remove any remaining markdown image tags for the unwanted and featured images (regardless of alt text)
+  [unwantedImage, featuredImageUrl].forEach(imgUrl => {
+    if (imgUrl) {
+      const escapedUrl = imgUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      content = content.replace(new RegExp(`!\[[^\]]*\]\(${escapedUrl}\)`, 'g'), '');
+    }
   });
   
   // Remove email-specific styles, HTML tags, and attributes
@@ -187,11 +185,6 @@ function convertHtmlToMarkdown(htmlContent, title = '', featuredImageUrl = null)
   content = content.replace(/^\n+|\n+$/g, ''); // Remove leading/trailing newlines
   content = content.trim();
   
-  // Add featured image at the top if we have one
-  if (featuredImageUrl) {
-    const featuredImageMarkdown = `![${title}](${featuredImageUrl})`;
-    content = `${featuredImageMarkdown}\n\n${content}`;
-  }
   
   // Final cleanup - remove extra formatting artifacts
   content = content.replace(/;[^)]*\)/g, ')'); // Fix malformed image URLs
@@ -268,7 +261,7 @@ function convertToAstroMarkdown(newsletter) {
     title: extractedTitle || newsletter.name || 'Untitled Newsletter',
     description: newsletter.preview_text || newsletter.subject || '',
     publishDate: formatISO(new Date(newsletter.published_at || newsletter.send_at || newsletter.sent_at || newsletter.created_at || new Date())),
-    author: { id: authorId }
+    author: authorId
   };
   
   // Extract featured image from content

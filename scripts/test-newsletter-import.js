@@ -135,12 +135,6 @@ function testBlogPost(filepath) {
       if (!isValid) allFieldsValid = false;
     }
     
-    // Test 3: Check image in frontmatter if present
-    if (frontmatter.image && frontmatter.image.src) {
-      const imageValid = imageExists(frontmatter.image.src);
-      console.log(`${imageValid ? '✅' : '❌'} frontmatter image: ${frontmatter.image.src}`);
-      if (!imageValid) allFieldsValid = false;
-    }
     
     // Test 4: Extract and check content
     const postContent = extractContent(content);

@@ -6,14 +6,10 @@ description: >-
 publishDate: '2025-08-28T08:36:18-04:00'
 author:
   id: bekah
-featured: false
-draft: false
 ---
+![Last Show at The Luna image](https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/rWt73RAD1HnrQuqCoPXWrx)
 
-![Last Show at The Luna](https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/i3Dq1kuDvLFgaUu7Qdsvjx))
-
-## **
-**Welcome to micro-monthly, where we will present short stories of all shapes, colors—and dimensions. These are meant to be fun. Some may make you laugh. Others may even scare you. These are the snacks in between the entrees we’re currently writing. If you like them, share them. If you don’t, forget them and come back for next month’s story.  **We proudly present this month’s tale.**![Image](https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/rWt73RAD1HnrQuqCoPXWrx)**Last Show at The Luna**by: Bekah**It was Tuesday morning, but it wasn’t just another Tuesday morning. It was the first Tuesday morning since Jenna’s Aunt Helen died. It was the first Tuesday morning she had been given that she would open her aunt’s vintage clothing shop on her own. It was the first Tuesday that she heard a distant echo of applause. It was muffled, like a crowd clapping behind thick, vintage curtains.
+**Last Show at The Luna**by: Bekah**It was Tuesday morning, but it wasn’t just another Tuesday morning. It was the first Tuesday morning since Jenna’s Aunt Helen died. It was the first Tuesday morning she had been given that she would open her aunt’s vintage clothing shop on her own. It was the first Tuesday that she heard a distant echo of applause. It was muffled, like a crowd clapping behind thick, vintage curtains.
 She had closed the shop for a couple of weeks after her aunt died and had only been in it a couple of times before. She wasn’t exactly interested in vintage clothes. She wasn’t sure why Helen had left it to her, other than maybe there was no one else to leave it to. When she first stepped into the shop a couple of weeks ago, she was overwhelmed. Hats hung from every inch of the ceiling. Racks and racks of vintage clothes, zipped up in plastic garment bags hung so tightly together that you could barely see what you were looking at. But that wasn’t all.
 She'd been hearing things. Not voices exactly, but sounds that belonged to another time. Aunt Helen would have called it "the building settling," but Jenna knew better. Buildings didn't settle with 1940s big band music or the rustle of taffeta gowns.
 Jenna locked her car door and looked around the parking lot. It hadn’t always been a broken up cement lot with faded paint just barely visible enough to discern. The office building that sat on the parking lot used to be the Luna Theatre until it shut down in 1978. The Luna had held a special place in Steubenville history. Now, it was mostly forgotten by everyone in town, but sometimes, when the light hit the adjacent brick wall just right, Jenna thought she could almost see the ghost of the old marquee: "Now Showing: Casablanca."
