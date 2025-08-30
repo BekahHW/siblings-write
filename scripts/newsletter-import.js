@@ -41,7 +41,7 @@ if (!fs.existsSync(IMAGE_DOWNLOAD_DIR)) {
  */
 function isValidNewsletterSubject(subject) {
   if (!subject) return false;
-  return subject.toLowerCase().includes('a hawrot siblings micro-monthly');
+  return subject.toLowerCase().includes('a hawrot siblings micro-monthly story');
 }
 
 /**
@@ -79,8 +79,8 @@ async function fetchNewsletters() {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     
-    const data = await response.json();
-    console.log(`Found ${data.broadcasts?.length || 0} broadcasts`);
+  const data = await response.json();
+  console.log(`Found ${data.broadcasts?.length || 0} broadcasts`);
     
     // Get full content for each broadcast and filter by subject
     const newsletters = [];
