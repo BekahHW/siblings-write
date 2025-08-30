@@ -108,40 +108,95 @@ async function fetchNewsletters() {
 }
 
 /**
+ * Extract featured image URL from newsletter content
+ */
+function extractFeaturedImageUrl(htmlContent) {
+  if (!htmlContent) return null;
+  
+  // Look for Kit CDN images
+  const kitImageMatch = htmlContent.match(/https:\/\/embed\.filekitcdn\.com\/[^"\'\s]+/i);
+  if (kitImageMatch) {
+    return kitImageMatch[0];
+  }
+  
+  return null;
+}
+
+/**
  * Convert HTML content to cleaner markdown format
  */
-function convertHtmlToMarkdown(htmlContent) {
+function convertHtmlToMarkdown(htmlContent, title = '', featuredImageUrl = null) {
   if (!htmlContent) return '';
   
   let content = htmlContent;
   
-  // Convert HTML images to markdown images
+  // Convert HTML images to markdown images (filter out unwanted images)
   content = content.replace(/<img[^>]+src="([^"]+)"[^>]*\/?>(?:<\/img>)?/gi, (match, src) => {
+    // Skip the featured image - we'll add it at the top
+    if (featuredImageUrl && src === featuredImageUrl) {
+      return '';
+    }
+    
+    // Skip Kit branding images
+    if (src.includes('convertkit.com') || src.includes('kit-badge')) {
+      return '';
+    }
+    
     // Extract alt text if present
     const altMatch = match.match(/alt="([^"]*)"/i);
     const alt = altMatch ? altMatch[1] : 'Image';
     return `![${alt}](${src})`;
   });
   
-  // Remove email-specific styles and HTML tags
+  // Remove email-specific styles, HTML tags, and attributes
   content = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-  content = content.replace(/<(?:table|tbody|tr|td)[^>]*>/gi, '');
-  content = content.replace(/<\/(?:table|tbody|tr|td)>/gi, '');
+  content = content.replace(/<(?:table|tbody|tr|td|center|figure|figcaption|div)[^>]*>/gi, '');
+  content = content.replace(/<\/(?:table|tbody|tr|td|center|figure|figcaption|div)>/gi, '');
   content = content.replace(/cellPadding="[^"]*"/gi, '');
   content = content.replace(/cellSpacing="[^"]*"/gi, '');
   content = content.replace(/bgcolor="[^"]*"/gi, '');
+  content = content.replace(/style="[^"]*"/gi, '');
+  content = content.replace(/class="[^"]*"/gi, '');
+  content = content.replace(/width="[^"]*"/gi, '');
+  content = content.replace(/height="[^"]*"/gi, '');
   
   // Convert basic HTML tags to markdown
   content = content.replace(/<strong[^>]*>([^<]+)<\/strong>/gi, '**$1**');
   content = content.replace(/<em[^>]*>([^<]+)<\/em>/gi, '*$1*');
-  content = content.replace(/<hr[^>]*\/?>/gi, '---');
+  content = content.replace(/<hr[^>]*\/?>/gi, '\n---\n');
+  content = content.replace(/<p[^>]*>([^<]*)<\/p>/gi, '$1\n\n');
+  content = content.replace(/<h[1-6][^>]*>([^<]+)<\/h[1-6]>/gi, '## $1\n\n');
   
   // Remove remaining HTML tags but keep content
   content = content.replace(/<[^>]+>/g, '');
   
-  // Clean up excessive whitespace
+  // Clean up HTML entities
+  content = content.replace(/&quot;/g, '"');
+  content = content.replace(/&#x27;/g, "'");
+  content = content.replace(/&amp;/g, '&');
+  content = content.replace(/&lt;/g, '<');
+  content = content.replace(/&gt;/g, '>');
+  content = content.replace(/&nbsp;/g, ' ');
+  
+  // Clean up excessive whitespace and special characters
   content = content.replace(/\n\s*\n\s*\n/g, '\n\n');
+  content = content.replace(/​/g, ''); // Remove zero-width space
+  content = content.replace(/\s*\n\s*/g, '\n'); // Clean up line breaks
+  content = content.replace(/^\n+|\n+$/g, ''); // Remove leading/trailing newlines
   content = content.trim();
+  
+  // Add featured image at the top if we have one
+  if (featuredImageUrl) {
+    const featuredImageMarkdown = `![${title}](${featuredImageUrl})`;
+    content = `${featuredImageMarkdown}\n\n${content}`;
+  }
+  
+  // Final cleanup - remove extra formatting artifacts
+  content = content.replace(/;[^)]*\)/g, ')'); // Fix malformed image URLs
+  content = content.replace(/\*\*\*\*/g, '**'); // Fix excessive bold formatting
+  content = content.replace(/## \*\*\*\*\s*/g, ''); // Remove empty headers
+  content = content.replace(/\{\{[^}]+\}\}/g, ''); // Remove template variables
+  content = content.replace(/^---\s*$/gm, '\n---\n'); // Fix horizontal rules
   
   return content;
 }
@@ -216,20 +271,15 @@ function convertToAstroMarkdown(newsletter) {
     draft: false,
   };
   
-  // Handle featured image if present
-  if (newsletter.thumbnail_url) {
-    frontmatter.image = {
-      src: newsletter.thumbnail_url,
-      alt: extractedTitle || newsletter.name || 'Newsletter image'
-    };
-  }
+  // Extract featured image from content instead of thumbnail_url
+  const featuredImageUrl = extractFeaturedImageUrl(htmlContent);
   
   // Convert frontmatter to YAML
   const frontmatterYaml = yaml.dump(frontmatter);
   
   // Extract and clean the HTML content
   const rawContent = newsletter.content || newsletter.html_content || newsletter.text_content || '';
-  const cleanContent = convertHtmlToMarkdown(rawContent);
+  const cleanContent = convertHtmlToMarkdown(rawContent, extractedTitle, featuredImageUrl);
   
   // Combine with content
   return `---

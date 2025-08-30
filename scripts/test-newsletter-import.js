@@ -57,12 +57,17 @@ function isValidDate(dateString) {
 }
 
 /**
- * Test if an image file exists
+ * Test if an image file exists or is a valid external URL
  */
 function imageExists(imagePath) {
   if (!imagePath) return false;
   
-  // Handle both absolute and relative paths
+  // Allow external URLs from Kit CDN
+  if (imagePath.startsWith('https://embed.filekitcdn.com/')) {
+    return true; // Assume Kit CDN URLs are valid
+  }
+  
+  // Handle both absolute and relative paths for local files
   if (imagePath.startsWith('/')) {
     // Remove leading slash for public directory
     const publicPath = path.join(process.cwd(), 'public', imagePath.substring(1));
