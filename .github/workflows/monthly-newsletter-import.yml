@@ -24,7 +24,7 @@ jobs:
       
       - name: Create branch for potential changes
         run: |
-          BRANCH_NAME="newsletter-import-$(date +'%Y-%m')"
+          BRANCH_NAME="newsletter-import-$(date +'%Y-%m-%d-%H%M%S')"
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git checkout -b $BRANCH_NAME
