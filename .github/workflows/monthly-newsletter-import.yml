@@ -2,7 +2,7 @@ name: Monthly Newsletter Import
 
 on:
   schedule:
-  - cron: '00 8 30 * *'
+  - cron: '00 8 28 * *'
   workflow_dispatch: # Allow manual triggering
 
 jobs:

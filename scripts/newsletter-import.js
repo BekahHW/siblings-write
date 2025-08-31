@@ -164,7 +164,13 @@ function convertHtmlToMarkdown(htmlContent, title = '', featuredImageUrl = null)
   content = content.replace(/<strong[^>]*>([^<]+)<\/strong>/gi, '**$1**');
   content = content.replace(/<em[^>]*>([^<]+)<\/em>/gi, '*$1*');
   content = content.replace(/<hr[^>]*\/?>/gi, '\n---\n');
-  content = content.replace(/<p[^>]*>([^<]*)<\/p>/gi, '$1\n\n');
+  // Replace <p>...</p> with exactly two newlines (one blank line) between paragraphs
+  content = content.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, (match, inner) => {
+    const clean = inner.trim();
+    // If the paragraph is empty, return just a blank line
+    if (!clean) return '\n\n';
+    return clean + '\n\n';
+  });
   content = content.replace(/<h[1-6][^>]*>([^<]+)<\/h[1-6]>/gi, '## $1\n\n');
   
   // Remove remaining HTML tags but keep content
@@ -179,11 +185,11 @@ function convertHtmlToMarkdown(htmlContent, title = '', featuredImageUrl = null)
   content = content.replace(/&nbsp;/g, ' ');
   
   // Clean up excessive whitespace and special characters
-  content = content.replace(/\n\s*\n\s*\n/g, '\n\n');
+  // Only trim leading/trailing whitespace, not blank lines between paragraphs
   content = content.replace(/​/g, ''); // Remove zero-width space
-  content = content.replace(/\s*\n\s*/g, '\n'); // Clean up line breaks
-  content = content.replace(/^\n+|\n+$/g, ''); // Remove leading/trailing newlines
-  content = content.trim();
+  content = content.replace(/[ \t]+\n/g, '\n'); // Remove trailing spaces/tabs at end of lines
+  content = content.replace(/\n[ \t]+/g, '\n'); // Remove leading spaces/tabs at start of lines
+  content = content.replace(/^\s+|\s+$/g, ''); // Remove leading/trailing whitespace (not blank lines)
   
   
   // Final cleanup - remove extra formatting artifacts
@@ -251,7 +257,6 @@ async function downloadImage(imageUrl, filename) {
 function convertToAstroMarkdown(newsletter) {
   // Extract HTML content first to get author and title
   const htmlContent = newsletter.content || newsletter.html_content || newsletter.text_content || '';
-  
   // Extract title and author from the content
   const extractedTitle = extractTitleFromContent(htmlContent);
   const authorId = extractAndMapAuthor(htmlContent);
