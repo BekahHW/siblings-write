@@ -1,11 +1,12 @@
 ---
+import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
 
 export async function getStaticPaths() {
-try {
+  try {
     const blogEntries = await getCollection('blog');
 
     // Create routes using entry ID
@@ -66,49 +67,50 @@ const prevPost = currentIndex > 0 ? allBlogPosts[currentIndex - 1] : null;
 
 const permalink = `${Astro.site.href}blog/${entry.id}`;
 ---
-<BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="blog">
-  <header>
-    <p>{entry.data.publishDate} ~ {entry.data.readingTime}</p>
-    <h1>{entry.data.title}</h1>
-    <hr />
-  </header>
-  <div class="container">
-    <article class="content">
-      <Content />
-    </article>
-    
-    <div class="post-navigation">
-      {prevPost && (
-      <a href={`/blog/${prevPost.id}`} class="nav-button prev-button">
-        <span class="nav-arrow">←</span>
-        <span class="nav-text">Previous Post</span>
-      </a>
-      )}
+<PostHogLayout>
+  <BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="blog">
+    <header>
+      <p>{entry.data.publishDate} ~ {entry.data.readingTime}</p>
+      <h1>{entry.data.title}</h1>
+      <hr />
+    </header>
+    <div class="container">
+      <article class="content">
+        <Content />
+      </article>
+      
+      <div class="post-navigation">
+        {prevPost && (
+        <a href={`/blog/${prevPost.id}`} class="nav-button prev-button">
+          <span class="nav-arrow">←</span>
+          <span class="nav-text">Previous Post</span>
+        </a>
+        )}
 
-      {nextPost && (
-      <a href={`/blog/${nextPost.id}`} class="nav-button next-button">
-        <span class="nav-text">Next Post</span>
-        <span class="nav-arrow">→</span>
-      </a>
-      )}
-    </div>
-    
-    <hr />
-    {author && (
-      <div class="author-bio">
-        <h3>About the Author</h3>
-        <Bio 
-          name={author.data.name}
-          bio={author.data.bio}
-          avatar={author.data.avatar}
-        />
+        {nextPost && (
+        <a href={`/blog/${nextPost.id}`} class="nav-button next-button">
+          <span class="nav-text">Next Post</span>
+          <span class="nav-arrow">→</span>
+        </a>
+        )}
       </div>
-    )}
-    
-    <ShareButtons title={entry.data.title} permalink={permalink} />
-</div>
-    
-</BaseLayout>
+      
+      <hr />
+      {author && (
+        <div class="author-bio">
+          <h3>About the Author</h3>
+          <Bio 
+            name={author.data.name}
+            bio={author.data.bio}
+            avatar={author.data.avatar}
+          />
+        </div>
+      )}
+      
+      <ShareButtons title={entry.data.title} permalink={permalink} />
+    </div>
+  </BaseLayout>
+</PostHogLayout>
 
 <style>
   header {

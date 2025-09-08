@@ -1,4 +1,5 @@
 ---
+import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
 
@@ -16,30 +17,30 @@ const getAuthorName = (authorId) => {
   return author ? author.data.name : authorId; // Fallback to ID if author not found
 };
 ---
-
-<BaseLayout title={title} description={description} permalink={permalink} current="blog">
-  <div class="container">
-    <h1>Our Short Stories</h1>
-    {sortedPosts.map((post, index) => {
-      return (
-        <div>
-          { index !== 0 && <hr /> }
-          <div class="post-item">
-            <h2>
-              <a href={`/blog/${post.id}`}>{post.data.title}</a>
-            </h2>
-            <p>{post.data.description}</p>
+<PostHogLayout>
+  <BaseLayout title={title} description={description} permalink={permalink} current="blog">
+    <div class="container">
+      <h1>Our Short Stories</h1>
+      {sortedPosts.map((post, index) => {
+        return (
+          <div>
+            { index !== 0 && <hr /> }
+            <div class="post-item">
+              <h2>
+                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+              </h2>
+              <p>{post.data.description}</p>
               <span class="post-item-author">
-  By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a>
-</span>
-
+                By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a>
+              </span>
               <span class="post-item-date">— {post.data.publishDate}</span>
             </div>
           </div>
-      )
-    })}
-  </div>
-</BaseLayout>
+        )
+      })}
+    </div>
+  </BaseLayout>
+</PostHogLayout>
 
 <style>
   h2,

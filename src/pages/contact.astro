@@ -1,4 +1,5 @@
 ---
+import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = 'Contact';
@@ -6,21 +7,23 @@ const description = 'Get in touch with us.';
 const permalink = `${Astro.site.href}contact`;
 ---
 
-<BaseLayout title={title} description={description} permalink={permalink} current="contact">
-  <div class="container">
-    <div class="contact-header">
-      <div class="title-section">
-        <h1>Contact</h1>
-        <p>We'd love to hear from you! Whether you have a question, want to collaborate, or just want to say hi, feel free to reach out.</p>
-        <p>Email us directly at: <a href="mailto:3siblingwriters@gmail.com">3siblingwriters@gmail.com</a></p>
-      </div>
-      
-      <div class="image-section">
-        <img src="/assets/logo.png" alt="The Hawrot Siblings typewriter logo" width="330">
+<PostHogLayout>
+  <BaseLayout title={title} description={description} permalink={permalink} current="contact">
+    <div class="container">
+      <div class="contact-header">
+        <div class="title-section">
+          <h1>Contact</h1>
+          <p>We'd love to hear from you! Whether you have a question, want to collaborate, or just want to say hi, feel free to reach out.</p>
+          <p>Email us directly at: <a href="mailto:3siblingwriters@gmail.com">3siblingwriters@gmail.com</a></p>
+        </div>
+        
+        <div class="image-section">
+          <img src="/assets/logo.png" alt="The Hawrot Siblings typewriter logo" width="330">
+        </div>
       </div>
     </div>
-  </div>
-</BaseLayout>
+  </BaseLayout>
+</PostHogLayout>
 
 <style>
   .container {
