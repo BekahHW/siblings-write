@@ -3,7 +3,7 @@ title: Last Show at The Luna
 description: >-
   When Jenna hears mysterious applause from where Steubenville's Luna Theatre
   once stood, she discovers that some stories are waiting to be finished.
-publishDate: '2025-08-28T08:36:18-04:00'
+publishDate: 28 August 2025
 author: bekah
 ---
 ![Last Show at The Luna image](https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/rWt73RAD1HnrQuqCoPXWrx)
