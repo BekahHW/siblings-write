@@ -1,7 +1,9 @@
 #!/bin/bash
 # analyze-sessions.sh
 set -e
-source .env
+
+# GitHub Actions will provide these as environment variables from secrets
+# POSTHOG_API_KEY, POSTHOG_HOST, and POSTHOG_PROJECT_ID should be set in the action
 
 echo "🎬 Fetching session recordings from PostHog..."
 
