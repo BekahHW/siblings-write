@@ -6,9 +6,9 @@ set -x
 echo "🔍 Starting daily PostHog session analysis..."
 
 # Run the session analysis
-./posthog-continuous-ai/analyze-sessions.sh > analysis-results.txt
+./analyze-sessions.sh > analysis-results.txt
 
 # Create GitHub issues based on the analysis
-./posthog-continuous-ai/create-github-issues.sh
+./create-github-issues.sh
 
 echo "✅ Daily analysis complete!"
