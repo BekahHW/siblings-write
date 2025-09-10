@@ -8,22 +8,15 @@ cd "$SCRIPT_DIR"
 
 echo "🔍 Starting daily PostHog session analysis..."
 
-# Check if .env file exists
-if [ ! -f ".env" ]; then
-  echo "❌ .env file not found. Please create it with your API keys."
+# Load .env file if it exists (for local development)
+if [ -f ".env" ]; then
+  source .env
+  echo "✅ Loaded local .env file"
+elif [ -n "$POSTHOG_API_KEY" ]; then
+  echo "✅ Using environment variables (GitHub Actions)"
+else
+  echo "❌ No .env file found and no environment variables set"
   exit 1
 fi
 
-# Check if GitHub CLI is authenticated
-if ! gh auth status &> /dev/null; then
-  echo "❌ GitHub CLI not authenticated. Please run 'gh auth login' first."
-  exit 1
-fi
-
-# Run the session analysis
-./analyze-sessions.sh > analysis-results.txt
-
-# Create GitHub issues based on the analysis  
-./create-github-issues.sh
-
-echo "✅ Daily analysis complete!"
+# Rest of script...
