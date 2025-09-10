@@ -27,4 +27,4 @@ jobs:
           npm install -g @continuedev/cli
 
       - name: Run analysis
-        run: ./daily-analysis.sh
+        run:  ./posthog-continuous-ai/daily-analysis.sh
