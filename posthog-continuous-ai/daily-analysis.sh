@@ -1,6 +1,7 @@
 #!/bin/bash
 # daily-analysis.sh
 set -e
+set -x
 
 echo "🔍 Starting daily PostHog session analysis..."
 
