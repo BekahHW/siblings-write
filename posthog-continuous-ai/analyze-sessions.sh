@@ -1,6 +1,7 @@
 #!/bin/bash
 # analyze-sessions.sh
 set -e
+set -x
 source .env
 
 echo "🎬 Fetching session recordings from PostHog..."
