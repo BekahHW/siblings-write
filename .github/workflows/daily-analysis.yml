@@ -2,7 +2,7 @@ name: Daily Session Analysis
 
 on:
   schedule:
-    - cron: "0 7 * * *" # Run at 7 AM UTC daily
+    - cron: "0 6 * * *" # Run at 6 AM UTC daily
   workflow_dispatch: # Allow manual triggering
 
 jobs:
@@ -11,15 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up environment
-        run: |
-          echo "POSTHOG_API_KEY=${{ secrets.POSTHOG_API_KEY }}" >> .env
-          echo "POSTHOG_PROJECT_ID=${{ secrets.POSTHOG_PROJECT_ID }}" >> .env
-          echo "POSTHOG_HOST=https://us.posthog.com" >> .env
-          echo "GITHUB_PERSONAL_ACCESS_TOKEN=${{ secrets.GH_PAT }}" >> .env
-          echo "GITHUB_OWNER=${{ github.repository_owner }}" >> .env
-          echo "GITHUB_REPO=$(echo ${{ github.repository }} | cut -d'/' -f2)" >> .env
-
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -27,4 +18,11 @@ jobs:
           npm install -g @continuedev/cli
 
       - name: Run analysis
-        run:  ./posthog-continuous-ai/daily-analysis.sh
+        env:
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+          POSTHOG_HOST: https://us.posthog.com
+          GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+        run: ./posthog-continuous-ai/daily-analysis.sh
