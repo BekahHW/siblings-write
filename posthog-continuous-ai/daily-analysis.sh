@@ -1,49 +1,39 @@
-#!/bin/bash
-# daily-analysis.sh
-set -e
+name: Daily Session Analysis
 
-# Get the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
 
-echo "🔍 Starting daily PostHog session analysis..."
+permissions:            # needed if you want to create issues
+  contents: read
+  issues: write
 
-# Check if running locally or in GitHub Actions
-if [ -f ".env" ]; then
-  # Local development - use .env file
-  source .env
-  echo "✅ Loaded local .env file"
-elif [ "$GITHUB_ACTIONS" = "true" ]; then
-  # GitHub Actions - use GitHub secrets via gh CLI
-  echo "✅ Running in GitHub Actions - using GitHub secrets"
-  export POSTHOG_API_KEY=$(gh secret list --json name,value | jq -r '.[] | select(.name=="POSTHOG_API_KEY") | .value')
-  export POSTHOG_PROJECT_ID=$(gh secret list --json name,value | jq -r '.[] | select(.name=="POSTHOG_PROJECT_ID") | .value')
-  export POSTHOG_HOST="https://us.posthog.com"
-  export GITHUB_OWNER="$GITHUB_REPOSITORY_OWNER"
-  export GITHUB_REPO="${GITHUB_REPOSITORY##*/}"
-elif [ -n "$POSTHOG_API_KEY" ]; then
-  # Environment variables already set
-  echo "✅ Using environment variables"
-else
-  echo "❌ No configuration found. Please:"
-  echo "  - Create .env file for local development, OR"
-  echo "  - Set environment variables, OR" 
-  echo "  - Run in GitHub Actions with secrets configured"
-  exit 1
-fi
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-# Check if GitHub CLI is authenticated
-if ! gh auth status &> /dev/null; then
-  echo "❌ GitHub CLI not authenticated. Please run 'gh auth login' first."
-  exit 1
-fi
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+          npm install -g @continuedev/cli
+          chmod +x daily-analysis.sh analyze-sessions.sh create-github-issues.sh
 
-# Run the session analysis
-echo "🎬 Running PostHog session analysis..."
-./analyze-sessions.sh > analysis-results.txt
+      - name: Run analysis
+        env:
+          # expose secrets as env vars (your script will use these)
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+          POSTHOG_HOST: https://us.posthog.com
 
-# Create GitHub issues based on the analysis  
-echo "📝 Creating GitHub issues from analysis..."
-./create-github-issues.sh
+          # repo info (if your scripts need them)
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
 
-echo "✅ Daily analysis complete!"
+          # auth for GitHub CLI. gh will auto-use this.
+          GH_TOKEN: ${{ github.token }}     # or secrets.GH_PAT if you prefer
+        run: |
+          ./daily-analysis.sh
