@@ -8,18 +8,25 @@ cd "$SCRIPT_DIR"
 
 echo "🔍 Starting daily PostHog session analysis..."
 
-# Check if running locally or in GitHub Actions
-if [ -f ".env" ]; then
-  # Local development - use .env file
+# Check environment in priority order: GitHub Actions first, then local
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+  # GitHub Actions - use environment variables from secrets (FIRST PRIORITY in CI)
+  echo "✅ Running in GitHub Actions - using repository secrets"
+  if [ -z "$POSTHOG_API_KEY" ] || [ -z "$GITHUB_PERSONAL_ACCESS_TOKEN" ]; then
+    echo "❌ GitHub Actions secrets not properly configured"
+    exit 1
+  fi
+elif [ -f ".env" ]; then
+  # Local development - use .env file (FIRST PRIORITY locally)
   source .env
   echo "✅ Loaded local .env file"
 elif [ -n "$POSTHOG_API_KEY" ]; then
-  # Environment variables already set (GitHub Actions)
+  # Fallback - use any available environment variables
   echo "✅ Using environment variables"
 else
   echo "❌ No configuration found. Please:"
-  echo "  - Create .env file for local development, OR"
-  echo "  - Set environment variables manually"
+  echo "  - For local: Create .env file"
+  echo "  - For GitHub Actions: Configure repository secrets"
   exit 1
 fi
 
@@ -41,5 +48,3 @@ echo "📝 Creating GitHub issues from analysis..."
 ./create-github-issues.sh
 
 echo "✅ Daily analysis complete!"
-
-
