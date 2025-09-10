@@ -1,0 +1,10 @@
+# Environment variables - contains API keys
+.env
+
+# Generated data files
+*.json
+analysis-results.txt
+daily-analysis.log
+
+# Temporary files
+*.tmp
