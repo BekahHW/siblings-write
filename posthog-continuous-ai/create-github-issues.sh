@@ -1,7 +1,12 @@
 #!/bin/bash
+
 # create-github-issues.sh - Creates GitHub issues using GitHub API
 set -e
-source .env
+
+# Load .env if it exists (for local testing)
+if [ -f .env ]; then
+  . .env
+fi
 
 # Input file containing Continue CLI analysis output
 ANALYSIS_FILE="analysis-results.txt"
