@@ -2,8 +2,19 @@
 # analyze-sessions.sh
 set -e
 
-# GitHub Actions will provide these as environment variables from secrets
-# POSTHOG_API_KEY, POSTHOG_HOST, and POSTHOG_PROJECT_ID should be set in the action
+# Load .env if it exists (for local testing), otherwise use GitHub Actions environment
+if [ -f .env ]; then
+    source .env
+fi
+
+# Check for required environment variables
+if [ -z "$POSTHOG_API_KEY" ] || [ -z "$POSTHOG_PROJECT_ID" ] || [ -z "$POSTHOG_HOST" ]; then
+    echo "❌ Missing required environment variables"
+    echo "POSTHOG_API_KEY: ${POSTHOG_API_KEY:+[SET]}"
+    echo "POSTHOG_PROJECT_ID: ${POSTHOG_PROJECT_ID:+[SET]}"
+    echo "POSTHOG_HOST: ${POSTHOG_HOST:+[SET]}"
+    exit 1
+fi
 
 echo "🎬 Fetching session recordings from PostHog..."
 
