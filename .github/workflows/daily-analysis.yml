@@ -2,41 +2,51 @@ name: Daily Session Analysis
 
 on:
   schedule:
-    - cron: "0 6 * * *" # Run at 6 AM UTC daily
-  workflow_dispatch: # Allow manual triggering
+    - cron: '0 6 * * *'  # Run at 6 AM UTC daily
+  workflow_dispatch:     # Allow manual triggering
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
-
+    
     permissions:
       contents: read
       issues: write
-
+      
     steps:
       - uses: actions/checkout@v3
         with:
-  # Use deploy key if available, otherwise use default token
-          ssh-key: ${{ secrets.CONTINUE_API_KEY || '' }}      
-
+          # Deploy key is REQUIRED for Continue CLI integration
+          ssh-key: ${{ secrets.CONTINUE_DEPLOY_KEY }}
+      
+      - name: Set up Continue API key
+        run: |
+          echo "CONTINUE_API_KEY=${{ secrets.CONTINUE_API_KEY }}" >> .env
+          
+      - name: Set up environment
+        run: |
+          echo "POSTHOG_API_KEY=${{ secrets.POSTHOG_API_KEY }}" >> .env
+          echo "POSTHOG_PROJECT_ID=${{ secrets.POSTHOG_PROJECT_ID }}" >> .env
+          echo "POSTHOG_HOST=https://us.posthog.com" >> .env
+          echo "GITHUB_OWNER=${{ github.repository_owner }}" >> .env
+          echo "GITHUB_REPO=$(echo ${{ github.repository }} | cut -d'/' -f2)" >> .env
+      
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y jq curl
+          # Install Continue CLI for AI analysis
           npm install -g @continuedev/cli
-
+          # GitHub CLI is pre-installed on GitHub-hosted runners
+          
       - name: Make scripts executable
         run: |
           chmod +x ./daily-analysis.sh
           chmod +x ./analyze-sessions.sh
           chmod +x ./create-github-issues.sh
-
-      - name: Run analysis
+      
+      - name: Run analysis and create issues
         env:
-          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
-          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
-          POSTHOG_HOST: https://us.posthog.com
-          GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PAT }}
-          GITHUB_OWNER: "BekahHW"
-          GITHUB_REPO: "siblings-write"
-        run: ./posthog-continuous-ai/daily-analysis.sh
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./daily-analysis.sh
