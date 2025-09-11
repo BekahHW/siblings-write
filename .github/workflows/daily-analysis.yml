@@ -41,12 +41,12 @@ jobs:
           
       - name: Make scripts executable
         run: |
-          chmod +x ./daily-analysis.sh
-          chmod +x ./analyze-sessions.sh
-          chmod +x ./create-github-issues.sh
-      
+          chmod +x ./posthog-continuous-ai/daily-analysis.sh
+          chmod +x ./posthog-continuous-ai/analyze-sessions.sh
+          chmod +x ./posthog-continuous-ai/create-github-issues.sh
+
       - name: Run analysis and create issues
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./daily-analysis.sh
+        run: ./posthog-continuous-ai/daily-analysis.sh
