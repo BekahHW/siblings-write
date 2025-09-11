@@ -13,7 +13,7 @@ echo "🤖 Running autonomous analysis with GitHub Actions secrets"
 echo "🐛 DEBUG: Environment variable status:"
 echo "  POSTHOG_API_KEY: ${POSTHOG_API_KEY:+SET} ${POSTHOG_API_KEY:-MISSING}"
 echo "  POSTHOG_PROJECT_ID: ${POSTHOG_PROJECT_ID:+SET} ${POSTHOG_PROJECT_ID:-MISSING}"
-echo "  GITHUB_PERSONAL_ACCESS_TOKEN: ${GH_PAT:+SET} ${GITHUB_PERSONAL_ACCESS_TOKEN:-MISSING}"
+echo "  GH_PAT: ${GH_PAT:+SET} ${GH_PAT:-MISSING}"
 echo "  GITHUB_OWNER: ${GITHUB_OWNER:+SET} ${GITHUB_OWNER:-MISSING}"
 echo "  GITHUB_REPO: ${GITHUB_REPO:+SET} ${GITHUB_REPO:-MISSING}"
 
@@ -22,7 +22,7 @@ echo "🐛 DEBUG: All GITHUB environment variables:"
 env | grep GITHUB || echo "No GITHUB environment variables found"
 
 # Verify required variables are set
-if [ -z "$POSTHOG_API_KEY" ] || [ -z "$GITHUB_PERSONAL_ACCESS_TOKEN" ] || [ -z "$GITHUB_OWNER" ] || [ -z "$GITHUB_REPO" ]; then
+if [ -z "$POSTHOG_API_KEY" ] || [ -z "$GH_PAT" ] || [ -z "$GITHUB_OWNER" ] || [ -z "$GITHUB_REPO" ]; then
   echo "❌ Missing required environment variables"
   exit 1
 fi

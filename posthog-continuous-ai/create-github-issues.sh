@@ -22,7 +22,7 @@ create_github_issue() {
 
   # Convert labels from JSON array to proper JSON array for API
   response=$(curl -s -X POST \
-    -H "Authorization: token $GITHUB_PERSONAL_ACCESS_TOKEN" \
+  -H "Authorization: token $GH_PAT" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/json" \
     -d "{\"title\":\"$title\", \"body\":\"$body\", \"labels\":$labels}" \
