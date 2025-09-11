@@ -45,6 +45,6 @@ jobs:
 
       - name: Run analysis and create issues
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: ./posthog-continuous-ai/daily-analysis.sh
