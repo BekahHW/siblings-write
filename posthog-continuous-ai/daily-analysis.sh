@@ -72,8 +72,20 @@ fi
 
 # Create GitHub issues
 echo "📝 Creating GitHub issues from analysis..."
-if ! bash ./posthog-continuous-ai/create-github-issues.sh; then
-  echo "❌ Issue creation failed"
+# Use 'set -x' to debug the exact command being run
+set -x
+bash ./posthog-continuous-ai/create-github-issues.sh
+RESULT=$?
+set +x
+
+if [ $RESULT -ne 0 ]; then
+  echo "❌ Issue creation failed with exit code: $RESULT"
+  # Show what files exist
+  echo "📁 Current directory: $(pwd)"
+  echo "📄 Files in current directory:"
+  ls -la *.txt 2>/dev/null || echo "No .txt files found"
+  echo "📄 Files in posthog-continuous-ai:"
+  ls -la posthog-continuous-ai/*.txt 2>/dev/null || echo "No .txt files found in posthog-continuous-ai"
   exit 1
 fi
 

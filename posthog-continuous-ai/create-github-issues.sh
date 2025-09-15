@@ -167,17 +167,28 @@ echo "🔍 Processing entire file as analysis content"
 # Pattern 1: Look for ### N. **Title** format (what Continue CLI is actually outputting)
 echo "🔍 Searching for '### [number]. **' pattern..."
 
+# Add error handling for the main loop
+set +e  # Temporarily disable exit on error
+
 # Process the file and extract issues
 current_issue_num=0
 current_title=""
 current_body=""
 current_priority=""
 
-while IFS= read -r line; do
+echo "📖 Reading analysis file line by line..."
+
+while IFS= read -r line || [ -n "$line" ]; do
+  echo "  🔍 Processing line: ${line:0:50}..."
+  
   # Check if this is a new issue header
   if [[ $line =~ ^###\ [0-9]+\.\ \*\*(.+)\*\* ]]; then
+    echo "  ✅ Matched issue pattern!"
+    
     # If we have a previous issue, create it
     if [ -n "$current_title" ] && [ -n "$current_body" ]; then
+      echo "  📝 Creating previous issue: $current_title"
+      
       # Determine labels
       if [[ "$current_priority" == "HIGH" ]]; then
         labels='["bug", "high-priority", "user-experience", "automated"]'
@@ -187,10 +198,15 @@ while IFS= read -r line; do
         labels='["low-priority", "user-experience", "automated"]'
       fi
       
+      echo "  🏷️  Labels: $labels"
+      
       if create_github_issue "🔍 UX Issue: $current_title" "$current_body" "$labels"; then
         ((issues_created++))
+        echo "  ✅ Issue created successfully (total: $issues_created)"
       else
         echo "  ⚠️  Failed to create issue #$current_issue_num"
+        echo "  Title was: $current_title"
+        echo "  Body length: ${#current_body}"
       fi
     fi
     
@@ -207,12 +223,43 @@ while IFS= read -r line; do
       # Check for priority
       if [[ $line =~ \*\*Priority\*\*:\ \*\*(HIGH|MEDIUM|LOW)\*\* ]]; then
         current_priority="${BASH_REMATCH[1]}"
-        echo "  Priority: $current_priority"
+        echo "    ➡️  Priority detected: $current_priority"
       fi
       current_body="${current_body}${line}"$'\n'
     fi
   fi
 done < "$ANALYSIS_FILE"
+
+echo "📖 Finished reading file"
+
+# Don't forget the last issue
+if [ -n "$current_title" ] && [ -n "$current_body" ]; then
+  echo "📝 Creating final issue: $current_title"
+  
+  # Determine labels
+  if [[ "$current_priority" == "HIGH" ]]; then
+    labels='["bug", "high-priority", "user-experience", "automated"]'
+  elif [[ "$current_priority" == "MEDIUM" ]]; then
+    labels='["enhancement", "medium-priority", "user-experience", "automated"]'
+  else
+    labels='["low-priority", "user-experience", "automated"]'
+  fi
+  
+  echo "  🏷️  Labels: $labels"
+  
+  if create_github_issue "🔍 UX Issue: $current_title" "$current_body" "$labels"; then
+    ((issues_created++))
+    echo "  ✅ Final issue created successfully (total: $issues_created)"
+  else
+    echo "  ⚠️  Failed to create final issue"
+    echo "  Title was: $current_title"
+    echo "  Body length: ${#current_body}"
+  fi
+else
+  echo "⚠️  No final issue to create (title='$current_title', body length=${#current_body})"
+fi
+
+set -e  # Re-enable exit on error
 
 # Don't forget the last issue
 if [ -n "$current_title" ] && [ -n "$current_body" ]; then
