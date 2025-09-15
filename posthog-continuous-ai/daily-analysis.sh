@@ -65,14 +65,14 @@ echo "✅ GitHub CLI authenticated"
 
 # Run the analysis
 echo "🎬 Running PostHog session analysis..."
-if ! bash ./analyze-sessions.sh; then
+if ! bash ./posthog-continuous-ai/analyze-sessions.sh; then
   echo "❌ Analysis failed"
   exit 1
 fi
 
 # Create GitHub issues
 echo "📝 Creating GitHub issues from analysis..."
-if ! bash ./create-github-issues.sh; then
+if ! bash ./posthog-continuous-ai/create-github-issues.sh; then
   echo "❌ Issue creation failed"
   exit 1
 fi
