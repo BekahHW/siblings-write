@@ -11,13 +11,29 @@ fi
 # Input file containing Continue CLI analysis output
 ANALYSIS_FILE="analysis-results.txt"
 
+# Determine where the analysis file should be based on how we're being called
+# If called from parent directory, files are created there
+if [ "$(basename $(pwd))" != "posthog-continuous-ai" ] && [ -d "posthog-continuous-ai" ]; then
+  echo "📁 Running from parent directory, analysis file should be here"
+  # Analysis file is in current (parent) directory
+elif [ "$(basename $(pwd))" == "posthog-continuous-ai" ] && [ -f "../$ANALYSIS_FILE" ]; then
+  echo "📁 Running from posthog-continuous-ai, but analysis file is in parent"
+  ANALYSIS_FILE="../$ANALYSIS_FILE"
+fi
+
 # Debug: Show environment
 echo "🐛 DEBUG: Environment Check"
 echo "  Working directory: $(pwd)"
+echo "  Script directory: $(dirname "$0")"
+echo "  Analysis file path: $ANALYSIS_FILE"
 echo "  Analysis file exists: $([ -f "$ANALYSIS_FILE" ] && echo "✅ Yes" || echo "❌ No")"
 echo "  Analysis file size: $([ -f "$ANALYSIS_FILE" ] && wc -c < "$ANALYSIS_FILE" || echo "0") bytes"
 echo "  GitHub repo: ${GITHUB_OWNER:-[NOT SET]}/${GITHUB_REPO:-[NOT SET]}"
 echo "  GH_PAT exists: $([ -n "$GH_PAT" ] && echo "✅ Yes (${#GH_PAT} chars)" || echo "❌ No")"
+
+# Also check what files exist in current directory
+echo "  Files in current directory:"
+ls -la *.txt *.json 2>/dev/null | head -5 || echo "    No .txt or .json files found"
 
 # Check required environment variables
 if [ -z "$GITHUB_OWNER" ] || [ -z "$GITHUB_REPO" ]; then
@@ -75,27 +91,45 @@ create_github_issue() {
 
   # Make the API request
   echo "  🚀 Making API request..."
-  response=$(curl -s -X POST \
-  -H "Authorization: token $GH_PAT" \
+  
+  # Use curl with error handling
+  http_code=$(curl -s -o /tmp/github_response.json -w "%{http_code}" \
+    -X POST \
+    -H "Authorization: token $GH_PAT" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/json" \
     -d "$json_body" \
     "https://api.github.com/repos/$GITHUB_OWNER/$GITHUB_REPO/issues")
-
-  # Check if issue was created successfully
-  issue_number=$(echo "$response" | jq -r '.number // empty')
   
-  if [ -n "$issue_number" ] && [ "$issue_number" != "null" ]; then
-    issue_url=$(echo "$response" | jq -r '.html_url')
+  response=$(cat /tmp/github_response.json)
+  
+  echo "  HTTP Status Code: $http_code"
+  
+  # Check if issue was created successfully (201 Created)
+  if [ "$http_code" = "201" ]; then
+    issue_number=$(echo "$response" | jq -r '.number // empty')
+    issue_url=$(echo "$response" | jq -r '.html_url // empty')
     echo "  ✅ Created issue #$issue_number: $issue_url"
+    return 0
   else
-    echo "  ❌ Failed to create issue"
+    echo "  ❌ Failed to create issue (HTTP $http_code)"
     echo "  Response: $response"
+    
     # Check for common errors
-    error_message=$(echo "$response" | jq -r '.message // empty')
+    error_message=$(echo "$response" | jq -r '.message // empty' 2>/dev/null || echo "")
     if [ -n "$error_message" ]; then
       echo "  Error message: $error_message"
     fi
+    
+    # Common error codes
+    case $http_code in
+      401) echo "  💡 Check your GH_PAT token permissions" ;;
+      403) echo "  💡 Forbidden - check repo permissions or rate limits" ;;
+      404) echo "  💡 Repository not found: $GITHUB_OWNER/$GITHUB_REPO" ;;
+      422) echo "  💡 Invalid request - check JSON format" ;;
+    esac
+    
+    return 1
   fi
 }
 
@@ -153,8 +187,11 @@ while IFS= read -r line; do
         labels='["low-priority", "user-experience", "automated"]'
       fi
       
-      create_github_issue "🔍 UX Issue: $current_title" "$current_body" "$labels"
-      ((issues_created++))
+      if create_github_issue "🔍 UX Issue: $current_title" "$current_body" "$labels"; then
+        ((issues_created++))
+      else
+        echo "  ⚠️  Failed to create issue #$current_issue_num"
+      fi
     fi
     
     # Start new issue

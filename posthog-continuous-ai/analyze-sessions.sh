@@ -38,6 +38,11 @@ cat sessions.json | jq -s 'map(select(.console_error_count > 0 or .recording_dur
 
 echo "🚨 Found $(cat problem-sessions.json | jq length) problematic sessions"
 
+# Debug: Show where files are being created
+echo "📁 Working directory: $(pwd)"
+echo "📄 Files created:"
+ls -la sessions.json problem-sessions.json 2>/dev/null || echo "Files not found"
+
 
 
 if [ -n "$CONTINUE_API_KEY" ]; then
@@ -90,5 +95,9 @@ Format your response with EXACTLY 3 issues using this structure:
 
 Base all issues on actual patterns in the provided session data. Focus on problems that affect multiple sessions or show critical failures.
 " > analysis-results.txt 2>&1
+
+# Debug: Show where analysis results were saved
+echo "📄 Analysis results saved to: $(pwd)/analysis-results.txt"
+echo "📏 File size: $(wc -c < analysis-results.txt 2>/dev/null || echo "0") bytes"
 
 echo "✅ Analysis complete! Check the output above for optimization opportunities."
