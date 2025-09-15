@@ -38,38 +38,57 @@ cat sessions.json | jq -s 'map(select(.console_error_count > 0 or .recording_dur
 
 echo "🚨 Found $(cat problem-sessions.json | jq length) problematic sessions"
 
-# Analyze with Continue CLI
+
+
+if [ -n "$CONTINUE_API_KEY" ]; then
+    echo "🔑 Logging in to Continue CLI..."
+    echo "$CONTINUE_API_KEY" | cn login
+fi
+
+# Analyze with Continue CLI - save output to file for issue creation
 cat problem-sessions.json | cn -p "
-Analyze these PostHog session recordings to identify user experience issues.
+Analyze these PostHog session recordings and create exactly 3 GitHub issues for the most critical user experience problems.
 
-Each session contains:
-- duration: how long the session lasted (in seconds)
-- start_url: the page where the user started
-- click_count: total number of clicks
-- console_error_count: JavaScript errors encountered
+Session data format:
+- duration: session length in seconds
+- start_url: starting page URL
+- click_count: total clicks in session
+- console_error_count: JavaScript errors
 
-Look for patterns that suggest code issues:
+Format your response with EXACTLY 3 issues using this structure:
 
-1. **High Error Sessions**: Sessions with console_error_count > 0
-   - What pages/URLs are generating errors?
-   - Are users abandoning after errors occur?
+### 1. **Widespread JavaScript Errors**
+**Problem**: Every session shows console errors affecting user experience
+**Technical Causes**: Broken dependencies, missing resources, or initialization failures
+**Affected Pages**: /blog/last-show/, /works/, /blog/viewing/
+**Recommended Fix**:
+- Add error monitoring (Sentry)
+- Audit browser console on each page
+- Fix broken dependencies
+**Priority**: **HIGH**
+**Impact**: Affects 100% of sessions
 
-2. **Long Duration Sessions**: Sessions over 300 seconds (5+ minutes)
-   - Are users struggling to complete tasks?
-   - Low click count + high duration = user confusion
+### 2. **[Second Issue Title]**
+**Problem**: [One sentence problem description]
+**Technical Causes**: [Technical explanation]
+**Affected Pages**: [List URLs from the data]
+**Recommended Fix**:
+- [Specific action 1]
+- [Specific action 2]
+**Priority**: **[HIGH/MEDIUM/LOW]**
+**Impact**: [Quantified impact]
 
-3. **Abandonment Patterns**:
-   - Users starting on key pages but not progressing
-   - Short sessions on important conversion pages
+### 3. **[Third Issue Title]**
+**Problem**: [One sentence problem description]
+**Technical Causes**: [Technical explanation]
+**Affected Pages**: [List URLs from the data]
+**Recommended Fix**:
+- [Specific action 1]
+- [Specific action 2]
+**Priority**: **[HIGH/MEDIUM/LOW]**
+**Impact**: [Quantified impact]
 
-For each issue pattern you identify:
-- Describe the user behavior problem
-- Suggest likely technical causes (JS errors, slow loading, UI confusion)
-- Recommend specific code areas to investigate
-- Provide example fixes or improvements
-- Priority: High (blocks user goals), Medium (hurts UX), Low (minor issue)
-
-Focus on actionable technical improvements that will measurably improve user experience.
-"
+Base all issues on actual patterns in the provided session data. Focus on problems that affect multiple sessions or show critical failures.
+" > analysis-results.txt 2>&1
 
 echo "✅ Analysis complete! Check the output above for optimization opportunities."
