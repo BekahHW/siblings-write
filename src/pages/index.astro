@@ -610,7 +610,7 @@ const getAuthorName = (authorId) => {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const form = document.querySelector('.newsletter-form-inline');
+  const form = document.querySelector('.newsletter-form-inline') as HTMLFormElement;
   const modal = document.getElementById('success-modal');
   const closeButton = document.getElementById('close-modal');
   const okButton = document.getElementById('modal-ok');
@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
   form.addEventListener('submit', function(e) {
     e.preventDefault(); // Prevent normal form submission
     
-    const email = form.querySelector('input[name="email_address"]').value;
+    const email = (form.querySelector('input[name="email_address"]') as HTMLInputElement)?.value;
     if (!email) return;
     
     const submitButton = form.querySelector('[data-element="submit"]');
@@ -636,9 +636,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const buttonText = submitButton.querySelector('span');
     
     // Show loading state
-    if (spinner) spinner.style.display = 'block';
+    if (spinner) (spinner as HTMLElement).style.display = 'block';
     if (buttonText) buttonText.style.opacity = '0';
-    submitButton.disabled = true;
+    (submitButton as HTMLButtonElement).disabled = true;
     
     // Create form data
     const formData = new FormData();
@@ -665,9 +665,9 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .finally(() => {
       // Reset button state
-      if (spinner) spinner.style.display = 'none';
+      if (spinner) (spinner as HTMLElement).style.display = 'none';
       if (buttonText) buttonText.style.opacity = '1';
-      submitButton.disabled = false;
+      (submitButton as HTMLButtonElement).disabled = false;
     });
   });
 
