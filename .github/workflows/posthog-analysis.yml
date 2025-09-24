@@ -23,15 +23,49 @@ jobs:
 
     - name: Install Continue CLI
       run: |
+        echo "Installing Continue CLI..."
         npm install -g @continuedev/cli
-        echo "✅ Continue CLI installed"
+        echo "Installation completed"
     
-
-    - name: Run Continue Agent
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+    - name: Debug - Verify CLI installation
       run: |
+        echo "Checking if cn command is available..."
+        which cn || echo "cn command not found in PATH"
+        echo "Checking npm global packages..."
+        npm list -g --depth=0 | grep continue || echo "Continue CLI not found in global packages"
+        echo "Trying to run cn --version..."
+        cn --version || echo "Failed to run cn --version"
+        env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+    
+    - name: Debug - Test CLI help
+      run: |
+        echo "Testing cn --help..."
+        cn --help || echo "Failed to run cn --help"
+        env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+    
+    - name: Run Continue Agent Analysis
+      run: |
+        echo "Starting Continue Agent analysis..."
+        echo "Command: cn --config 
+        continuedev/awesome-models-posthog-gh -p \"Analyze PostHog sessions
+        and create GitHub issues for UX problems\""
+                
+        set -x  # Enable command tracing
         cn --config continuedev/awesome-models-posthog-gh -p "Analyze PostHog sessions and create GitHub issues for UX problems"
+
+        echo "Continue Agent analysis completed with exit code: $?"
+        env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Debug - Post-execution info
+      if: always()  # Run even if previous steps fail
+      run: |
+        echo "Workflow completed"
+        echo "Exit codes from previous steps:"
+        echo "This step always runs to show final status"
 
     - name: Summary
       run: |
