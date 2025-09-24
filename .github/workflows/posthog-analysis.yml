@@ -56,7 +56,7 @@ jobs:
         cn --config continuedev/awesome-models-posthog-gh -p "Analyze PostHog sessions and create GitHub issues for UX problems"
 
         echo "Continue Agent analysis completed with exit code: $?"
-        env:
+      env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
