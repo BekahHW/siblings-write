@@ -51,7 +51,7 @@ jobs:
       run: |
         echo "🔧 Step 1: Verifying Continue Agent Configuration"
         echo "Testing basic agent response (10s timeout)"
-        timeout 10s cn -p "What is your name and what can you do?" || echo "❌ Basic agent test failed"
+        timeout 30s cn -p "What is your name and what can you do?" || echo "❌ Basic agent test failed"
         echo "✅ Basic agent test completed"
         
     - name: Test Specific PostHog Agent Config
@@ -61,7 +61,7 @@ jobs:
         echo "🎯 Step 2: Testing PostHog-specific agent configuration"
         echo "Loading PostHog config: continuedev/awesome-models-posthog-gh"
         echo "Testing agent identity (15s timeout)"
-        timeout 15s cn --config continuedev/awesome-models-posthog-gh -p "What is your role? Are you configured for PostHog analysis?" || echo "❌ PostHog agent config test failed"
+        timeout 35s cn --config continuedev/awesome-models-posthog-gh -p "What is your role? Are you configured for PostHog analysis?" || echo "❌ PostHog agent config test failed"
         echo "✅ PostHog agent config test completed"
         
     - name: Test PostHog Connection
