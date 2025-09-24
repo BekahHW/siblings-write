@@ -45,54 +45,87 @@ jobs:
         echo "Testing cn --help..."
         cn --help || echo "Failed to run cn --help"
     
-    - name: Test Continue CLI Basic Connection
+    - name: Verify Continue Agent Configuration
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
-        echo "🔍 Testing basic Continue CLI functionality..."
-        echo "Timeout set to 30 seconds for this test"
-        timeout 30s cn --help || echo "❌ CLI help command timed out or failed"
-        echo "✅ Basic CLI test completed"
-    
-    - name: Test PostHog Config Access
+        echo "🔧 Step 1: Verifying Continue Agent Configuration"
+        echo "Testing basic agent response (10s timeout)"
+        timeout 10s cn -p "What is your name and what can you do?" || echo "❌ Basic agent test failed"
+        echo "✅ Basic agent test completed"
+        
+    - name: Test Specific PostHog Agent Config
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
-        echo "🔍 Testing PostHog config access..."
-        echo "Attempting to load config: continuedev/awesome-models-posthog-gh"
-        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Hello, can you confirm PostHog access?" || echo "❌ PostHog config test timed out or failed"
-        echo "✅ PostHog config test completed"
-    
-    - name: Run PostHog Analysis Only
+        echo "🎯 Step 2: Testing PostHog-specific agent configuration"
+        echo "Loading PostHog config: continuedev/awesome-models-posthog-gh"
+        echo "Testing agent identity (15s timeout)"
+        timeout 15s cn --config continuedev/awesome-models-posthog-gh -p "What is your role? Are you configured for PostHog analysis?" || echo "❌ PostHog agent config test failed"
+        echo "✅ PostHog agent config test completed"
+        
+    - name: Test PostHog Connection
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
-        echo "📊 Starting PostHog analysis (without GitHub issue creation)..."
-        echo "Timeout set to 5 minutes for analysis"
-        timeout 300s cn --config continuedev/awesome-models-posthog-gh -p "Analyze recent PostHog sessions and summarize UX issues. Do NOT create GitHub issues - just provide analysis." || echo "❌ PostHog analysis timed out or failed"
-        echo "✅ PostHog analysis step completed"
+        echo "🔌 Step 3: Testing PostHog API connection"
+        echo "Attempting to verify PostHog connectivity (30s timeout)"
+        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Can you connect to PostHog? Please test the connection and report the status." || echo "❌ PostHog connection test failed"
+        echo "✅ PostHog connection test completed"
+        
+    - name: Test PostHog Data Access
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+      run: |
+        echo "📊 Step 4: Testing PostHog data access"
+        echo "Checking if agent can access session recordings (45s timeout)"
+        timeout 45s cn --config continuedev/awesome-models-posthog-gh -p "Can you access PostHog session recordings? Please check and list available data types (no analysis yet, just verify access)." || echo "❌ PostHog data access test failed"
+        echo "✅ PostHog data access test completed"
+        
+    - name: Test Session Recording Access
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+      run: |
+        echo "🎬 Step 5: Testing session recording access specifically"
+        echo "Verifying access to session recordings data (60s timeout)"
+        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Please verify you can access session recordings. How many sessions can you see? What date range? (Just verification, no full analysis)." || echo "❌ Session recording access test failed"
+        echo "✅ Session recording access test completed"
     
-    - name: Create GitHub Issues (Separate Step)
+    - name: Run Limited PostHog Analysis
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+      run: |
+        echo "🔍 Step 6: Running limited PostHog analysis"
+        echo "Analyzing just 5 recent sessions (2 minute timeout)"
+        timeout 120s cn --config continuedev/awesome-models-posthog-gh -p "Please analyze the 5 most recent PostHog sessions. Identify any obvious UX issues. Keep the analysis brief. Do NOT create GitHub issues." || echo "❌ Limited PostHog analysis failed"
+        echo "✅ Limited PostHog analysis completed"
+    
+    - name: Create GitHub Issues (Only if previous steps work)
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "🐛 Creating GitHub issues based on analysis..."
-        echo "Timeout set to 3 minutes for issue creation"
-        timeout 180s cn --config continuedev/awesome-models-posthog-gh -p "Based on previous PostHog analysis, create GitHub issues for the top 3 UX problems found. Use the GITHUB_TOKEN to create actual issues." || echo "❌ GitHub issue creation timed out or failed"
+        echo "🐛 Step 7: Creating GitHub issues based on analysis"
+        echo "This step only runs if data access worked (90s timeout)"
+        timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Based on the previous limited analysis, create 1 GitHub issue for the most critical UX problem found. Use the GITHUB_TOKEN." || echo "❌ GitHub issue creation failed"
         echo "✅ GitHub issue creation completed"
     
     
     - name: Debug - Post-execution info
       if: always()  # Run even if previous steps fail
       run: |
-        echo "📋 Workflow execution summary:"
-        echo "- Basic CLI test: Check logs above"
-        echo "- PostHog config test: Check logs above"
-        echo "- PostHog analysis: Check logs above"
-        echo "- GitHub issue creation: Check logs above"
+        echo "📋 Detailed workflow execution summary:"
+        echo "Step 1 - Agent Configuration: Check logs above"
+        echo "Step 2 - PostHog Agent Config: Check logs above"
+        echo "Step 3 - PostHog Connection: Check logs above"
+        echo "Step 4 - PostHog Data Access: Check logs above"
+        echo "Step 5 - Session Recording Access: Check logs above"
+        echo "Step 6 - Limited Analysis: Check logs above"
+        echo "Step 7 - GitHub Issues: Check logs above"
+        echo ""
         echo "🔍 Look for ✅ or ❌ indicators in each step"
-        echo "⏱️ All steps have timeouts to prevent hanging"
+        echo "⏱️ All steps have short timeouts to identify hang points"
+        echo "🎯 This will help identify exactly where the connection fails"
 
     - name: Summary
       run: |
