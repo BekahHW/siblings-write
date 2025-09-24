@@ -28,6 +28,8 @@ jobs:
         echo "Installation completed"
     
     - name: Debug - Verify CLI installation
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
         echo "Checking if cn command is available..."
         which cn || echo "cn command not found in PATH"
@@ -35,15 +37,13 @@ jobs:
         npm list -g --depth=0 | grep continue || echo "Continue CLI not found in global packages"
         echo "Trying to run cn --version..."
         cn --version || echo "Failed to run cn --version"
-        env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
     
     - name: Debug - Test CLI help
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
         echo "Testing cn --help..."
         cn --help || echo "Failed to run cn --help"
-        env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
     
     - name: Run Continue Agent Analysis
       env:
@@ -51,9 +51,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         echo "Starting Continue Agent analysis..."
-        echo "Command: cn --config 
-        continuedev/awesome-models-posthog-gh -p \"Analyze PostHog sessions
-        and create GitHub issues for UX problems\""
+        echo "Command: cn --config continuedev/awesome-models-posthog-gh -p \"Analyze PostHog sessions and create GitHub issues for UX problems\""
                 
         set -x  # Enable command tracing
         cn --config continuedev/awesome-models-posthog-gh -p "Analyze PostHog sessions and create GitHub issues for UX problems"
