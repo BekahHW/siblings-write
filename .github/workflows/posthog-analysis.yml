@@ -34,18 +34,36 @@ jobs:
         echo "🔌 Step 3: Testing PostHog API connection"
         echo "Testing simple PostHog query first..."
         
-        if timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Tell me about my posthog data. If you can't access any information, write 'no data'." > posthog_simple.md 2>posthog_simple_error.log; then
-          echo "✅ Simple PostHog test SUCCESS"
-          echo "=================================="
-          echo "Simple PostHog Response:"
-          cat posthog_simple.md
-          echo "=================================="
-          echo "File size:" 
-          ls -la posthog_simple.md
+        # Check what files exist before running
+        echo "Files before test:"
+        ls -la *.md *.log 2>/dev/null || echo "No .md or .log files yet"
+        
+        # Run the command and capture exit code
+        if timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Hello, can you access PostHog? Just respond with yes/no." > posthog_simple.md 2>posthog_simple_error.log; then
+          EXIT_CODE=0
         else
-          echo "❌ Simple PostHog test FAILED"
-          echo "Error log:"
-          cat posthog_simple_error.log
+          EXIT_CODE=$?
+        fi
+        
+        echo "Command exit code: $EXIT_CODE"
+        echo "Files after test:"
+        ls -la *.md *.log 2>/dev/null || echo "No .md or .log files found"
+        
+        # Check if files were created and show their contents
+        if [ -f "posthog_simple.md" ]; then
+          echo "Response file size: $(wc -c < posthog_simple.md) bytes"
+          echo "Response content:"
+          cat posthog_simple.md || echo "Cannot read response file"
+        else
+          echo "❌ Response file not created"
+        fi
+        
+        if [ -f "posthog_simple_error.log" ]; then
+          echo "Error file size: $(wc -c < posthog_simple_error.log) bytes"
+          echo "Error content:"
+          cat posthog_simple_error.log || echo "Cannot read error file"
+        else
+          echo "❌ Error file not created"
         fi
       
     
