@@ -32,12 +32,8 @@ jobs:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
         echo "🔌 Step 3: Testing PostHog API connection"
-        echo "Testing simple PostHog query first..."
-        
-        # Check what files exist before running
-        echo "Files before test:"
-        ls -la *.md *.log 2>/dev/null || echo "No .md or .log files yet"
-        
+        echo "Testing PostHog query first..."
+
         # Run the command and capture exit code - using the same prompt that works in TUI
         if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Using the MCP and my prompts, tell me about my posthog recording sessions data" > posthog_simple.md 2>posthog_simple_error.log; then
           EXIT_CODE=0
