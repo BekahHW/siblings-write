@@ -54,10 +54,6 @@ jobs:
         run: |
           echo "Checking Continue account authentication..."
           
-          # The cn whoami command has issues in non-interactive environments
-          echo "Note: cn whoami fails in GitHub Actions (non-interactive terminal)"
-          echo "Testing account authentication through basic agent query..."
-          
           # Create a prompt to check account identity
           cat > account_check.txt << 'EOF'
           Please tell me:
