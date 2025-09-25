@@ -54,18 +54,21 @@ jobs:
         run: |
           echo "Checking Continue account authentication..."
           
-          # Get current account info
-          if cn -p whoami > account_info.txt 2>account_error.log; then
+          # Get current account info using whoami command
+          echo "Running: cn whoami"
+          if cn whoami > account_info.txt 2>account_error.log; then
             echo "✅ whoami command executed successfully"
-            echo "Account info:"
+            echo "=================================="
+            echo "Account info from whoami:"
             cat account_info.txt
+            echo "=================================="
             
             # Check if logged in as bekah@continue.dev
             if grep -q "bekah@continue.dev" account_info.txt; then
               echo "✅ Logged in as bekah@continue.dev - CORRECT ACCOUNT"
             else
               echo "❌ NOT logged in as bekah@continue.dev"
-              echo "Current account:"
+              echo "Current account details:"
               cat account_info.txt
               echo ""
               echo "ERROR: Must be logged in as bekah@continue.dev for PostHog integration to work"
@@ -81,6 +84,7 @@ jobs:
             echo "- Invalid CONTINUE_API_KEY"
             echo "- Not authenticated with Continue service"
             echo "- Network connectivity issues"
+            echo "- Account not properly configured"
             exit 1
           fi
 
