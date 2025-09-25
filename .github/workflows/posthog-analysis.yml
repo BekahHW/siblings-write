@@ -55,7 +55,7 @@ jobs:
         echo "🐛 Step 4: Creating GitHub issues from PostHog analysis"
         echo "Using previous analysis to create issues (60s timeout)"
         
-        if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Based on the PostHog analysis you just performed, create GitHub issues for the top 3 UX problems you identified. Use the GITHUB_TOKEN to create the issues in this repository." > github_issues.md 2>github_error.log; then
+        if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Based on the PostHog analysis you just performed, create GitHub issues for the top 3 UX problems you identified. Use the gh CLI to create the issues in this repository. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'" > github_issues.md 2>github_error.log; then
           echo "✅ GitHub issue creation SUCCESS"
           echo "=================================="
           echo "GitHub Issues Created:"
