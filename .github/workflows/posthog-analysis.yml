@@ -38,27 +38,39 @@ jobs:
         echo "Trying to run cn --version..."
         cn --version || echo "Failed to run cn --version"
     
-    - name: Debug - Test CLI help
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        echo "Testing cn --help..."
-        cn --help || echo "Failed to run cn --help"
-    
     - name: Verify Continue Agent Configuration
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
         set -e  # Exit on any error
         echo "🔧 Step 1: Verifying Continue Agent Configuration"
-        echo "Testing basic agent response (30s timeout)"
-        if timeout 30s cn -p "Who is the user and what can you do?"; then
-          echo "✅ Basic agent test SUCCESS"
+        echo "Testing whoami query to agent (30s timeout)"
+        
+        if timeout 30s cn -p "whoami" > whoami_response.md 2>whoami_error.log; then
+          echo "✅ whoami agent query SUCCESS"
+          echo "=================================="
+          echo "Agent whoami response:"
+          cat whoami_response.md
+          echo "=================================="
+          
+        # Check if response mentions bekah@continue.dev
+        if grep -qi "bekah@continue.dev" whoami_response.md; then
+          echo "✅ Verified: Agent is associated with bekah@continue.dev"
         else
-          echo "❌ Basic agent test FAILED - stopping workflow"
+          echo "❌ Agent is NOT associated with bekah@continue.dev"
+          echo "Current response shown above"
+          echo ""
+          echo "ERROR: Must be logged in as bekah@continue.dev for PostHog integration to work"
+          echo "Please ensure the CONTINUE_API_KEY belongs to bekah@continue.dev"
           exit 1
         fi
-        
+        else
+          echo "❌ whoami agent query FAILED - stopping workflow"
+          echo "Error log:"
+          cat whoami_error.log
+          exit 1
+        fi
+          
     - name: Debug PostHog Config Loading
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
