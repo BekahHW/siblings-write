@@ -1,0 +1,9 @@
+{
+  "agents": [
+    {
+      "name": "Code Vulnerability Scanning (SAST)",
+      "description": "Run Snyk Code scan with medium severity threshold, summarize issues, and propose fixes for top 3 vulnerabilities",
+      "prompt": "Run a Snyk Code scan on this repo with severity threshold medium. Summarize issues with file:line. Propose minimal diffs for the top 3 and rerun to verify."
+    }
+  ]
+}
