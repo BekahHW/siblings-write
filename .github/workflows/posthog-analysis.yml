@@ -26,30 +26,6 @@ jobs:
         echo "Installing Continue CLI..."
         npm install -g @continuedev/cli
         echo "Installation completed"
-          
-          
-    - name: Debug PostHog Config Loading
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        set -e  # Exit on any error
-        echo "🔍 Step 2: Testing PostHog config loading"
-        echo "Config: continuedev/awesome-models-posthog-gh"
-        
-        # Test if we can even load the config with a minimal command
-        echo "Testing config load with simple prompt (20s timeout)..."
-        if timeout 20s cn --config continuedev/awesome-models-posthog-gh -p "Hi"; then
-          echo "✅ PostHog config loads SUCCESS"
-        else
-          EXIT_CODE=$?
-          echo "❌ PostHog config loading FAILED with exit code: $EXIT_CODE"
-          echo "Possible issues:"
-          echo "- Config 'continuedev/awesome-models-posthog-gh' doesn't exist"
-          echo "- Network timeout accessing remote config"
-          echo "- Authentication issues with the config"
-          echo "- PostHog credentials not configured in the agent"
-          exit 1
-        fi
         
     - name: Test PostHog Connection
       env:
