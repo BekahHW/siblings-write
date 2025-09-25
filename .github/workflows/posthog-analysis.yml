@@ -33,46 +33,40 @@ jobs:
       run: |
         echo "🔌 Step 3: Testing PostHog API connection"
         echo "Attempting to verify PostHog connectivity (30s timeout)"
-        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Can you connect to PostHog? Please test the connection and report the status." || echo "❌ PostHog connection test failed"
-        echo "✅ PostHog connection test completed"
         
-    - name: Test PostHog Data Access
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        echo "📊 Step 4: Testing PostHog data access"
-        echo "Checking if agent can access session recordings (45s timeout)"
-        timeout 45s cn --config continuedev/awesome-models-posthog-gh -p "Can you access PostHog session recordings? Please check and list available data types (no analysis yet, just verify access)." || echo "❌ PostHog data access test failed"
-        echo "✅ PostHog data access test completed"
-        
-    - name: Test Session Recording Access
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        echo "🎬 Step 5: Testing session recording access specifically"
-        echo "Verifying access to session recordings data (60s timeout)"
-        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Please verify you can access session recordings. How many sessions can you see? What date range? (Just verification, no full analysis)." || echo "❌ Session recording access test failed"
-        echo "✅ Session recording access test completed"
+        if timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Please analyze the 5 most recent PostHog sessions and identify the top 3 UX issues. DO NOT create GitHub issues - just list the issues." > posthog_data.md 2>posthog_error.log; then
+          echo "✅ PostHog connection test SUCCESS"
+          echo "=================================="
+          echo "PostHog Analysis Response:"
+          cat posthog_data.md
+          echo "=================================="
+        else
+          echo "❌ PostHog connection test FAILED"
+          echo "Error log:"
+          cat posthog_error.log
+        fi
+  
     
-    - name: Run Limited PostHog Analysis
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        echo "🔍 Step 6: Running limited PostHog analysis"
-        echo "Analyzing just 5 recent sessions (2 minute timeout)"
-        timeout 120s cn --config continuedev/awesome-models-posthog-gh -p "Please analyze the 5 most recent PostHog sessions. Identify any obvious UX issues. Keep the analysis brief. Do NOT create GitHub issues." || echo "❌ Limited PostHog analysis failed"
-        echo "✅ Limited PostHog analysis completed"
-    
-    - name: Create GitHub Issues (Only if previous steps work)
+    - name: Create GitHub Issues from Analysis
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "🐛 Step 7: Creating GitHub issues based on analysis"
-        echo "This step only runs if data access worked (90s timeout)"
-        timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Based on the previous limited analysis, create 1 GitHub issue for the most critical UX problem found. Use the GITHUB_TOKEN." || echo "❌ GitHub issue creation failed"
-        echo "✅ GitHub issue creation completed"
-    
+        echo "🐛 Step 4: Creating GitHub issues from PostHog analysis"
+        echo "Using previous analysis to create issues (60s timeout)"
+        
+        if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Based on the PostHog analysis you just performed, create GitHub issues for the top 3 UX problems you identified. Use the GITHUB_TOKEN to create the issues in this repository." > github_issues.md 2>github_error.log; then
+          echo "✅ GitHub issue creation SUCCESS"
+          echo "=================================="
+          echo "GitHub Issues Created:"
+          cat github_issues.md
+          echo "=================================="
+        else
+          echo "❌ GitHub issue creation FAILED"
+          echo "Error log:"
+          cat github_error.log
+        fi
+      
     
     - name: Debug - Post-execution info
       if: always()  # Run even if previous steps fail
