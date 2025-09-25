@@ -49,20 +49,38 @@ jobs:
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
+        set -e  # Exit on any error
         echo "🔧 Step 1: Verifying Continue Agent Configuration"
-        echo "Testing basic agent response (10s timeout)"
-        timeout 30s cn -p "What is your name and what can you do?" || echo "❌ Basic agent test failed"
-        echo "✅ Basic agent test completed"
+        echo "Testing basic agent response (30s timeout)"
+        if timeout 30s cn -p "What is your name and what can you do?"; then
+          echo "✅ Basic agent test SUCCESS"
+        else
+          echo "❌ Basic agent test FAILED - stopping workflow"
+          exit 1
+        fi
         
-    - name: Test Specific PostHog Agent Config
+    - name: Debug PostHog Config Loading
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
-        echo "🎯 Step 2: Testing PostHog-specific agent configuration"
-        echo "Loading PostHog config: continuedev/awesome-models-posthog-gh"
-        echo "Testing agent identity (15s timeout)"
-        timeout 35s cn --config continuedev/awesome-models-posthog-gh -p "What is your role? Are you configured for PostHog analysis?" || echo "❌ PostHog agent config test failed"
-        echo "✅ PostHog agent config test completed"
+        set -e  # Exit on any error
+        echo "🔍 Step 2: Testing PostHog config loading"
+        echo "Config: continuedev/awesome-models-posthog-gh"
+        
+        # Test if we can even load the config with a minimal command
+        echo "Testing config load with simple prompt (20s timeout)..."
+        if timeout 20s cn --config continuedev/awesome-models-posthog-gh -p "Hi"; then
+          echo "✅ PostHog config loads SUCCESS"
+        else
+          EXIT_CODE=$?
+          echo "❌ PostHog config loading FAILED with exit code: $EXIT_CODE"
+          echo "Possible issues:"
+          echo "- Config 'continuedev/awesome-models-posthog-gh' doesn't exist"
+          echo "- Network timeout accessing remote config"
+          echo "- Authentication issues with the config"
+          echo "- PostHog credentials not configured in the agent"
+          exit 1
+        fi
         
     - name: Test PostHog Connection
       env:
