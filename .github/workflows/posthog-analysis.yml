@@ -32,7 +32,7 @@ jobs:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
         echo "🔌 Step 3: Testing PostHog API connection"
-        echo "Testing PostHog query first..."
+        echo "Testing PostHog query with cn"
 
         # Run the command and capture exit code - using the same prompt that works in TUI
         timeout 240s cn --config continuedev/awesome-models-posthog-gh -p "Using the MCP and my prompts, tell me about my posthog recording sessions data" 
