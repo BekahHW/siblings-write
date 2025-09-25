@@ -52,7 +52,7 @@ jobs:
         set -e  # Exit on any error
         echo "🔧 Step 1: Verifying Continue Agent Configuration"
         echo "Testing basic agent response (30s timeout)"
-        if timeout 30s cn -p "What is your name and what can you do?"; then
+        if timeout 30s cn -p "Who is the user and what can you do?"; then
           echo "✅ Basic agent test SUCCESS"
         else
           echo "❌ Basic agent test FAILED - stopping workflow"
