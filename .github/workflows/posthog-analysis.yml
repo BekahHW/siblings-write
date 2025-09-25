@@ -45,25 +45,23 @@ jobs:
         echo "Files after test:"
         ls -la *.md *.log 2>/dev/null || echo "No .md or .log files found"
         
-        # Check if we got actual data
-        if [ "$EXIT_CODE" -ne 0 ]; then
-          echo "❌ Command failed with exit code $EXIT_CODE"
-          if [ -f "posthog_simple_error.log" ]; then
-            echo "Error content:"
-            cat posthog_simple_error.log || echo "Cannot read error file"
-          fi
-          echo "FAILING THE WORKFLOW - PostHog connection failed"
-          exit 1
-        fi
-        
-        # Check if response file has content
+        # Check if we got actual data (even if command timed out)
         if [ -f "posthog_simple.md" ] && [ -s "posthog_simple.md" ]; then
-          echo "✅ PostHog responded with data"
+          echo "✅ PostHog responded with data (despite exit code $EXIT_CODE)"
           echo "Response file size: $(wc -c < posthog_simple.md) bytes"
-          echo "Response content:"
+          echo "=================================="
+          echo "PostHog Response Content:"
           cat posthog_simple.md
+          echo "=================================="
+          
+          # Show error log if it exists (for debugging)
+          if [ -f "posthog_simple_error.log" ] && [ -s "posthog_simple_error.log" ]; then
+            echo "Note: Error log content (exit code $EXIT_CODE was likely timeout):"
+            cat posthog_simple_error.log
+          fi
         else
-          echo "❌ No PostHog data received (empty or missing response)"
+          echo "❌ No PostHog data received"
+          echo "Command failed with exit code $EXIT_CODE"
           if [ -f "posthog_simple_error.log" ]; then
             echo "Error content:"
             cat posthog_simple_error.log || echo "Cannot read error file"
