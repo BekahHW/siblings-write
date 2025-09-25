@@ -27,26 +27,6 @@ jobs:
         npm install -g @continuedev/cli
         echo "Installation completed"
 
-    - name: Test PostHog Connection  - 1
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        echo "🔌 Step 3: Testing PostHog API connection"
-        echo "=================================="
-        timeout 90s cn --config continuedev/awesome-models-posthog-gh "Look at the PostHog Data and create a new file called posthog_data.txt summarizing what you see"
-         # timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Look at the PostHog Data and create a new file called posthog_data.txt summarizing what you see" --- IGNORE ---
-        echo "=================================="
-            
-    - name: Test PostHog Connection
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        echo "🔌 Step 3: Testing PostHog API connection"
-        echo "Testing PostHog query with cn"
-
-        # Run the command and capture exit code - using the same prompt that works in TUI
-        timeout 240s cn --config continuedev/awesome-models-posthog-gh -p "Using the MCP and my prompts, tell me about my posthog recording sessions data" 
-    
     - name: Create GitHub Issues from Analysis
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
@@ -55,7 +35,7 @@ jobs:
         echo "🐛 Step 4: Creating GitHub issues from PostHog analysis"
         echo "Using previous analysis to create issues (60s timeout)"
         
-        if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Based on the PostHog analysis you just performed, create GitHub issues for the top 3 UX problems you identified. Use the gh CLI to create the issues in this repository. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'" > github_issues.md 2>github_error.log; then
+        if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p " Use the gh CLI to create an issue in this repository to improve accessibility. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'" > github_issues.md 2>github_error.log; then
           echo "✅ GitHub issue creation SUCCESS"
           echo "=================================="
           echo "GitHub Issues Created:"
@@ -66,7 +46,48 @@ jobs:
           echo "Error log:"
           cat github_error.log
         fi
+
+    # - name: Test PostHog Connection  - 1
+    #   env:
+    #     CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+    #   run: |
+    #     echo "🔌 Step 3: Testing PostHog API connection"
+    #     echo "=================================="
+    #     timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Look at the PostHog Data and create a new file called posthog_data.txt summarizing what you see"
+    #      # timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Look at the PostHog Data and create a new file called posthog_data.txt summarizing what you see" --- IGNORE ---
+    #     echo "=================================="
+            
+    # - name: Test PostHog Connection
+    #   env:
+    #     CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+    #   run: |
+    #     echo "🔌 Step 3: Testing PostHog API connection"
+    #     echo "Testing PostHog query with cn"
+
+    #     # Run the command and capture exit code - using the same prompt that works in TUI
+    #     timeout 240s cn --config continuedev/awesome-models-posthog-gh -p "Using the MCP and my prompts, tell me about my posthog recording sessions data" 
+    
+    # - name: Create GitHub Issues from Analysis
+    #   env:
+    #     CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   run: |
+    #     echo "🐛 Step 4: Creating GitHub issues from PostHog analysis"
+    #     echo "Using previous analysis to create issues (60s timeout)"
+        
+    #     if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Based on the PostHog analysis you just performed, create GitHub issues for the top 3 UX problems you identified. Use the gh CLI to create the issues in this repository. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'" > github_issues.md 2>github_error.log; then
+    #       echo "✅ GitHub issue creation SUCCESS"
+    #       echo "=================================="
+    #       echo "GitHub Issues Created:"
+    #       cat github_issues.md
+    #       echo "=================================="
+    #     else
+    #       echo "❌ GitHub issue creation FAILED"
+    #       echo "Error log:"
+    #       cat github_error.log
+    #     fi
       
+    
     
     - name: Debug - Post-execution info
       if: always()  # Run even if previous steps fail
