@@ -32,20 +32,22 @@ jobs:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
       run: |
         echo "🔌 Step 3: Testing PostHog API connection"
-        echo "Attempting to verify PostHog connectivity (30s timeout)"
+        echo "Testing simple PostHog query first..."
         
-        if timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Please analyze the 5 most recent PostHog sessions and identify the top 3 UX issues. DO NOT create GitHub issues - just list the issues." > posthog_data.md 2>posthog_error.log; then
-          echo "✅ PostHog connection test SUCCESS"
+        if timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Tell me about my posthog data. If you can't access any information, write 'no data'." > posthog_simple.md 2>posthog_simple_error.log; then
+          echo "✅ Simple PostHog test SUCCESS"
           echo "=================================="
-          echo "PostHog Analysis Response:"
-          cat posthog_data.md
+          echo "Simple PostHog Response:"
+          cat posthog_simple.md
           echo "=================================="
+          echo "File size:" 
+          ls -la posthog_simple.md
         else
-          echo "❌ PostHog connection test FAILED"
+          echo "❌ Simple PostHog test FAILED"
           echo "Error log:"
-          cat posthog_error.log
+          cat posthog_simple_error.log
         fi
-  
+      
     
     - name: Create GitHub Issues from Analysis
       env:
