@@ -35,7 +35,7 @@ jobs:
         echo "Testing PostHog query first..."
 
         # Run the command and capture exit code - using the same prompt that works in TUI
-        if timeout 60s cn --config continuedev/awesome-models-posthog-gh "Using the MCP and my prompts, tell me about my posthog recording sessions data" > posthog_simple.md 2>posthog_simple_error.log; then
+        if timeout 240s cn --config continuedev/awesome-models-posthog-gh -p "Using the MCP and my prompts, tell me about my posthog recording sessions data" > posthog_simple.md 2>posthog_simple_error.log; then
           EXIT_CODE=0
         else
           EXIT_CODE=$?
