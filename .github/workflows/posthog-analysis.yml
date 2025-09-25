@@ -38,8 +38,8 @@ jobs:
         echo "Files before test:"
         ls -la *.md *.log 2>/dev/null || echo "No .md or .log files yet"
         
-        # Run the command and capture exit code
-        if timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Hello, can you access PostHog? Just respond with yes/no." > posthog_simple.md 2>posthog_simple_error.log; then
+        # Run the command and capture exit code - using the same prompt that works in TUI
+        if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Using the MCP and my prompts, tell me about my posthog recording sessions data" > posthog_simple.md 2>posthog_simple_error.log; then
           EXIT_CODE=0
         else
           EXIT_CODE=$?
