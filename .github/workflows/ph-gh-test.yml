@@ -48,6 +48,42 @@ jobs:
             echo "✅ CONTINUE_API_KEY is configured"
           fi
 
+      - name: Verify Continue Account
+        env:
+          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        run: |
+          echo "Checking Continue account authentication..."
+          
+          # Get current account info
+          if cn -p whoami > account_info.txt 2>account_error.log; then
+            echo "✅ whoami command executed successfully"
+            echo "Account info:"
+            cat account_info.txt
+            
+            # Check if logged in as bekah@continue.dev
+            if grep -q "bekah@continue.dev" account_info.txt; then
+              echo "✅ Logged in as bekah@continue.dev - CORRECT ACCOUNT"
+            else
+              echo "❌ NOT logged in as bekah@continue.dev"
+              echo "Current account:"
+              cat account_info.txt
+              echo ""
+              echo "ERROR: Must be logged in as bekah@continue.dev for PostHog integration to work"
+              echo "Please ensure the CONTINUE_API_KEY belongs to bekah@continue.dev"
+              exit 1
+            fi
+          else
+            echo "❌ Failed to get account information"
+            echo "Error log:"
+            cat account_error.log
+            echo ""
+            echo "Possible issues:"
+            echo "- Invalid CONTINUE_API_KEY"
+            echo "- Not authenticated with Continue service"
+            echo "- Network connectivity issues"
+            exit 1
+          fi
+
       - name: Test Basic Agent Response
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
