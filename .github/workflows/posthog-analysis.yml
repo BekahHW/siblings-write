@@ -45,21 +45,31 @@ jobs:
         echo "Files after test:"
         ls -la *.md *.log 2>/dev/null || echo "No .md or .log files found"
         
-        # Check if files were created and show their contents
-        if [ -f "posthog_simple.md" ]; then
-          echo "Response file size: $(wc -c < posthog_simple.md) bytes"
-          echo "Response content:"
-          cat posthog_simple.md || echo "Cannot read response file"
-        else
-          echo "❌ Response file not created"
+        # Check if we got actual data
+        if [ "$EXIT_CODE" -ne 0 ]; then
+          echo "❌ Command failed with exit code $EXIT_CODE"
+          if [ -f "posthog_simple_error.log" ]; then
+            echo "Error content:"
+            cat posthog_simple_error.log || echo "Cannot read error file"
+          fi
+          echo "FAILING THE WORKFLOW - PostHog connection failed"
+          exit 1
         fi
         
-        if [ -f "posthog_simple_error.log" ]; then
-          echo "Error file size: $(wc -c < posthog_simple_error.log) bytes"
-          echo "Error content:"
-          cat posthog_simple_error.log || echo "Cannot read error file"
+        # Check if response file has content
+        if [ -f "posthog_simple.md" ] && [ -s "posthog_simple.md" ]; then
+          echo "✅ PostHog responded with data"
+          echo "Response file size: $(wc -c < posthog_simple.md) bytes"
+          echo "Response content:"
+          cat posthog_simple.md
         else
-          echo "❌ Error file not created"
+          echo "❌ No PostHog data received (empty or missing response)"
+          if [ -f "posthog_simple_error.log" ]; then
+            echo "Error content:"
+            cat posthog_simple_error.log || echo "Cannot read error file"
+          fi
+          echo "FAILING THE WORKFLOW - No PostHog data"
+          exit 1
         fi
       
     
