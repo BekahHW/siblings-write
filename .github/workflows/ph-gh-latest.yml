@@ -29,7 +29,7 @@ jobs:
     - name: Check Continue Configuration and Model
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT }}
       run: |
         echo "🔧 Checking Continue CLI configuration..."
         echo "============================================"
@@ -55,27 +55,11 @@ jobs:
         echo "🔍 Alternative model check:"
         timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "What model are you using? Please respond with just your model name and provider." 2>&1 | tee alt_model_info.log || echo "Alternative model check failed"
 
-    - name: Test PostHog MCP Connection
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        echo "🔌 Testing PostHog MCP connection..."
-        echo "===================================="
-        
-        # Test basic MCP tools availability
-        echo "Testing MCP tools availability:"
-        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "List all available MCP tools and functions you have access to. Focus on PostHog-related capabilities." 2>&1 | tee mcp_tools.log || echo "MCP tools test failed"
-        
-        # Test basic PostHog connection
-        echo ""
-        echo "Testing PostHog connection:"
-        timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Can you access PostHog? Try to connect and tell me if you can see any PostHog data or insights." 2>&1 | tee posthog_connection.log || echo "PostHog connection test failed"
 
     - name: Analyze PostHog Session Recordings  
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT }}
       run: |
         echo "📊 Analyzing PostHog session recording data..."
         echo "=============================================="
@@ -86,38 +70,14 @@ jobs:
         
         # Main analysis prompt - using agent MCP and specific instructions
         echo "🔍 Running PostHog session analysis for UX issues:"
-        timeout 300s cn --config continuedev/awesome-models-posthog-gh -p "
-        Using the PostHog MCP agent and session recording data, analyze recent user sessions to identify UX problems.
+        timeout 300s cn --config continuedev/awesome-models-posthog-gh "
+        Using the PostHog MCP agent and session recording data, analyze recent user sessions to identify UX problems, then use the gh CLI to create an issue based on the top PostHog data problem areas in this repository to improve. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'"
 
-        **Task**: Analyze PostHog session recordings and identify the top 3 most critical UX issues that need GitHub issues created.
-
-        **Instructions**:
-        1. Access PostHog session recording data from recent sessions (last 24-48 hours)
-        2. Look for patterns indicating user friction, errors, or abandonment
-        3. Focus on accessibility issues, navigation problems, and user flow disruptions  
-        4. Identify specific pages/components where issues occur
-        5. Quantify the impact (how many users affected, conversion impact, etc.)
-
-        **Output Format**:
-        For each of the top 3 issues, provide:
-        - Issue Title (clear, actionable)
-        - Detailed Description (what's happening, evidence from sessions)
-        - Steps to Reproduce (based on session data)
-        - User Impact (metrics, affected user count)
-        - Suggested Priority (High/Medium/Low with reasoning)
-        - Specific Location (page, component, or flow)
-
-        Please analyze the data thoroughly and provide actionable insights based on real session evidence.
-        " 2>&1 | tee posthog_analysis.log || {
-          echo "❌ PostHog analysis failed or timed out"
-          echo "Checking output..."
-          cat posthog_analysis.log 2>/dev/null || echo "No analysis output captured"
-        }
 
     - name: Create GitHub Issues from Analysis
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT }}
       run: |
         echo "🐛 Creating GitHub issues from PostHog analysis..."
         echo "=================================================="
@@ -171,7 +131,7 @@ jobs:
 
     - name: Verify Created Issues
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT }}
       run: |
         echo "✅ Verifying created GitHub issues..."
         echo "====================================="
