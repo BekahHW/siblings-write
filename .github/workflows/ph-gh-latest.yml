@@ -39,8 +39,6 @@ jobs:
         
         # Show current model information using /model slash command
         echo ""
-        echo "🤖 Checking current model configuration:"
-        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "What model are you using?"
         timeout 330s cn -p "Tell me about my posthog data. If you can't access it, tell me about my project and suggest improvements."
 
 
