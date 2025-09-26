@@ -36,7 +36,7 @@ jobs:
     - name: Debug Environment and Configuration
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_PAT: ${{ secrets.GH_PAT }}
       run: |
         echo "🔍 Environment Debug Information:"
         echo "=================================="
@@ -52,11 +52,11 @@ jobs:
           echo "❌ CONTINUE_API_KEY is NOT set"
         fi
         
-        # Check if GITHUB_TOKEN is set (without showing value)
-        if [ -n "$GITHUB_TOKEN" ]; then
-          echo "✅ GITHUB_TOKEN is set (length: ${#GITHUB_TOKEN})"
+        # Check if GH_PAT is set (without showing value)
+        if [ -n "$GH_PAT" ]; then
+          echo "✅ GH_PAT is set (length: ${#GH_PAT})"
         else
-          echo "❌ GITHUB_TOKEN is NOT set"
+          echo "❌ GH_PAT is NOT set"
         fi
         
         # Test basic cn command
@@ -130,7 +130,7 @@ jobs:
     - name: Create GitHub Issues (Only If All Tests Pass)
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_PAT: ${{ secrets.GH_PAT }}
       run: |
         echo "🐛 Creating GitHub issues:"
         echo "=================================="
@@ -143,7 +143,7 @@ jobs:
         
         # Setup GitHub CLI
         echo "Setting up GitHub CLI..."
-        echo "$GITHUB_TOKEN" | gh auth login --with-token
+        echo "$GH_PAT" | gh auth login --with-token
         gh auth status
         
         # Get repository slug
