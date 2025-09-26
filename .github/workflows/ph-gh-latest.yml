@@ -41,7 +41,7 @@ jobs:
         echo ""
         echo "🤖 Checking current model configuration:"
         timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "What model are you using?"
-        timeout 330s cn -p "Using the PostHog MCP agent and session recording data, analyze recent user sessions to identify UX problems, then use the gh CLI to create an issue based on the top PostHog data problem areas in this repository to improve. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'"
+        timeout 330s cn -p "Tell me about my posthog data. If you can't access it, tell me about my project and suggest improvements."
 
 
     - name: Analyze PostHog Session Recordings  
