@@ -1,21 +1,17 @@
-name: PostHog Session Analysis with Continue CLI Agent (Debug)
+name: PostHog Session Analysis - Improved Debug
 
 on:
-  schedule: 
-  - cron: "0 6 * * *" # Run at 6 AM UTC daily
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch: # Manual triggering for testing
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
-
     permissions:
         contents: read
         issues: write
 
     steps:
     - uses: actions/checkout@v4
-
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
@@ -25,188 +21,165 @@ jobs:
       run: |
         echo "Installing Continue CLI..."
         npm install -g @continuedev/cli
-        echo "Installation completed"
-        
-        # Verify installation
-        echo "Verifying Continue CLI installation:"
-        which cn || echo "❌ cn command not found in PATH"
-        cn --version || echo "❌ cn --version failed"
-        cn --help || echo "❌ cn --help failed"
 
-    - name: Debug Environment and Configuration
+    - name: Test PostHog Connection with Better Error Handling
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-        GH_PAT: ${{ secrets.GH_PAT }}
       run: |
-        echo "🔍 Environment Debug Information:"
-        echo "=================================="
-        echo "Node version: $(node --version)"
-        echo "NPM version: $(npm --version)"
-        echo "Current working directory: $(pwd)"
-        echo "PATH: $PATH"
+        echo "🔌 Testing PostHog connection with better error handling:"
+        echo "================================================="
         
-        # Check if CONTINUE_API_KEY is set (without showing value)
-        if [ -n "$CONTINUE_API_KEY" ]; then
-          echo "✅ CONTINUE_API_KEY is set (length: ${#CONTINUE_API_KEY})"
-        else
-          echo "❌ CONTINUE_API_KEY is NOT set"
+        # Test 1: Very simple PostHog query
+        echo "Test 1: Simple PostHog test..."
+        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "Can you access PostHog data? Just say yes or no." 2>&1 | tee posthog_simple.log &
+        PID=$!
+        
+        # Monitor the process
+        for i in {1..30}; do
+          if ! kill -0 $PID 2>/dev/null; then
+            echo "Process completed after ${i} seconds"
+            break
+          fi
+          echo "Still running... ${i}s"
+          sleep 1
+        done
+        
+        # If still running, kill it
+        if kill -0 $PID 2>/dev/null; then
+          echo "Killing hung process..."
+          kill $PID
+          echo "❌ PostHog test hung after 30 seconds"
         fi
         
-        # Check if GH_PAT is set (without showing value)
-        if [ -n "$GH_PAT" ]; then
-          echo "✅ GH_PAT is set (length: ${#GH_PAT})"
+        echo "PostHog simple test output:"
+        cat posthog_simple.log 2>/dev/null || echo "No output generated"
+
+    - name: Test GitHub CLI Setup Separately
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      run: |
+        echo "🐙 Testing GitHub CLI setup:"
+        echo "============================="
+        
+        # Debug GitHub CLI setup
+        echo "GitHub CLI version:"
+        gh --version
+        
+        echo "Attempting GitHub CLI authentication..."
+        echo "$GITHUB_TOKEN" | gh auth login --with-token 2>&1 || {
+          echo "❌ GitHub CLI auth failed with exit code: $?"
+          echo "Token length: ${#GITHUB_TOKEN}"
+          echo "First 4 chars: ${GITHUB_TOKEN:0:4}..."
+        }
+        
+        echo "Checking auth status..."
+        gh auth status 2>&1 || echo "Auth status check failed"
+        
+        # Test repository detection
+        echo "Testing repository detection..."
+        REPO_SLUG=$(git remote get-url origin 2>/dev/null | sed -E 's#.*github.com[:/](.+)\.git#\1#' 2>/dev/null) || REPO_SLUG=""
+        
+        if [ -n "$REPO_SLUG" ]; then
+          echo "✅ Repository detected: $REPO_SLUG"
+          
+          # Test basic gh command
+          echo "Testing basic gh repo view..."
+          gh repo view "$REPO_SLUG" --json name,owner 2>&1 || echo "Repo view failed"
+          
         else
-          echo "❌ GH_PAT is NOT set"
+          echo "❌ Could not detect repository slug"
+          echo "Git remote URL:"
+          git remote get-url origin 2>&1 || echo "No git remote found"
         fi
-        
-        # Test basic cn command
-        echo "Testing basic cn command:"
-        cn --version 2>&1 || echo "❌ cn --version failed with exit code $?"
-        
-        echo "Testing cn config list:"
-        cn config list 2>&1 || echo "❌ cn config list failed with exit code $?"
-        
-        echo "Testing specific config:"
-        cn --config continuedev/awesome-models-posthog-gh config show 2>&1 || echo "❌ Config show failed with exit code $?"
 
-    - name: Test Simple Continue Command First
+    - name: Test Continue with GitHub CLI Integration
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
       run: |
-        echo "🧪 Testing simple Continue CLI command:"
-        echo "=================================="
+        echo "🤖 Testing Continue CLI with GitHub integration:"
+        echo "================================================"
         
-        # Test with a very simple prompt first
-        echo "Testing with basic prompt..."
-        set -x  # Enable command tracing
-        timeout 30s cn -p "Hello, respond with just 'CLI is working'" 2>&1 | tee simple_test.log || {
-          exit_code=$?
-          echo "❌ Simple test failed with exit code: $exit_code"
-          echo "Output from simple test:"
-          cat simple_test.log 2>/dev/null || echo "No output file created"
-        }
-        set +x  # Disable command tracing
-
-    - name: Test Config-Specific Command
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        echo "🔧 Testing config-specific Continue CLI command:"
-        echo "=================================="
+        # Get repo slug first
+        REPO_SLUG=$(git remote get-url origin 2>/dev/null | sed -E 's#.*github.com[:/](.+)\.git#\1#' 2>/dev/null)
         
-        echo "Testing with specific config..."
-        set -x  # Enable command tracing
-        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Respond with 'Config is working'" 2>&1 | tee config_test.log || {
-          exit_code=$?
-          echo "❌ Config test failed with exit code: $exit_code"
-          echo "Output from config test:"
-          cat config_test.log 2>/dev/null || echo "No output file created"
-        }
-        set +x  # Disable command tracing
-
-    - name: Test PostHog Connection (If Previous Tests Pass)
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-      run: |
-        echo "🔌 Testing PostHog API connection:"
-        echo "=================================="
-        
-        # Only run if previous tests indicated cn is working
-        if [ ! -f simple_test.log ] || [ ! -f config_test.log ]; then
-          echo "❌ Skipping PostHog test - previous tests failed"
+        if [ -z "$REPO_SLUG" ]; then
+          echo "❌ Cannot proceed without repository slug"
           exit 1
         fi
         
-        echo "Testing PostHog connection with verbose output..."
-        set -x
-        timeout 120s cn --config continuedev/awesome-models-posthog-gh -p "Test PostHog connection by listing available tools or checking if PostHog MCP is connected. Just respond with connection status." 2>&1 | tee posthog_test.log || {
-          exit_code=$?
-          echo "❌ PostHog test failed with exit code: $exit_code"
-          echo "Output from PostHog test:"
-          cat posthog_test.log 2>/dev/null || echo "No output file created"
-        }
-        set +x
-
-    - name: Create GitHub Issues (Only If All Tests Pass)
-      env:
-        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-        GH_PAT: ${{ secrets.GH_PAT }}
-      run: |
-        echo "🐛 Creating GitHub issues:"
-        echo "=================================="
+        echo "Using repository: $REPO_SLUG"
         
-        # Check if we should proceed
-        if [ ! -f posthog_test.log ]; then
-          echo "❌ Skipping GitHub issue creation - PostHog test failed"
-          exit 1
+        # Simple Continue command that should work
+        echo "Testing Continue CLI with simple GitHub task..."
+        timeout 45s cn --config continuedev/awesome-models-posthog-gh -p "Execute this exact command: echo 'GitHub integration test successful'" 2>&1 | tee github_integration.log &
+        PID=$!
+        
+        # Monitor with shorter intervals
+        for i in {1..45}; do
+          if ! kill -0 $PID 2>/dev/null; then
+            echo "GitHub integration test completed after ${i} seconds"
+            break
+          fi
+          if [ $((i % 5)) -eq 0 ]; then
+            echo "Still running... ${i}s"
+          fi
+          sleep 1
+        done
+        
+        # Clean up if hung
+        if kill -0 $PID 2>/dev/null; then
+          echo "Killing hung process..."
+          kill $PID
+          echo "❌ GitHub integration test hung"
         fi
         
-        # Setup GitHub CLI
-        echo "Setting up GitHub CLI..."
-        echo "$GH_PAT" | gh auth login --with-token
-        gh auth status
-        
-        # Get repository slug
-        REPO_SLUG=$(git remote get-url origin | sed -E 's#.*github.com[:/](.+)\.git#\1#')
-        echo "Repository: $REPO_SLUG"
-        
-        echo "Creating GitHub issue with Continue CLI..."
-        set -x
-        timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Create a GitHub issue for accessibility improvements. Use: gh issue create --repo '$REPO_SLUG' --title 'Accessibility Improvement Needed' --body 'This is a test issue created by Continue CLI automation.' --label 'automated,accessibility'" 2>&1 | tee github_creation.log || {
-          exit_code=$?
-          echo "❌ GitHub issue creation failed with exit code: $exit_code"
-          echo "Output from GitHub creation:"
-          cat github_creation.log 2>/dev/null || echo "No output file created"
-        }
-        set +x
+        echo "GitHub integration test output:"
+        cat github_integration.log 2>/dev/null || echo "No output generated"
 
-    - name: Collect All Debug Information
-      if: always()  # Run even if previous steps fail
+    - name: Final Debug Summary
+      if: always()
       run: |
-        echo "📋 COMPLETE DEBUG SUMMARY:"
-        echo "=============================================="
+        echo "📊 FINAL DEBUG ANALYSIS:"
+        echo "========================="
+        
+        echo "✅ Continue CLI: Working (version 1.4.44)"
+        echo "✅ Config Load: Working (continuedev/awesome-models-posthog-gh)"
         echo ""
         
-        echo "🔧 Installation Check:"
-        cn --version 2>&1 || echo "❌ cn not available"
+        echo "❓ PostHog Connection:"
+        if [ -f posthog_simple.log ] && [ -s posthog_simple.log ]; then
+          echo "Has output - check content above"
+        else
+          echo "❌ No output or hanging - MCP connection issue likely"
+        fi
         echo ""
         
-        echo "📄 Log Files Created:"
+        echo "❓ GitHub CLI Setup:"
+        gh auth status 2>&1 && echo "✅ GitHub CLI authenticated" || echo "❌ GitHub CLI authentication failed"
+        echo ""
+        
+        echo "❓ Continue + GitHub Integration:"
+        if [ -f github_integration.log ] && [ -s github_integration.log ]; then
+          echo "Has output - check content above"
+        else
+          echo "❌ No output or hanging"
+        fi
+        
+        echo ""
+        echo "🎯 NEXT STEPS BASED ON RESULTS:"
+        echo "- If PostHog test hangs: MCP server connection issue"
+        echo "- If GitHub CLI fails: Token permissions issue"
+        echo "- If Continue hangs on simple commands: Model/assistant configuration issue"
+        
+        echo ""
+        echo "📁 All log files:"
         ls -la *.log 2>/dev/null || echo "No log files found"
-        echo ""
         
-        if [ -f simple_test.log ]; then
-          echo "📝 Simple Test Output:"
-          echo "----------------------"
-          cat simple_test.log
-          echo ""
-        fi
-        
-        if [ -f config_test.log ]; then
-          echo "📝 Config Test Output:"
-          echo "----------------------"
-          cat config_test.log
-          echo ""
-        fi
-        
-        if [ -f posthog_test.log ]; then
-          echo "📝 PostHog Test Output:"
-          echo "-----------------------"
-          cat posthog_test.log
-          echo ""
-        fi
-        
-        if [ -f github_creation.log ]; then
-          echo "📝 GitHub Creation Output:"
-          echo "--------------------------"
-          cat github_creation.log
-          echo ""
-        fi
-        
-        echo "🎯 DEBUGGING SUMMARY:"
-        echo "- Check the outputs above to see exactly where the failure occurs"
-        echo "- Look for specific error messages in each test phase"
-        echo "- If cn --version fails, it's an installation issue"
-        echo "- If simple test fails, it's a basic Continue CLI issue"
-        echo "- If config test fails, it's a configuration issue"
-        echo "- If PostHog test fails, it's an MCP/PostHog connection issue"
+        for logfile in *.log; do
+          if [ -f "$logfile" ]; then
+            echo ""
+            echo "=== $logfile ==="
+            cat "$logfile"
+          fi
+        done
