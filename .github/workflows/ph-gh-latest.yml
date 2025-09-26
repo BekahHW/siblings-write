@@ -70,7 +70,7 @@ jobs:
         
         # Main analysis prompt - using agent MCP and specific instructions
         echo "🔍 Running PostHog session analysis for UX issues:"
-        timeout 300s cn --config continuedev/awesome-models-posthog-gh "
+        timeout 300s cn --config continuedev/awesome-models-posthog-gh -p "
         Using the PostHog MCP agent and session recording data, analyze recent user sessions to identify UX problems, then use the gh CLI to create an issue based on the top PostHog data problem areas in this repository to improve. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'"
 
 
