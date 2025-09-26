@@ -37,10 +37,6 @@ jobs:
         # Check basic CLI functionality
         echo "Continue CLI version: $(cn --version)"
         
-        # Check available configurations
-        echo "Available configurations:"
-        cn config list 2>&1 || echo "❌ Failed to list configs"
-        
         # Show current model information using /model slash command
         echo ""
         echo "🤖 Checking current model configuration:"
