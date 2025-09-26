@@ -1,0 +1,212 @@
+name: PostHog Session Analysis with Continue CLI Agent (Debug)
+
+on:
+  schedule: 
+  - cron: "0 6 * * *" # Run at 6 AM UTC daily
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    permissions:
+        contents: read
+        issues: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Install Continue CLI
+      run: |
+        echo "Installing Continue CLI..."
+        npm install -g @continuedev/cli
+        echo "Installation completed"
+        
+        # Verify installation
+        echo "Verifying Continue CLI installation:"
+        which cn || echo "❌ cn command not found in PATH"
+        cn --version || echo "❌ cn --version failed"
+        cn --help || echo "❌ cn --help failed"
+
+    - name: Debug Environment and Configuration
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🔍 Environment Debug Information:"
+        echo "=================================="
+        echo "Node version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        echo "Current working directory: $(pwd)"
+        echo "PATH: $PATH"
+        
+        # Check if CONTINUE_API_KEY is set (without showing value)
+        if [ -n "$CONTINUE_API_KEY" ]; then
+          echo "✅ CONTINUE_API_KEY is set (length: ${#CONTINUE_API_KEY})"
+        else
+          echo "❌ CONTINUE_API_KEY is NOT set"
+        fi
+        
+        # Check if GITHUB_TOKEN is set (without showing value)
+        if [ -n "$GITHUB_TOKEN" ]; then
+          echo "✅ GITHUB_TOKEN is set (length: ${#GITHUB_TOKEN})"
+        else
+          echo "❌ GITHUB_TOKEN is NOT set"
+        fi
+        
+        # Test basic cn command
+        echo "Testing basic cn command:"
+        cn --version 2>&1 || echo "❌ cn --version failed with exit code $?"
+        
+        echo "Testing cn config list:"
+        cn config list 2>&1 || echo "❌ cn config list failed with exit code $?"
+        
+        echo "Testing specific config:"
+        cn --config continuedev/awesome-models-posthog-gh config show 2>&1 || echo "❌ Config show failed with exit code $?"
+
+    - name: Test Simple Continue Command First
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+      run: |
+        echo "🧪 Testing simple Continue CLI command:"
+        echo "=================================="
+        
+        # Test with a very simple prompt first
+        echo "Testing with basic prompt..."
+        set -x  # Enable command tracing
+        timeout 30s cn -p "Hello, respond with just 'CLI is working'" 2>&1 | tee simple_test.log || {
+          exit_code=$?
+          echo "❌ Simple test failed with exit code: $exit_code"
+          echo "Output from simple test:"
+          cat simple_test.log 2>/dev/null || echo "No output file created"
+        }
+        set +x  # Disable command tracing
+
+    - name: Test Config-Specific Command
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+      run: |
+        echo "🔧 Testing config-specific Continue CLI command:"
+        echo "=================================="
+        
+        echo "Testing with specific config..."
+        set -x  # Enable command tracing
+        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Respond with 'Config is working'" 2>&1 | tee config_test.log || {
+          exit_code=$?
+          echo "❌ Config test failed with exit code: $exit_code"
+          echo "Output from config test:"
+          cat config_test.log 2>/dev/null || echo "No output file created"
+        }
+        set +x  # Disable command tracing
+
+    - name: Test PostHog Connection (If Previous Tests Pass)
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+      run: |
+        echo "🔌 Testing PostHog API connection:"
+        echo "=================================="
+        
+        # Only run if previous tests indicated cn is working
+        if [ ! -f simple_test.log ] || [ ! -f config_test.log ]; then
+          echo "❌ Skipping PostHog test - previous tests failed"
+          exit 1
+        fi
+        
+        echo "Testing PostHog connection with verbose output..."
+        set -x
+        timeout 120s cn --config continuedev/awesome-models-posthog-gh -p "Test PostHog connection by listing available tools or checking if PostHog MCP is connected. Just respond with connection status." 2>&1 | tee posthog_test.log || {
+          exit_code=$?
+          echo "❌ PostHog test failed with exit code: $exit_code"
+          echo "Output from PostHog test:"
+          cat posthog_test.log 2>/dev/null || echo "No output file created"
+        }
+        set +x
+
+    - name: Create GitHub Issues (Only If All Tests Pass)
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🐛 Creating GitHub issues:"
+        echo "=================================="
+        
+        # Check if we should proceed
+        if [ ! -f posthog_test.log ]; then
+          echo "❌ Skipping GitHub issue creation - PostHog test failed"
+          exit 1
+        fi
+        
+        # Setup GitHub CLI
+        echo "Setting up GitHub CLI..."
+        echo "$GITHUB_TOKEN" | gh auth login --with-token
+        gh auth status
+        
+        # Get repository slug
+        REPO_SLUG=$(git remote get-url origin | sed -E 's#.*github.com[:/](.+)\.git#\1#')
+        echo "Repository: $REPO_SLUG"
+        
+        echo "Creating GitHub issue with Continue CLI..."
+        set -x
+        timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Create a GitHub issue for accessibility improvements. Use: gh issue create --repo '$REPO_SLUG' --title 'Accessibility Improvement Needed' --body 'This is a test issue created by Continue CLI automation.' --label 'automated,accessibility'" 2>&1 | tee github_creation.log || {
+          exit_code=$?
+          echo "❌ GitHub issue creation failed with exit code: $exit_code"
+          echo "Output from GitHub creation:"
+          cat github_creation.log 2>/dev/null || echo "No output file created"
+        }
+        set +x
+
+    - name: Collect All Debug Information
+      if: always()  # Run even if previous steps fail
+      run: |
+        echo "📋 COMPLETE DEBUG SUMMARY:"
+        echo "=============================================="
+        echo ""
+        
+        echo "🔧 Installation Check:"
+        cn --version 2>&1 || echo "❌ cn not available"
+        echo ""
+        
+        echo "📄 Log Files Created:"
+        ls -la *.log 2>/dev/null || echo "No log files found"
+        echo ""
+        
+        if [ -f simple_test.log ]; then
+          echo "📝 Simple Test Output:"
+          echo "----------------------"
+          cat simple_test.log
+          echo ""
+        fi
+        
+        if [ -f config_test.log ]; then
+          echo "📝 Config Test Output:"
+          echo "----------------------"
+          cat config_test.log
+          echo ""
+        fi
+        
+        if [ -f posthog_test.log ]; then
+          echo "📝 PostHog Test Output:"
+          echo "-----------------------"
+          cat posthog_test.log
+          echo ""
+        fi
+        
+        if [ -f github_creation.log ]; then
+          echo "📝 GitHub Creation Output:"
+          echo "--------------------------"
+          cat github_creation.log
+          echo ""
+        fi
+        
+        echo "🎯 DEBUGGING SUMMARY:"
+        echo "- Check the outputs above to see exactly where the failure occurs"
+        echo "- Look for specific error messages in each test phase"
+        echo "- If cn --version fails, it's an installation issue"
+        echo "- If simple test fails, it's a basic Continue CLI issue"
+        echo "- If config test fails, it's a configuration issue"
+        echo "- If PostHog test fails, it's an MCP/PostHog connection issue"
