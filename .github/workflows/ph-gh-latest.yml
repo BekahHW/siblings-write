@@ -40,16 +40,9 @@ jobs:
         # Show current model information using /model slash command
         echo ""
         echo "🤖 Checking current model configuration:"
-        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p
+        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "What model are you using?"
                 echo "Continue CLI config: $(cn --config)"
                 echo "Continue CLI model: $(cn --model)"
-
-
-        
-        # Get model info in a different way if /model doesn't work
-        echo ""
-        echo "🔍 Alternative model check:"
-        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "What model are you using? Please respond with just your model name"
 
 
     - name: Analyze PostHog Session Recordings  
