@@ -1,4 +1,4 @@
-name: PostHog Session Analysis to GitHub Issues - latest
+name: latest PostHog Session Analysis to GitHub Issues 
 
 on:
   schedule: 
