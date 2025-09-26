@@ -40,7 +40,7 @@ jobs:
         # Show current model information using /model slash command
         echo ""
         echo "🤖 Checking current model configuration:"
-        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "What model are you using?"
+        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "What model are you using?  Using the PostHog MCP agent and session recording data, analyze recent user sessions to identify UX problems, then use the gh CLI to create an issue based on the top PostHog data problem areas in this repository to improve. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'"
 
 
     - name: Analyze PostHog Session Recordings  
