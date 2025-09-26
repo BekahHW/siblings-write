@@ -1,0 +1,247 @@
+name: PostHog Session Analysis to GitHub Issues - latest
+
+on:
+  schedule: 
+  - cron: "0 6 * * *" # Run at 6 AM UTC daily
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  analyze-and-create-issues:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: read
+        issues: write
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Install Continue CLI
+      run: |
+        echo "📦 Installing Continue CLI..."
+        npm install -g @continuedev/cli
+        echo "✅ Continue CLI installed: $(cn --version)"
+
+    - name: Check Continue Configuration and Model
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🔧 Checking Continue CLI configuration..."
+        echo "============================================"
+        
+        # Check basic CLI functionality
+        echo "Continue CLI version: $(cn --version)"
+        
+        # Check available configurations
+        echo "Available configurations:"
+        cn config list 2>&1 || echo "❌ Failed to list configs"
+        
+        # Show current model information using /model slash command
+        echo ""
+        echo "🤖 Checking current model configuration:"
+        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "/model" 2>&1 | tee model_info.log || {
+          echo "❌ Failed to get model info"
+          echo "Checking if it's a model selection UI..."
+          cat model_info.log 2>/dev/null || echo "No model info captured"
+        }
+        
+        # Get model info in a different way if /model doesn't work
+        echo ""
+        echo "🔍 Alternative model check:"
+        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p "What model are you using? Please respond with just your model name and provider." 2>&1 | tee alt_model_info.log || echo "Alternative model check failed"
+
+    - name: Test PostHog MCP Connection
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🔌 Testing PostHog MCP connection..."
+        echo "===================================="
+        
+        # Test basic MCP tools availability
+        echo "Testing MCP tools availability:"
+        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "List all available MCP tools and functions you have access to. Focus on PostHog-related capabilities." 2>&1 | tee mcp_tools.log || echo "MCP tools test failed"
+        
+        # Test basic PostHog connection
+        echo ""
+        echo "Testing PostHog connection:"
+        timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Can you access PostHog? Try to connect and tell me if you can see any PostHog data or insights." 2>&1 | tee posthog_connection.log || echo "PostHog connection test failed"
+
+    - name: Analyze PostHog Session Recordings  
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "📊 Analyzing PostHog session recording data..."
+        echo "=============================================="
+        
+        # Wait a moment for PostHog data to be available
+        echo "⏳ Allowing time for session recording data to be available..."
+        sleep 10
+        
+        # Main analysis prompt - using agent MCP and specific instructions
+        echo "🔍 Running PostHog session analysis for UX issues:"
+        timeout 300s cn --config continuedev/awesome-models-posthog-gh -p "
+        Using the PostHog MCP agent and session recording data, analyze recent user sessions to identify UX problems.
+
+        **Task**: Analyze PostHog session recordings and identify the top 3 most critical UX issues that need GitHub issues created.
+
+        **Instructions**:
+        1. Access PostHog session recording data from recent sessions (last 24-48 hours)
+        2. Look for patterns indicating user friction, errors, or abandonment
+        3. Focus on accessibility issues, navigation problems, and user flow disruptions  
+        4. Identify specific pages/components where issues occur
+        5. Quantify the impact (how many users affected, conversion impact, etc.)
+
+        **Output Format**:
+        For each of the top 3 issues, provide:
+        - Issue Title (clear, actionable)
+        - Detailed Description (what's happening, evidence from sessions)
+        - Steps to Reproduce (based on session data)
+        - User Impact (metrics, affected user count)
+        - Suggested Priority (High/Medium/Low with reasoning)
+        - Specific Location (page, component, or flow)
+
+        Please analyze the data thoroughly and provide actionable insights based on real session evidence.
+        " 2>&1 | tee posthog_analysis.log || {
+          echo "❌ PostHog analysis failed or timed out"
+          echo "Checking output..."
+          cat posthog_analysis.log 2>/dev/null || echo "No analysis output captured"
+        }
+
+    - name: Create GitHub Issues from Analysis
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🐛 Creating GitHub issues from PostHog analysis..."
+        echo "=================================================="
+        
+        # Check if we have analysis results
+        if [ ! -f posthog_analysis.log ] || [ ! -s posthog_analysis.log ]; then
+          echo "❌ No PostHog analysis results to process"
+          exit 1
+        fi
+        
+        echo "📝 Analysis results found, proceeding with GitHub issue creation..."
+        
+        # Create GitHub issues using Continue CLI with the analysis results
+        timeout 180s cn --config continuedev/awesome-models-posthog-gh -p "
+        Based on the PostHog session analysis I just completed, create GitHub issues for the top 3 UX problems identified.
+
+        **Instructions**:
+        1. For each of the 3 issues identified in my previous analysis, create a GitHub issue
+        2. Use the GitHub CLI to create issues in this repository: $GITHUB_REPOSITORY
+        3. Search for existing similar issues first to avoid duplicates
+        4. Include PostHog evidence and metrics in issue descriptions
+
+        **GitHub CLI Commands to use**:
+        For each issue, execute:
+        \`\`\`bash
+        # Check for existing similar issues first
+        gh issue list --repo '$GITHUB_REPOSITORY' --search 'is:issue [search-term]' --state all --limit 5
+
+        # Create new issue if no duplicates found
+        gh issue create --repo '$GITHUB_REPOSITORY' \\
+          --title '[UX Issue] [Specific Title]' \\
+          --body '[Detailed description with PostHog evidence]' \\
+          --label 'bug,ux,posthog-analysis,automated'
+        \`\`\`
+
+        **Issue Template**:
+        Each issue should include:
+        - **Problem**: Clear description of the UX issue
+        - **Evidence**: PostHog session data supporting this issue  
+        - **Impact**: User metrics and business impact
+        - **Steps to Reproduce**: Based on session recordings
+        - **Suggested Solution**: Initial recommendations
+        - **Priority**: High/Medium/Low with reasoning
+
+        Execute the GitHub CLI commands to create these issues now.
+        " 2>&1 | tee github_creation.log || {
+          echo "❌ GitHub issue creation failed or timed out"
+          echo "Checking output..."
+          cat github_creation.log 2>/dev/null || echo "No GitHub creation output captured"
+        }
+
+    - name: Verify Created Issues
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "✅ Verifying created GitHub issues..."
+        echo "====================================="
+        
+        # List recent automated issues
+        echo "Recent automated issues:"
+        gh issue list --repo "$GITHUB_REPOSITORY" --label "automated,posthog-analysis" --limit 10 --json number,title,createdAt,labels | jq -r '.[] | "Issue #\(.number): \(.title) (Created: \(.createdAt))"'
+        
+        # Show issues created today
+        echo ""
+        echo "Issues created today:"
+        gh issue list --repo "$GITHUB_REPOSITORY" --label "automated" --created "$(date +%Y-%m-%d)" --json number,title,url | jq -r '.[] | "Issue #\(.number): \(.title)\n  URL: \(.url)\n"'
+
+    - name: Debug Summary
+      if: always()
+      run: |
+        echo "📋 EXECUTION SUMMARY"
+        echo "===================="
+        echo ""
+        
+        echo "🤖 Model Information:"
+        if [ -f model_info.log ] && [ -s model_info.log ]; then
+          echo "Primary model info:"
+          cat model_info.log | head -10
+        fi
+        
+        if [ -f alt_model_info.log ] && [ -s alt_model_info.log ]; then
+          echo "Alternative model info:"
+          cat alt_model_info.log | head -5
+        fi
+        
+        echo ""
+        echo "🔌 MCP Connection:"
+        if [ -f mcp_tools.log ] && [ -s mcp_tools.log ]; then
+          echo "✅ MCP tools response captured"
+          echo "First few lines:"
+          cat mcp_tools.log | head -5
+        else
+          echo "❌ No MCP tools response"
+        fi
+        
+        echo ""
+        echo "📊 PostHog Analysis:"
+        if [ -f posthog_analysis.log ] && [ -s posthog_analysis.log ]; then
+          echo "✅ PostHog analysis completed"
+          echo "Analysis size: $(wc -l < posthog_analysis.log) lines"
+          echo "Preview:"
+          cat posthog_analysis.log | head -10
+        else
+          echo "❌ No PostHog analysis results"
+        fi
+        
+        echo ""
+        echo "🐛 GitHub Issue Creation:"
+        if [ -f github_creation.log ] && [ -s github_creation.log ]; then
+          echo "✅ GitHub creation process ran"
+          echo "Output size: $(wc -l < github_creation.log) lines"
+          echo "Preview:"
+          cat github_creation.log | head -10
+        else
+          echo "❌ No GitHub creation output"
+        fi
+        
+        echo ""
+        echo "📁 All log files:"
+        ls -la *.log 2>/dev/null || echo "No log files found"
+        
+        echo ""
+        echo "🎯 SUCCESS INDICATORS:"
+        echo "- Continue CLI working: $(cn --version 2>/dev/null && echo '✅' || echo '❌')"
+        echo "- Model info captured: $([ -f model_info.log ] && [ -s model_info.log ] && echo '✅' || echo '❌')"
+        echo "- PostHog analysis: $([ -f posthog_analysis.log ] && [ -s posthog_analysis.log ] && echo '✅' || echo '❌')"
+        echo "- GitHub creation: $([ -f github_creation.log ] && [ -s github_creation.log ] && echo '✅' || echo '❌')"
