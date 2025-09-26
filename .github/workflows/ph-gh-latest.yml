@@ -40,7 +40,7 @@ jobs:
         # Show current model information using /model slash command
         echo ""
         echo "🤖 Checking current model configuration:"
-        timeout 30s cn --config continuedev/awesome-models-posthog-gh 
+        timeout 30s cn --config continuedev/awesome-models-posthog-gh -p
                 echo "Continue CLI config: $(cn --config)"
                 echo "Continue CLI model: $(cn --model)"
 
