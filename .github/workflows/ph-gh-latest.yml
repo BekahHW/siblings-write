@@ -36,10 +36,10 @@ jobs:
         
         # Check basic CLI functionality
         echo "Continue CLI version: $(cn --version)"
+        echo "✅ Version check completed"
         
         # Check if config file exists
-        echo ""
-        echo "📁 Checking config file:"
+        echo "📁 Checking config file..."
         if [ -f "continuedev/awesome-models-posthog-gh" ]; then
           echo "✅ Config file exists"
           echo "Config file size: $(wc -c < continuedev/awesome-models-posthog-gh) bytes"
@@ -48,27 +48,36 @@ jobs:
           echo "Available files in continuedev/:"
           ls -la continuedev/ 2>/dev/null || echo "continuedev/ directory not found"
         fi
+        echo "✅ Config check completed"
         
         # Simple test first
-        echo ""
-        echo "🧪 Testing with simple prompt:"
-        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Hello, please respond with 'Test successful'" 2>&1 | tee simple_agent_test.log || {
-          EXIT_CODE=$?
-          echo "❌ Simple agent test failed with exit code: $EXIT_CODE"
+        echo "🧪 Testing with simple prompt..."
+        timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Hello, please respond with 'Test successful'" 2>&1 | tee simple_agent_test.log
+        EXIT_CODE=$?
+        echo "Simple test exit code: $EXIT_CODE"
+        
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo "❌ Simple agent test failed"
           echo "Output captured:"
           cat simple_agent_test.log 2>/dev/null || echo "No output captured"
-          
-          # Don't exit yet, let's try to understand the error
-        }
+        else
+          echo "✅ Simple test completed successfully"
+        fi
         
-        echo ""
-        echo "📊 Testing PostHog agent access:"
-        timeout 120s cn --config continuedev/awesome-models-posthog-gh -p "Can you access PostHog data? If yes, tell me about it. If no, explain what you can access." 2>&1 | tee posthog_access_test.log || {
-          EXIT_CODE=$?
-          echo "❌ PostHog access test failed with exit code: $EXIT_CODE"
+        echo "📊 Testing PostHog agent access..."
+        timeout 120s cn --config continuedev/awesome-models-posthog-gh -p "Can you access PostHog data? If yes, tell me about it. If no, explain what you can access." 2>&1 | tee posthog_access_test.log
+        EXIT_CODE2=$?
+        echo "PostHog test exit code: $EXIT_CODE2"
+        
+        if [ $EXIT_CODE2 -ne 0 ]; then
+          echo "❌ PostHog access test failed"
           echo "Output captured:"
           cat posthog_access_test.log 2>/dev/null || echo "No output captured"
-        }
+        else
+          echo "✅ PostHog test completed successfully"
+        fi
+        
+        echo "🏁 All tests completed"
 
 
     - name: Analyze PostHog Session Recordings  
