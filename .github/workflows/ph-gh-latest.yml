@@ -32,13 +32,10 @@ jobs:
         # Ask about available tools
         echo ""
         echo "Getting available tools:"
-        echo "Waiting for MCP connections..."
+         # First, initialize and wait
+        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List your tools"
         sleep 5
-        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List your available MCP tools and capabilities. Be specific about what tools you have access to." 2>&1 | tee tools.log
-        
-        # Ask specifically about PostHog MCP
-        echo ""
-        echo "Checking PostHog MCP specifically:"
+        # Then run the actual command
         npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Do you have PostHog MCP configured? Can you access PostHog data? What PostHog-specific tools are available to you?" 2>&1 | tee posthog_check.log
         
         # Try to get system/config information indirectly
