@@ -33,7 +33,7 @@ jobs:
         echo ""
         echo "Getting available tools:"
          # First, initialize and wait
-        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List your tools"
+        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "say hello"
         sleep 5
         # Then run the actual command
         npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Do you have PostHog MCP configured? Can you access PostHog data? What PostHog-specific tools are available to you?" 2>&1 | tee posthog_check.log
