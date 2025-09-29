@@ -36,7 +36,8 @@ jobs:
           echo "===================================="
           
           echo "from the cli:"
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "What agent are you?" 2>&1 | tee format1.log
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "What do you do?" 2>&1 | tee format1.log
+          sleep 20
           npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Using the PostHog MCP,
            analyze my website's user data and identify the top 3 UX issues that need attention.  Focus on session recordings, user behavior patterns, and pain points." 2>&1 | tee format2.log
           
