@@ -32,7 +32,7 @@ jobs:
         # Ask about available tools
         echo ""
         echo "Getting available tools:"
-        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "sleep 5 && echo 'Waiting for MCP connections...' && "List your available MCP tools and capabilities. Be specific about what tools you have access to." 2>&1 | tee tools.log
+        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "sleep 5 && echo 'Waiting for MCP connections...' && echo 'List your available MCP tools and capabilities. Be specific about what tools you have access to.'" 2>&1 | tee tools.log
         
         # Ask specifically about PostHog MCP
         echo ""
