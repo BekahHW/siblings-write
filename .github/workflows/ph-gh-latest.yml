@@ -28,10 +28,6 @@ jobs:
         
         # Verify installation
         echo "✅ Continue CLI version: $(npx @continuedev/cli --version)"
-
-        # Ask about the current model
-        echo "Getting model information:"
-        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "What AI model are you? Please respond with just your model name and version." 2>&1 | tee model.log
         
         # Ask about available tools
         echo ""
