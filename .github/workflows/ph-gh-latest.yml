@@ -29,6 +29,25 @@ jobs:
         # Verify installation
         echo "✅ Continue CLI version: $(npx @continuedev/cli --version)"
 
+        # Ask about the current model
+        echo "Getting model information:"
+        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "What AI model are you? Please respond with just your model name and version." 2>&1 | tee model.log
+        
+        # Ask about available tools
+        echo ""
+        echo "Getting available tools:"
+        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List your available MCP tools and capabilities. Be specific about what tools you have access to." 2>&1 | tee tools.log
+        
+        # Ask specifically about PostHog MCP
+        echo ""
+        echo "Checking PostHog MCP specifically:"
+        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Do you have PostHog MCP configured? Can you access PostHog data? What PostHog-specific tools are available to you?" 2>&1 | tee posthog_check.log
+        
+        # Try to get system/config information indirectly
+        echo ""
+        echo "4. Getting system configuration (indirect)..."
+        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Tell me about your current configuration: What agent/assistant configuration are you using? What's your context window size? What tools are enabled?" 2>&1 | tee config_details.log
+
     - name: Test Continue Agent with PostHog MCP
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
