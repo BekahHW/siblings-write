@@ -1,10 +1,10 @@
-name: Diagnose Agent Configuration
+name: Debug Agent Loading in Headless Mode
 
 on:
   workflow_dispatch:
 
 jobs:
-  diagnose:
+  debug-agent:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,179 +17,203 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install Continue CLI
+      - name: Install Continue CLI with Debug Output
         run: |
           echo "📦 Installing Continue CLI..."
           npm install @continuedev/cli
           echo "✅ Continue CLI version: $(npx @continuedev/cli --version)"
+          
+          # Check if the package has debug capabilities
+          echo ""
+          echo "Checking for debug environment variables:"
+          npx @continuedev/cli --help 2>&1 | grep -i "debug\|verbose" || echo "No debug flags found in help"
 
-      - name: Verify Agent Configuration
+      - name: Test Agent Loading with Verbose/Debug Mode
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+          # Try various debug environment variables
+          DEBUG: "*"
+          NODE_ENV: "development"
+          CONTINUE_DEBUG: "true"
+          VERBOSE: "true"
         run: |
-          echo "🔍 VERIFYING AGENT CONFIGURATION"
-          echo "================================="
+          echo "🔍 TESTING AGENT LOADING WITH DEBUG OUTPUT"
+          echo "==========================================="
           
-          echo "1. Testing with specified agent slug:"
-          echo "-------------------------------------"
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
-          Please tell me:
-          1. What is your assistant/agent name from your configuration?
-          2. What version are you?
-          3. What models are configured for you?
-          4. What MCP servers are configured (not just available tools)?
-          5. What rules are you following?
-          6. What prompts do you have access to?
-          " 2>&1 | tee agent_info.log
+          echo "1. Test with verbose flag if available:"
+          echo "---------------------------------------"
+          npx @continuedev/cli --verbose --config continuedev/awesome-models-posthog-gh -p "What is your agent name and version?" 2>&1 | tee verbose_test.log || echo "Verbose flag may not exist"
           
           echo ""
-          echo "2. Asking about configuration source:"
-          echo "-------------------------------------"
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
-          Tell me about your configuration:
-          - Are you using a configuration from Continue Hub or a local file?
-          - What is the exact name of your configuration?
-          - If from Hub, what is the slug/identifier?
-          - Can you see any mcpServers in your configuration?
-          " 2>&1 | tee config_source.log
+          echo "2. Test with debug environment:"
+          echo "-------------------------------"
+          DEBUG="*" npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "What is your agent configuration name?" 2>&1 | tee debug_test.log
           
           echo ""
-          echo "3. Direct MCP server query:"
-          echo "---------------------------"
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
-          Looking at your internal configuration:
-          - Do you see 'mcpServers' defined?
-          - Is there a 'posthog/posthog-mcp' entry?
-          - What environment variables or secrets should be available for MCP?
-          - Are there any MCP connection errors in your initialization?
-          " 2>&1 | tee mcp_config.log
+          echo "3. Check stderr for hidden debug output:"
+          echo "----------------------------------------"
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List your configuration" 2>&1 | tee full_output.log
 
-      - name: Test Without Config Flag
+      - name: Test Different Agent Slug Formats
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         run: |
-          echo "🔄 TESTING WITHOUT --config FLAG"
-          echo "================================="
+          echo "🔄 TESTING DIFFERENT CONFIG FORMATS"
+          echo "===================================="
           
-          echo "What happens without specifying config:"
-          npx @continuedev/cli -p "What agent/assistant configuration are you using?" 2>&1 | tee no_config.log
+          echo "1. With owner/name format:"
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "What agent are you?" 2>&1 | tee format1.log
+          
+          echo ""
+          echo "2. With slug:// prefix:"
+          npx @continuedev/cli --config "slug://continuedev/awesome-models-posthog-gh" -p "What agent are you?" 2>&1 | tee format2.log || echo "slug:// format may not be supported"
+          
+          echo ""
+          echo "3. With full URL:"
+          npx @continuedev/cli --config "https://hub.continue.dev/continuedev/awesome-models-posthog-gh" -p "What agent are you?" 2>&1 | tee format3.log || echo "URL format may not be supported"
 
-      - name: Compare TUI vs Headless Initialization
+      - name: Check Continue CLI Internal State
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         run: |
-          echo "🔬 COMPARING INITIALIZATION MODES"
-          echo "=================================="
+          echo "🔬 CHECKING CLI INTERNAL STATE"
+          echo "==============================="
           
-          echo "Creating a test script to simulate TUI initialization..."
-          cat > test_init.js << 'EOF'
+          # Create a test script to inspect the CLI behavior
+          cat > debug_cli.js << 'EOF'
           const { spawn } = require('child_process');
+          const fs = require('fs');
+          const path = require('path');
           
-          console.log("Testing initialization differences...\n");
+          console.log("Debugging Continue CLI initialization...\n");
           
-          // Test 1: Headless mode (what we're using)
-          console.log("1. HEADLESS MODE (-p flag):");
-          console.log("----------------------------");
-          const headless = spawn('npx', [
+          // Check for Continue config directory
+          const homeDir = process.env.HOME || process.env.USERPROFILE;
+          const continueDir = path.join(homeDir, '.continue');
+          
+          console.log("Continue directory:", continueDir);
+          if (fs.existsSync(continueDir)) {
+            console.log("Contents:", fs.readdirSync(continueDir));
+          } else {
+            console.log("Continue directory doesn't exist");
+          }
+          
+          // Run CLI with timing
+          console.log("\nRunning CLI with config...");
+          const startTime = Date.now();
+          
+          const cli = spawn('npx', [
             '@continuedev/cli',
             '--config', 'continuedev/awesome-models-posthog-gh',
-            '-p', 'List your configuration name and MCP servers'
-          ], { env: process.env });
-          
-          headless.stdout.on('data', (data) => {
-            process.stdout.write(`[HEADLESS] ${data}`);
+            '-p', 'What is the name field in your configuration?'
+          ], {
+            env: process.env,
+            stdio: ['pipe', 'pipe', 'pipe']
           });
           
-          headless.on('close', (code) => {
-            console.log(`\nHeadless process exited with code ${code}\n`);
+          let stdout = '';
+          let stderr = '';
+          
+          cli.stdout.on('data', (data) => {
+            stdout += data.toString();
+            process.stdout.write(data);
+          });
+          
+          cli.stderr.on('data', (data) => {
+            stderr += data.toString();
+            process.stderr.write(data);
+          });
+          
+          cli.on('close', (code) => {
+            const duration = Date.now() - startTime;
+            console.log(`\nProcess exited with code ${code} after ${duration}ms`);
             
-            // Test 2: Try to simulate TUI mode initialization
-            console.log("2. SIMULATED TUI MODE (stdin interaction):");
-            console.log("-------------------------------------------");
-            const tui = spawn('npx', [
-              '@continuedev/cli',
-              '--config', 'continuedev/awesome-models-posthog-gh'
-            ], { env: process.env });
+            if (stderr) {
+              console.log("\nStderr output:");
+              console.log(stderr);
+            }
             
-            // Send a command after initialization
-            setTimeout(() => {
-              tui.stdin.write('List your configuration name and MCP servers\n');
-              setTimeout(() => {
-                tui.kill();
-              }, 5000);
-            }, 3000);
-            
-            tui.stdout.on('data', (data) => {
-              process.stdout.write(`[TUI] ${data}`);
-            });
-            
-            tui.on('close', () => {
-              console.log("\nTUI process terminated");
-            });
+            // Check if configuration was mentioned
+            if (stdout.includes('Awesome Models') || stdout.includes('PostHog')) {
+              console.log("\n✅ Agent configuration appears to be loaded");
+            } else {
+              console.log("\n❌ Agent configuration not detected in output");
+            }
           });
           EOF
           
-          timeout 30s node test_init.js 2>&1 | tee init_comparison.log || echo "Test completed"
+          node debug_cli.js 2>&1 | tee cli_debug.log
 
-      - name: Check for Configuration Loading Issues
+      - name: Test with Explicit Wait for MCP
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         run: |
-          echo "🐛 CHECKING FOR CONFIG LOADING ISSUES"
+          echo "⏱️ TESTING WITH EXPLICIT MCP WAIT"
+          echo "=================================="
+          
+          echo "Attempting to give MCP time to load..."
+          
+          # Try multiple sequential calls to see if state persists
+          echo "Call 1: Initialize"
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Initialize" 2>&1 | head -5
+          
+          echo ""
+          echo "Waiting 15 seconds..."
+          sleep 15
+          
+          echo "Call 2: Check configuration"
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "What is your configuration name and version?" 2>&1 | tee config_after_wait.log
+          
+          echo ""
+          echo "Call 3: Check MCP"
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List any MCP servers you have" 2>&1 | tee mcp_after_wait.log
+
+      - name: Check Network Connectivity to Continue Hub
+        run: |
+          echo "🌐 CHECKING CONTINUE HUB CONNECTIVITY"
           echo "======================================"
           
-          echo "Testing if the agent can see its own configuration details:"
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
-          Based on the YAML configuration for 'Awesome Models for PostHog + GH Issues':
-          - Version should be: 1.0.64
-          - Models should include: anthropic/claude-4-sonnet
-          - MCP servers should include: posthog/posthog-mcp
-          - Rules should include: bekahhw/env-vars
+          echo "1. Testing API endpoint:"
+          curl -s -o /dev/null -w "HTTP Status: %{http_code}, Time: %{time_total}s\n" \
+            "https://api.continue.dev/agents/continuedev/awesome-models-posthog-gh" || echo "Failed to reach API"
           
-          Do you see these in your configuration?
-          " 2>&1 | tee config_check.log
+          echo ""
+          echo "2. Fetching agent configuration:"
+          curl -s "https://api.continue.dev/agents/continuedev/awesome-models-posthog-gh" 2>&1 | head -20 || echo "Failed to fetch config"
+          
+          echo ""
+          echo "3. Testing hub.continue.dev:"
+          curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" \
+            "https://hub.continue.dev/continuedev/awesome-models-posthog-gh" || echo "Failed to reach hub"
 
       - name: Summary Analysis
         if: always()
         run: |
-          echo "📊 DIAGNOSTIC SUMMARY"
-          echo "====================="
+          echo "📊 DEBUG SUMMARY"
+          echo "================"
           
           echo ""
-          echo "🔍 Configuration Detection:"
+          echo "🔍 Agent Loading Results:"
           
-          if [ -f agent_info.log ]; then
-            echo "Agent name mentioned:"
-            grep -i "awesome\|posthog\|gh.*issue" agent_info.log | head -2 || echo "  Not found"
-          fi
-          
-          if [ -f config_source.log ]; then
-            echo ""
-            echo "Configuration source:"
-            grep -i "hub\|local\|slug" config_source.log | head -2 || echo "  Not detected"
-          fi
-          
-          if [ -f mcp_config.log ]; then
-            echo ""
-            echo "MCP servers detected:"
-            grep -i "mcp\|posthog" mcp_config.log | head -3 || echo "  None mentioned"
-          fi
-          
-          if [ -f config_check.log ]; then
-            echo ""
-            echo "Expected configuration elements:"
-            grep -i "1.0.64\|claude-4\|posthog.*mcp\|yes" config_check.log | head -3 || echo "  Not confirmed"
-          fi
+          for file in verbose_test.log debug_test.log format1.log format2.log format3.log config_after_wait.log mcp_after_wait.log; do
+            if [ -f "$file" ]; then
+              echo ""
+              echo "$file:"
+              grep -i "awesome\|posthog\|mcp\|version\|name" "$file" | head -3 || echo "  No relevant content found"
+            fi
+          done
           
           echo ""
-          echo "💡 KEY FINDINGS:"
-          echo "----------------"
-          echo "1. The agent should be: 'Awesome Models for PostHog + GH Issues' v1.0.64"
-          echo "2. It should have posthog/posthog-mcp in mcpServers"
-          echo "3. Working in TUI but not headless suggests initialization timing issue"
-          echo "4. The agent config IS on Continue Hub at: continuedev/awesome-models-posthog-gh"
+          echo "💡 DIAGNOSIS:"
+          echo "------------"
+          echo "1. Check if agent name 'Awesome Models for PostHog + GH Issues' appears anywhere"
+          echo "2. Check if version '1.0.64' is mentioned"
+          echo "3. Check if 'posthog/posthog-mcp' is listed as an MCP server"
+          echo "4. Check if the agent is falling back to a default configuration"
           echo ""
-          echo "🔧 LIKELY ISSUE:"
-          echo "The MCP servers defined in the Hub agent are not being initialized properly"
-          echo "in headless mode. This is a Continue CLI bug where headless mode doesn't"
-          echo "wait long enough for Hub-configured MCP servers to connect."
+          echo "🐛 POTENTIAL ISSUES:"
+          echo "- Hub agent configuration not being fetched in headless mode"
+          echo "- MCP servers from Hub config not being initialized"
+          echo "- Timeout issue: headless mode exits before MCP can connect"
+          echo "- Authentication issue: API key not being used for Hub config fetch"
+          echo "- The --config flag might not work properly with Hub slugs in headless mode"
