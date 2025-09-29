@@ -36,11 +36,8 @@ jobs:
         echo "🔧 Testing Continue Agent..."
         echo "============================="
         
-        # The agent 'continuedev/awesome-models-posthog-gh' includes PostHog MCP configuration
-        # No need for separate PostHog API keys - they're configured in the agent on Continue Hub
-        
         echo "Testing agent with built-in PostHog MCP:"
-        cn --config continuedev/awesome-models-posthog-gh -p "Can you access PostHog data through your MCP tools?" 2>&1 | tee test.log
+        npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p  "Can you access PostHog data through your MCP tools?" 2>&1 | tee test.log
         
         if [ -s test.log ]; then
           echo "✅ Agent is responding"
