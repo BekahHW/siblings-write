@@ -37,9 +37,9 @@ jobs:
         # Check basic CLI functionality
         echo "Continue CLI version: $(cn --version)"
         
-        # Show current model information using /model slash command
+        # posthog data
         echo ""
-        timeout 330s cn -p "Tell me about my posthog data. If you can't access it, tell me about my project and suggest improvements."
+        timeout 330s cn --config continuedev/awesome-models-posthog-gh -p "Tell me about my posthog data. If you can't access it, tell me about my project and suggest improvements."
 
 
     - name: Analyze PostHog Session Recordings  
