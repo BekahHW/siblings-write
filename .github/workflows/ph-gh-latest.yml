@@ -1,16 +1,13 @@
-name: PostHog Session Analysis via Continue Agent (With MCP Load Delays)
+name: Diagnose Agent Configuration
 
 on:
-  schedule:
-    - cron: "0 6 * * *" # Run at 6 AM UTC daily
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
 
 jobs:
-  analyze-and-create-issues:
+  diagnose:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
 
     steps:
       - uses: actions/checkout@v4
@@ -18,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22" # Continue CLI requires Node 22+
+          node-version: "22"
 
       - name: Install Continue CLI
         run: |
@@ -26,186 +23,173 @@ jobs:
           npm install @continuedev/cli
           echo "✅ Continue CLI version: $(npx @continuedev/cli --version)"
 
-      - name: Initialize Agent and Wait for MCP
+      - name: Verify Agent Configuration
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         run: |
-          echo "🚀 INITIALIZING AGENT AND MCP CONNECTIONS"
-          echo "=========================================="
+          echo "🔍 VERIFYING AGENT CONFIGURATION"
+          echo "================================="
           
-          # First call to initialize the agent and start MCP connections
-          echo "Step 1: Initial agent activation..."
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Hello, initializing" 2>&1 | tee init1.log
+          echo "1. Testing with specified agent slug:"
+          echo "-------------------------------------"
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
+          Please tell me:
+          1. What is your assistant/agent name from your configuration?
+          2. What version are you?
+          3. What models are configured for you?
+          4. What MCP servers are configured (not just available tools)?
+          5. What rules are you following?
+          6. What prompts do you have access to?
+          " 2>&1 | tee agent_info.log
           
-          # Give MCP servers more time to connect (10 seconds)
           echo ""
-          echo "⏳ Waiting 10 seconds for MCP servers to fully connect..."
-          sleep 10
+          echo "2. Asking about configuration source:"
+          echo "-------------------------------------"
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
+          Tell me about your configuration:
+          - Are you using a configuration from Continue Hub or a local file?
+          - What is the exact name of your configuration?
+          - If from Hub, what is the slug/identifier?
+          - Can you see any mcpServers in your configuration?
+          " 2>&1 | tee config_source.log
           
-          # Second call to check if MCP is now available
           echo ""
-          echo "Step 2: Checking MCP availability after delay..."
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List all your available MCP servers and tools" 2>&1 | tee init2.log
+          echo "3. Direct MCP server query:"
+          echo "---------------------------"
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
+          Looking at your internal configuration:
+          - Do you see 'mcpServers' defined?
+          - Is there a 'posthog/posthog-mcp' entry?
+          - What environment variables or secrets should be available for MCP?
+          - Are there any MCP connection errors in your initialization?
+          " 2>&1 | tee mcp_config.log
+
+      - name: Test Without Config Flag
+        env:
+          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        run: |
+          echo "🔄 TESTING WITHOUT --config FLAG"
+          echo "================================="
           
-          # Additional wait if needed
-          echo ""
-          echo "⏳ Additional 5 second wait for stability..."
-          sleep 5
+          echo "What happens without specifying config:"
+          npx @continuedev/cli -p "What agent/assistant configuration are you using?" 2>&1 | tee no_config.log
+
+      - name: Compare TUI vs Headless Initialization
+        env:
+          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+        run: |
+          echo "🔬 COMPARING INITIALIZATION MODES"
+          echo "=================================="
           
-          # Final check specifically for PostHog
-          echo ""
-          echo "Step 3: Final PostHog MCP verification..."
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Do you have PostHog MCP tools available? List any PostHog-specific functions you can use." 2>&1 | tee posthog_check.log
+          echo "Creating a test script to simulate TUI initialization..."
+          cat > test_init.js << 'EOF'
+          const { spawn } = require('child_process');
           
-          # Check if PostHog is mentioned
-          if grep -qi "posthog" posthog_check.log; then
-            echo ""
-            echo "✅ PostHog MCP appears to be available"
-          else
-            echo ""
-            echo "⚠️ PostHog MCP may not be available"
-            echo "Attempting one more initialization with longer wait..."
+          console.log("Testing initialization differences...\n");
+          
+          // Test 1: Headless mode (what we're using)
+          console.log("1. HEADLESS MODE (-p flag):");
+          console.log("----------------------------");
+          const headless = spawn('npx', [
+            '@continuedev/cli',
+            '--config', 'continuedev/awesome-models-posthog-gh',
+            '-p', 'List your configuration name and MCP servers'
+          ], { env: process.env });
+          
+          headless.stdout.on('data', (data) => {
+            process.stdout.write(`[HEADLESS] ${data}`);
+          });
+          
+          headless.on('close', (code) => {
+            console.log(`\nHeadless process exited with code ${code}\n`);
             
-            # One more attempt with even longer wait
-            sleep 15
-            npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "After waiting, do you now have PostHog MCP tools?" 2>&1 | tee posthog_retry.log
-          fi
+            // Test 2: Try to simulate TUI mode initialization
+            console.log("2. SIMULATED TUI MODE (stdin interaction):");
+            console.log("-------------------------------------------");
+            const tui = spawn('npx', [
+              '@continuedev/cli',
+              '--config', 'continuedev/awesome-models-posthog-gh'
+            ], { env: process.env });
+            
+            // Send a command after initialization
+            setTimeout(() => {
+              tui.stdin.write('List your configuration name and MCP servers\n');
+              setTimeout(() => {
+                tui.kill();
+              }, 5000);
+            }, 3000);
+            
+            tui.stdout.on('data', (data) => {
+              process.stdout.write(`[TUI] ${data}`);
+            });
+            
+            tui.on('close', () => {
+              console.log("\nTUI process terminated");
+            });
+          });
+          EOF
+          
+          timeout 30s node test_init.js 2>&1 | tee init_comparison.log || echo "Test completed"
 
-      - name: Analyze PostHog Session Recordings
+      - name: Check for Configuration Loading Issues
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        timeout-minutes: 10
         run: |
-          echo "📊 Analyzing PostHog session recordings..."
-          echo "========================================="
+          echo "🐛 CHECKING FOR CONFIG LOADING ISSUES"
+          echo "======================================"
           
-          # Add a small delay before the main analysis to ensure stability
-          echo "⏳ Ensuring MCP connection stability..."
-          sleep 3
-          
-          # Main analysis with PostHog MCP
+          echo "Testing if the agent can see its own configuration details:"
           npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
-          Using your PostHog MCP tools, analyze recent session recordings to identify the top 3 UX issues.
+          Based on the YAML configuration for 'Awesome Models for PostHog + GH Issues':
+          - Version should be: 1.0.64
+          - Models should include: anthropic/claude-4-sonnet
+          - MCP servers should include: posthog/posthog-mcp
+          - Rules should include: bekahhw/env-vars
           
-          If PostHog MCP tools are not available, please state that clearly and provide a simulated analysis instead.
-          
-          Instructions for PostHog analysis:
-          1. Access PostHog session recordings from the last 24-48 hours
-          2. Look for patterns of user friction, errors, or confusion
-          3. Focus on accessibility issues and navigation problems
-          4. Identify specific pages/components with issues
-          
-          For each of the top 3 issues found, provide:
-          - Issue Title
-          - Description with specific evidence from sessions
-          - Steps to Reproduce
-          - User Impact (with metrics if available)
-          - Priority (High/Medium/Low)
-          - Affected Component/Page
-          
-          Format your response clearly with numbered issues.
-          " 2>&1 | tee analysis.log || {
-            echo "⚠️ Analysis completed with warnings"
-          }
-          
-          echo ""
-          if [ -s analysis.log ]; then
-            echo "✅ Analysis complete ($(wc -l < analysis.log) lines)"
-            echo "Preview of results:"
-            head -20 analysis.log
-          else
-            echo "❌ No analysis output captured"
-          fi
+          Do you see these in your configuration?
+          " 2>&1 | tee config_check.log
 
-      - name: Create GitHub Issues from Analysis
-        env:
-          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        timeout-minutes: 5
-        run: |
-          echo "🐛 Creating GitHub issues..."
-          echo "============================"
-          
-          # Check if we have analysis results
-          if [ ! -f analysis.log ] || [ ! -s analysis.log ]; then
-            echo "⚠️ No analysis results found, skipping issue creation"
-            exit 0
-          fi
-          
-          # Small delay to ensure session continuity
-          sleep 2
-          
-          # Create issues based on the analysis
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
-          Based on the PostHog analysis I just completed, create GitHub issues for the UX problems found.
-          
-          Important: Execute these GitHub CLI commands to create the issues:
-          
-          For each issue:
-          1. First check if a similar issue exists:
-             gh issue list --repo '$GITHUB_REPOSITORY' --search 'keywords from title' --state open
-          
-          2. If no duplicate exists, create the issue:
-             gh issue create --repo '$GITHUB_REPOSITORY' \\
-               --title '[UX] Specific Issue Title' \\
-               --body 'Detailed description with PostHog evidence' \\
-               --label 'bug,ux,posthog-analysis,automated'
-          
-          Execute these commands now to create up to 3 issues.
-          Include the PostHog session evidence in each issue body.
-          " 2>&1 | tee creation.log || {
-            echo "⚠️ Issue creation completed with warnings"
-          }
-          
-          if [ -s creation.log ]; then
-            echo "✅ Issue creation attempted"
-          else
-            echo "❌ No issue creation output"
-          fi
-
-      - name: Verify Results
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Summary Analysis
         if: always()
         run: |
-          echo "✅ Verification and Summary"
-          echo "==========================="
-          
-          # Check for newly created issues
-          echo "Checking for automated issues:"
-          gh issue list --repo "$GITHUB_REPOSITORY" \
-            --label "automated" \
-            --limit 5 \
-            --json number,title,createdAt,labels \
-            --jq '.[] | "Issue #\(.number): \(.title)\n  Created: \(.createdAt)\n  Labels: \(.labels | map(.name) | join(", "))\n"' || {
-            echo "No automated issues found or jq parsing failed"
-            gh issue list --repo "$GITHUB_REPOSITORY" --label "automated" --limit 5
-          }
+          echo "📊 DIAGNOSTIC SUMMARY"
+          echo "====================="
           
           echo ""
-          echo "📋 Execution Summary:"
-          echo "- Continue CLI: $(npx @continuedev/cli --version 2>/dev/null && echo '✅ Working' || echo '❌ Not working')"
-          echo "- PostHog MCP check: $(grep -qi 'posthog' posthog_check.log 2>/dev/null && echo '✅ Mentioned' || echo '❌ Not detected')"
-          echo "- Analysis: $([ -s analysis.log ] && echo '✅ Generated' || echo '❌ Failed')"
-          echo "- Issue creation: $([ -s creation.log ] && echo '✅ Attempted' || echo '❌ Not attempted')"
+          echo "🔍 Configuration Detection:"
           
-          # Show diagnostic information
+          if [ -f agent_info.log ]; then
+            echo "Agent name mentioned:"
+            grep -i "awesome\|posthog\|gh.*issue" agent_info.log | head -2 || echo "  Not found"
+          fi
+          
+          if [ -f config_source.log ]; then
+            echo ""
+            echo "Configuration source:"
+            grep -i "hub\|local\|slug" config_source.log | head -2 || echo "  Not detected"
+          fi
+          
+          if [ -f mcp_config.log ]; then
+            echo ""
+            echo "MCP servers detected:"
+            grep -i "mcp\|posthog" mcp_config.log | head -3 || echo "  None mentioned"
+          fi
+          
+          if [ -f config_check.log ]; then
+            echo ""
+            echo "Expected configuration elements:"
+            grep -i "1.0.64\|claude-4\|posthog.*mcp\|yes" config_check.log | head -3 || echo "  Not confirmed"
+          fi
+          
           echo ""
-          echo "🔍 MCP Initialization Logs:"
-          if [ -f init2.log ]; then
-            echo "Available tools after initialization:"
-            grep -i "tool\|mcp\|function" init2.log | head -5 || echo "No tool mentions found"
-          fi
-          
-          if [ -f posthog_check.log ]; then
-            echo ""
-            echo "PostHog MCP status:"
-            grep -i "posthog" posthog_check.log | head -5 || echo "PostHog not mentioned"
-          fi
-          
-          if [ -f posthog_retry.log ]; then
-            echo ""
-            echo "PostHog retry attempt:"
-            grep -i "posthog" posthog_retry.log | head -3 || echo "PostHog not found in retry"
-          fi
+          echo "💡 KEY FINDINGS:"
+          echo "----------------"
+          echo "1. The agent should be: 'Awesome Models for PostHog + GH Issues' v1.0.64"
+          echo "2. It should have posthog/posthog-mcp in mcpServers"
+          echo "3. Working in TUI but not headless suggests initialization timing issue"
+          echo "4. The agent config IS on Continue Hub at: continuedev/awesome-models-posthog-gh"
+          echo ""
+          echo "🔧 LIKELY ISSUE:"
+          echo "The MCP servers defined in the Hub agent are not being initialized properly"
+          echo "in headless mode. This is a Continue CLI bug where headless mode doesn't"
+          echo "wait long enough for Hub-configured MCP servers to connect."
