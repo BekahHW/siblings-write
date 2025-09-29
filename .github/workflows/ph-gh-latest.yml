@@ -28,32 +28,6 @@ jobs:
           echo "Checking for debug environment variables:"
           npx @continuedev/cli --help 2>&1 | grep -i "debug\|verbose" || echo "No debug flags found in help"
 
-      - name: Test Agent Loading with Verbose/Debug Mode
-        env:
-          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-          # Try various debug environment variables
-          DEBUG: "*"
-          NODE_ENV: "development"
-          CONTINUE_DEBUG: "true"
-          VERBOSE: "true"
-        run: |
-          echo "🔍 TESTING AGENT LOADING WITH DEBUG OUTPUT"
-          echo "==========================================="
-          
-          echo "1. Test with verbose flag if available:"
-          echo "---------------------------------------"
-          npx @continuedev/cli --verbose --config continuedev/awesome-models-posthog-gh -p "What is your agent name and version?" 2>&1 | tee verbose_test.log || echo "Verbose flag may not exist"
-          
-          echo ""
-          echo "2. Test with debug environment:"
-          echo "-------------------------------"
-          DEBUG="*" npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "What is your agent configuration name?" 2>&1 | tee debug_test.log
-          
-          echo ""
-          echo "3. Check stderr for hidden debug output:"
-          echo "----------------------------------------"
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List your configuration" 2>&1 | tee full_output.log
-
       - name: Test Different Agent Slug Formats
         env:
           CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
