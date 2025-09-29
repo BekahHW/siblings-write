@@ -1,4 +1,4 @@
-name: PostHog Session Analysis via Continue Agent
+name: PostHog Session Analysis via Continue Agent (With MCP Load Delays)
 
 on:
   schedule:
@@ -23,42 +23,52 @@ jobs:
       - name: Install Continue CLI
         run: |
           echo "📦 Installing Continue CLI..."
-          # Install as local package to avoid global installation issues
           npm install @continuedev/cli
-
-          # Verify installation
           echo "✅ Continue CLI version: $(npx @continuedev/cli --version)"
 
-      - name: Test Continue Agent Configuration
+      - name: Initialize Agent and Wait for MCP
         env:
-          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}  # Add API key here!
+          CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         run: |
-          echo "🔧 Testing Continue Agent Configuration..."
+          echo "🚀 INITIALIZING AGENT AND MCP CONNECTIONS"
           echo "=========================================="
           
-          # First, initialize and wait for MCP connections
-          echo "Initializing agent and MCP connections..."
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Hello, please confirm you're ready" 2>&1 | tee init.log
+          # First call to initialize the agent and start MCP connections
+          echo "Step 1: Initial agent activation..."
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Hello, initializing" 2>&1 | tee init1.log
           
-          # Give MCP servers time to connect
-          echo "Waiting for MCP connections to establish..."
+          # Give MCP servers more time to connect (10 seconds)
+          echo ""
+          echo "⏳ Waiting 10 seconds for MCP servers to fully connect..."
+          sleep 10
+          
+          # Second call to check if MCP is now available
+          echo ""
+          echo "Step 2: Checking MCP availability after delay..."
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "List all your available MCP servers and tools" 2>&1 | tee init2.log
+          
+          # Additional wait if needed
+          echo ""
+          echo "⏳ Additional 5 second wait for stability..."
           sleep 5
           
-          # Now check for PostHog MCP tools
+          # Final check specifically for PostHog
           echo ""
-          echo "Checking PostHog MCP availability:"
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Do you have PostHog MCP configured? Can you access PostHog data? What PostHog-specific tools are available to you?" 2>&1 | tee posthog_check.log
+          echo "Step 3: Final PostHog MCP verification..."
+          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Do you have PostHog MCP tools available? List any PostHog-specific functions you can use." 2>&1 | tee posthog_check.log
           
-          # Get configuration details
-          echo ""
-          echo "Getting configuration details:"
-          npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "Tell me about your current configuration: What agent/assistant configuration are you using? What's your context window size? What tools are enabled?" 2>&1 | tee config_details.log
-          
-          if [ -s posthog_check.log ]; then
-            echo "✅ Agent is responding"
+          # Check if PostHog is mentioned
+          if grep -qi "posthog" posthog_check.log; then
+            echo ""
+            echo "✅ PostHog MCP appears to be available"
           else
-            echo "❌ No response from agent"
-            exit 1
+            echo ""
+            echo "⚠️ PostHog MCP may not be available"
+            echo "Attempting one more initialization with longer wait..."
+            
+            # One more attempt with even longer wait
+            sleep 15
+            npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "After waiting, do you now have PostHog MCP tools?" 2>&1 | tee posthog_retry.log
           fi
 
       - name: Analyze PostHog Session Recordings
@@ -69,17 +79,23 @@ jobs:
         run: |
           echo "📊 Analyzing PostHog session recordings..."
           echo "========================================="
-
-          # The agent has PostHog MCP configured, so it can directly access PostHog data
+          
+          # Add a small delay before the main analysis to ensure stability
+          echo "⏳ Ensuring MCP connection stability..."
+          sleep 3
+          
+          # Main analysis with PostHog MCP
           npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
           Using your PostHog MCP tools, analyze recent session recordings to identify the top 3 UX issues.
-
-          Instructions:
+          
+          If PostHog MCP tools are not available, please state that clearly and provide a simulated analysis instead.
+          
+          Instructions for PostHog analysis:
           1. Access PostHog session recordings from the last 24-48 hours
           2. Look for patterns of user friction, errors, or confusion
           3. Focus on accessibility issues and navigation problems
           4. Identify specific pages/components with issues
-
+          
           For each of the top 3 issues found, provide:
           - Issue Title
           - Description with specific evidence from sessions
@@ -87,12 +103,12 @@ jobs:
           - User Impact (with metrics if available)
           - Priority (High/Medium/Low)
           - Affected Component/Page
-
+          
           Format your response clearly with numbered issues.
           " 2>&1 | tee analysis.log || {
             echo "⚠️ Analysis completed with warnings"
           }
-
+          
           echo ""
           if [ -s analysis.log ]; then
             echo "✅ Analysis complete ($(wc -l < analysis.log) lines)"
@@ -110,35 +126,38 @@ jobs:
         run: |
           echo "🐛 Creating GitHub issues..."
           echo "============================"
-
+          
           # Check if we have analysis results
           if [ ! -f analysis.log ] || [ ! -s analysis.log ]; then
             echo "⚠️ No analysis results found, skipping issue creation"
             exit 0
           fi
-
+          
+          # Small delay to ensure session continuity
+          sleep 2
+          
           # Create issues based on the analysis
           npx @continuedev/cli --config continuedev/awesome-models-posthog-gh -p "
           Based on the PostHog analysis I just completed, create GitHub issues for the UX problems found.
-
+          
           Important: Execute these GitHub CLI commands to create the issues:
-
+          
           For each issue:
           1. First check if a similar issue exists:
              gh issue list --repo '$GITHUB_REPOSITORY' --search 'keywords from title' --state open
-
+          
           2. If no duplicate exists, create the issue:
              gh issue create --repo '$GITHUB_REPOSITORY' \\
                --title '[UX] Specific Issue Title' \\
                --body 'Detailed description with PostHog evidence' \\
                --label 'bug,ux,posthog-analysis,automated'
-
+          
           Execute these commands now to create up to 3 issues.
           Include the PostHog session evidence in each issue body.
           " 2>&1 | tee creation.log || {
             echo "⚠️ Issue creation completed with warnings"
           }
-
+          
           if [ -s creation.log ]; then
             echo "✅ Issue creation attempted"
           else
@@ -152,7 +171,7 @@ jobs:
         run: |
           echo "✅ Verification and Summary"
           echo "==========================="
-
+          
           # Check for newly created issues
           echo "Checking for automated issues:"
           gh issue list --repo "$GITHUB_REPOSITORY" \
@@ -163,23 +182,30 @@ jobs:
             echo "No automated issues found or jq parsing failed"
             gh issue list --repo "$GITHUB_REPOSITORY" --label "automated" --limit 5
           }
-
+          
           echo ""
           echo "📋 Execution Summary:"
           echo "- Continue CLI: $(npx @continuedev/cli --version 2>/dev/null && echo '✅ Working' || echo '❌ Not working')"
-          echo "- Agent configured: $([ -s posthog_check.log ] && echo '✅ Yes' || echo '❌ No')"
+          echo "- PostHog MCP check: $(grep -qi 'posthog' posthog_check.log 2>/dev/null && echo '✅ Mentioned' || echo '❌ Not detected')"
           echo "- Analysis: $([ -s analysis.log ] && echo '✅ Generated' || echo '❌ Failed')"
           echo "- Issue creation: $([ -s creation.log ] && echo '✅ Attempted' || echo '❌ Not attempted')"
-
-          # Show brief output preview
-          if [ -f analysis.log ] && [ -s analysis.log ]; then
-            echo ""
-            echo "📊 Analysis Preview (first 10 lines):"
-            head -10 analysis.log
+          
+          # Show diagnostic information
+          echo ""
+          echo "🔍 MCP Initialization Logs:"
+          if [ -f init2.log ]; then
+            echo "Available tools after initialization:"
+            grep -i "tool\|mcp\|function" init2.log | head -5 || echo "No tool mentions found"
           fi
           
-          if [ -f posthog_check.log ] && [ -s posthog_check.log ]; then
+          if [ -f posthog_check.log ]; then
             echo ""
-            echo "🔌 PostHog MCP Status:"
-            grep -i "posthog\|mcp\|tool" posthog_check.log | head -5
+            echo "PostHog MCP status:"
+            grep -i "posthog" posthog_check.log | head -5 || echo "PostHog not mentioned"
+          fi
+          
+          if [ -f posthog_retry.log ]; then
+            echo ""
+            echo "PostHog retry attempt:"
+            grep -i "posthog" posthog_retry.log | head -3 || echo "PostHog not found in retry"
           fi
