@@ -179,7 +179,7 @@ jobs:
         "
         
         echo "Running analysis with Continue CLI..."
-        if timeout 120s cn "$ANALYSIS_PROMPT" -p > posthog_analysis.md 2>analysis_error.log; then
+        if timeout 120s cn --config bekahhw/bekahhw-first-assistant "$ANALYSIS_PROMPT" -p > posthog_analysis.md 2>analysis_error.log; then
           echo "✅ AI analysis completed successfully"
           echo "Analysis preview:"
           head -20 posthog_analysis.md
