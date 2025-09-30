@@ -1,4 +1,4 @@
-name: PostHog Session Analysis with Continue CLI Agent
+name: PostHog Session Analysis with Direct API Access
 
 on:
   schedule: 
@@ -21,94 +21,248 @@ jobs:
       with:
         node-version: "20"
 
-    - name: Install Continue CLI
+    - name: Install Dependencies
       run: |
-        echo "Installing Continue CLI..."
+        echo "Installing Continue CLI and curl..."
         npm install -g @continuedev/cli
+        sudo apt-get update
+        sudo apt-get install -y curl jq
         echo "Installation completed"
+
+    - name: Query PostHog API - Recent Events
+      env:
+        POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+        POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+        POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+      run: |
+        echo "📊 Fetching PostHog events data..."
+        echo "=================================="
+        
+        # Get events from the last 7 days
+        SEVEN_DAYS_AGO=$(date -d '7 days ago' --iso-8601)
+        
+        # Query events
+        curl -H "Authorization: Bearer ${POSTHOG_API_KEY}" \
+             -G "${POSTHOG_HOST}/api/projects/${POSTHOG_PROJECT_ID}/events/" \
+             --data-urlencode "after=${SEVEN_DAYS_AGO}" \
+             --data-urlencode "limit=1000" \
+             -o posthog_events.json
+        
+        if [ -f posthog_events.json ] && [ -s posthog_events.json ]; then
+          echo "✅ Events data retrieved successfully"
+          echo "Events count: $(jq '.results | length' posthog_events.json)"
+        else
+          echo "❌ Failed to retrieve events data"
+          exit 1
+        fi
+
+    - name: Query PostHog API - Session Recordings
+      env:
+        POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+        POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+        POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+      run: |
+        echo "🎥 Fetching PostHog session recordings..."
+        echo "========================================"
+        
+        # Get session recordings from the last 7 days
+        SEVEN_DAYS_AGO=$(date -d '7 days ago' --iso-8601)
+        
+        curl -H "Authorization: Bearer ${POSTHOG_API_KEY}" \
+             -G "${POSTHOG_HOST}/api/projects/${POSTHOG_PROJECT_ID}/session_recordings/" \
+             --data-urlencode "date_from=${SEVEN_DAYS_AGO}" \
+             --data-urlencode "limit=100" \
+             -o posthog_recordings.json
+        
+        if [ -f posthog_recordings.json ] && [ -s posthog_recordings.json ]; then
+          echo "✅ Session recordings data retrieved successfully"
+          echo "Recordings count: $(jq '.results | length' posthog_recordings.json)"
+        else
+          echo "❌ Failed to retrieve session recordings data"
+          # Don't exit here as we might still have events data
+        fi
+
+    - name: Query PostHog API - Insights and Funnels
+      env:
+        POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+        POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+        POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+      run: |
+        echo "📈 Fetching PostHog insights data..."
+        echo "==================================="
+        
+        # Get insights/dashboards
+        curl -H "Authorization: Bearer ${POSTHOG_API_KEY}" \
+             "${POSTHOG_HOST}/api/projects/${POSTHOG_PROJECT_ID}/insights/" \
+             -o posthog_insights.json
+        
+        if [ -f posthog_insights.json ] && [ -s posthog_insights.json ]; then
+          echo "✅ Insights data retrieved successfully"
+          echo "Insights count: $(jq '.results | length' posthog_insights.json)"
+        else
+          echo "❌ Failed to retrieve insights data"
+        fi
+
+    - name: Create PostHog Data Summary
+      run: |
+        echo "📋 Creating PostHog data summary..."
+        echo "=================================="
+        
+        # Create a comprehensive summary file
+        cat > posthog_summary.md << 'EOF'
+        # PostHog Data Analysis Summary
+        
+        ## Data Collection Period
+        - Analysis Date: $(date)
+        - Data Range: Last 7 days
+        
+        ## Events Data
+        EOF
+        
+        if [ -f posthog_events.json ] && [ -s posthog_events.json ]; then
+          echo "- Total Events: $(jq '.results | length' posthog_events.json)" >> posthog_summary.md
+          echo "- Event Types:" >> posthog_summary.md
+          jq -r '.results[] | .event' posthog_events.json | sort | uniq -c | sort -nr | head -10 | sed 's/^/  - /' >> posthog_summary.md
+          
+          echo "" >> posthog_summary.md
+          echo "## Top Events by Frequency:" >> posthog_summary.md
+          jq -r '.results[] | .event' posthog_events.json | sort | uniq -c | sort -nr | head -5 | while read count event; do
+            echo "- $event: $count occurrences" >> posthog_summary.md
+          done
+        fi
+        
+        if [ -f posthog_recordings.json ] && [ -s posthog_recordings.json ]; then
+          echo "" >> posthog_summary.md
+          echo "## Session Recordings" >> posthog_summary.md
+          echo "- Total Recordings: $(jq '.results | length' posthog_recordings.json)" >> posthog_summary.md
+        fi
+        
+        if [ -f posthog_insights.json ] && [ -s posthog_insights.json ]; then
+          echo "" >> posthog_summary.md
+          echo "## Insights Available" >> posthog_summary.md
+          echo "- Total Insights: $(jq '.results | length' posthog_insights.json)" >> posthog_summary.md
+        fi
+        
+        # Add raw JSON snippets for AI analysis
+        echo "" >> posthog_summary.md
+        echo "## Sample Event Data (for AI analysis):" >> posthog_summary.md
+        echo '```json' >> posthog_summary.md
+        if [ -f posthog_events.json ]; then
+          jq '.results[:5]' posthog_events.json >> posthog_summary.md
+        fi
+        echo '```' >> posthog_summary.md
+        
+        echo "✅ PostHog summary created successfully"
+        echo "Summary preview:"
+        head -20 posthog_summary.md
+
+    - name: AI Analysis of PostHog Data
+      env:
+        CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
+      run: |
+        echo "🤖 Running AI analysis of PostHog data..."
+        echo "========================================"
+        
+        # Create analysis prompt with the actual data
+        ANALYSIS_PROMPT="
+        Analyze the following PostHog data and identify UX issues, problems, and areas for improvement:
+
+        $(cat posthog_summary.md)
+
+        Based on this PostHog data, please:
+        1. Identify the top 3 most critical UX issues or problems
+        2. For each issue, provide:
+           - Clear description of the problem
+           - Evidence from the data supporting this issue
+           - Potential impact on users
+           - Suggested solutions
+        3. Focus on actionable insights that can be turned into GitHub issues
+
+        Format your response as a structured analysis that can be used to create GitHub issues.
+        "
+        
+        echo "Running analysis with Continue CLI..."
+        if timeout 120s cn -p "$ANALYSIS_PROMPT" > posthog_analysis.md 2>analysis_error.log; then
+          echo "✅ AI analysis completed successfully"
+          echo "Analysis preview:"
+          head -20 posthog_analysis.md
+        else
+          echo "❌ AI analysis failed"
+          echo "Error log:"
+          cat analysis_error.log
+          exit 1
+        fi
 
     - name: Create GitHub Issues from Analysis
       env:
         CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "🐛 Step 4: Creating GitHub issues from PostHog analysis"
-        echo "Using previous analysis to create issues (60s timeout)"
+        echo "🐛 Creating GitHub issues from PostHog analysis..."
+        echo "================================================="
         
-        if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p " Use the gh CLI to create an issue in this repository to improve accessibility. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'" > github_issues.md 2>github_error.log; then
-          echo "✅ GitHub issue creation SUCCESS"
-          echo "=================================="
-          echo "GitHub Issues Created:"
-          cat github_issues.md
-          echo "=================================="
+        # Create GitHub issues prompt with analysis results
+        GITHUB_PROMPT="
+        Based on the following PostHog analysis, create GitHub issues for the top 3 UX problems identified:
+
+        $(cat posthog_analysis.md)
+
+        For each issue:
+        1. First check for existing similar issues using: gh issue list --search 'relevant keywords'
+        2. If no similar issues exist, create a new issue using: gh issue create
+        3. Use this format for each issue:
+
+        Title: [UX Issue] [Specific Problem Title]
+        Labels: bug,ux,posthog-analysis,automated
+        Body should include:
+        - Problem description
+        - PostHog evidence
+        - User impact
+        - Suggested solution
+
+        Execute the gh commands to create the issues now. Use the GITHUB_TOKEN for authentication.
+        "
+        
+        echo "Creating GitHub issues..."
+        if timeout 120s cn -p "$GITHUB_PROMPT" > github_creation.log 2>github_error.log; then
+          echo "✅ GitHub issue creation process completed"
+          echo "Creation log:"
+          cat github_creation.log
         else
-          echo "❌ GitHub issue creation FAILED"
+          echo "❌ GitHub issue creation failed"
           echo "Error log:"
           cat github_error.log
         fi
 
-    # - name: Test PostHog Connection  - 1
-    #   env:
-    #     CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-    #   run: |
-    #     echo "🔌 Step 3: Testing PostHog API connection"
-    #     echo "=================================="
-    #     timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Look at the PostHog Data and create a new file called posthog_data.txt summarizing what you see"
-    #      # timeout 90s cn --config continuedev/awesome-models-posthog-gh -p "Look at the PostHog Data and create a new file called posthog_data.txt summarizing what you see" --- IGNORE ---
-    #     echo "=================================="
-            
-    # - name: Test PostHog Connection
-    #   env:
-    #     CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-    #   run: |
-    #     echo "🔌 Step 3: Testing PostHog API connection"
-    #     echo "Testing PostHog query with cn"
-
-    #     # Run the command and capture exit code - using the same prompt that works in TUI
-    #     timeout 240s cn --config continuedev/awesome-models-posthog-gh -p "Using the MCP and my prompts, tell me about my posthog recording sessions data" 
-    
-    # - name: Create GitHub Issues from Analysis
-    #   env:
-    #     CONTINUE_API_KEY: ${{ secrets.CONTINUE_API_KEY }}
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   run: |
-    #     echo "🐛 Step 4: Creating GitHub issues from PostHog analysis"
-    #     echo "Using previous analysis to create issues (60s timeout)"
-        
-    #     if timeout 60s cn --config continuedev/awesome-models-posthog-gh -p "Based on the PostHog analysis you just performed, create GitHub issues for the top 3 UX problems you identified. Use the gh CLI to create the issues in this repository. Execute: gh issue create --title '[Title]' --body '[Details]' --label 'automated'" > github_issues.md 2>github_error.log; then
-    #       echo "✅ GitHub issue creation SUCCESS"
-    #       echo "=================================="
-    #       echo "GitHub Issues Created:"
-    #       cat github_issues.md
-    #       echo "=================================="
-    #     else
-    #       echo "❌ GitHub issue creation FAILED"
-    #       echo "Error log:"
-    #       cat github_error.log
-    #     fi
-      
-    
-    
-    - name: Debug - Post-execution info
-      if: always()  # Run even if previous steps fail
+    - name: Verify Created Issues
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "📋 Detailed workflow execution summary:"
-        echo "Step 1 - Agent Configuration: Check logs above"
-        echo "Step 2 - PostHog Agent Config: Check logs above"
-        echo "Step 3 - PostHog Connection: Check logs above"
-        echo "Step 4 - PostHog Data Access: Check logs above"
-        echo "Step 5 - Session Recording Access: Check logs above"
-        echo "Step 6 - Limited Analysis: Check logs above"
-        echo "Step 7 - GitHub Issues: Check logs above"
-        echo ""
-        echo "🔍 Look for ✅ or ❌ indicators in each step"
-        echo "⏱️ All steps have short timeouts to identify hang points"
-        echo "🎯 This will help identify exactly where the connection fails"
+        echo "✅ Verifying created GitHub issues..."
+        echo "===================================="
+        
+        # List recent automated issues
+        echo "Recent PostHog analysis issues:"
+        gh issue list --label "posthog-analysis,automated" --limit 10 --json number,title,createdAt,url | jq -r '.[] | "Issue #\(.number): \(.title)\n  URL: \(.url)\n  Created: \(.createdAt)\n"'
 
     - name: Summary
+      if: always()
       run: |
-        echo "✅ PostHog analysis workflow completed!"
-        echo "📊 Check the artifacts for detailed analysis results"
-        echo "🐛 Check your repository issues for newly created UX issues"
-        echo "🤖 Agent automatically handled both analysis and issue creation"
+        echo "📋 Workflow Execution Summary"
+        echo "============================"
+        echo ""
+        echo "🔍 Data Collection:"
+        echo "- PostHog Events: $([ -f posthog_events.json ] && echo '✅' || echo '❌')"
+        echo "- Session Recordings: $([ -f posthog_recordings.json ] && echo '✅' || echo '❌')"
+        echo "- Insights: $([ -f posthog_insights.json ] && echo '✅' || echo '❌')"
+        echo ""
+        echo "🤖 AI Analysis:"
+        echo "- Data Summary: $([ -f posthog_summary.md ] && echo '✅' || echo '❌')"
+        echo "- AI Analysis: $([ -f posthog_analysis.md ] && echo '✅' || echo '❌')"
+        echo ""
+        echo "🐛 GitHub Issues:"
+        echo "- Issue Creation: $([ -f github_creation.log ] && echo '✅' || echo '❌')"
+        echo ""
+        echo "📁 Generated Files:"
+        ls -la *.json *.md *.log 2>/dev/null || echo "No files found"
 
