@@ -319,11 +319,13 @@ function extractAndMapAuthor(htmlContent) {
  * Map author name to author ID
  */
 function mapAuthorNameToId(authorName) {
+  // Normalize for case-insensitive matching
+  const name = String(authorName || '').toLowerCase();
   // Handle partial matches and variations
-  if (authorName.includes('Bekah')) return 'bekah';
-  if (authorName.includes('Michael') || authorName.includes('Fr.')) return 'frmichael';
-  if (authorName.includes('Josh')) return 'josh';
-  if (authorName.includes('zach')) return 'zach';
+  if (name.includes('bekah')) return 'bekah';
+  if (name.includes('michael') || name.includes('fr.')) return 'frmichael';
+  if (name.includes('josh')) return 'josh';
+  if (name.includes('zach')) return 'zach';
   
   // Default
   return 'bekah';

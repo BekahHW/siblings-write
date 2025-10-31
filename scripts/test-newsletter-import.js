@@ -21,6 +21,18 @@ const yaml = require('js-yaml');
 const specificFile = process.argv[2];
 const BLOG_DIR = path.join(process.cwd(), 'src/content/blog');
 const ASSETS_DIR = path.join(process.cwd(), 'public/assets/blog');
+const AUTHORS_DIR = path.join(process.cwd(), 'src/content/authors');
+
+/**
+ * Get valid author slugs from the authors collection
+ * Returns a Set of lowercase slugs for case-insensitive matching
+ */
+function getValidAuthorSlugs() {
+  if (!fs.existsSync(AUTHORS_DIR)) return new Set();
+  const files = fs.readdirSync(AUTHORS_DIR).filter(f => f.endsWith('.md'));
+  const slugsLower = files.map(f => path.basename(f, '.md').toLowerCase());
+  return new Set(slugsLower);
+}
 
 /**
  * Extract frontmatter from markdown content
@@ -80,9 +92,13 @@ function imageExists(imagePath) {
 /**
  * Check if content starts with a markdown image
  */
-// function startsWithImage(content) {
-//   return /^\s*!\[.*?\]\(.*?\)/.test(content);
-// }
+function startsWithImage(content) {
+  const trimmed = content.trimStart();
+  const match = trimmed.match(/^!\[[^\]]*\]\(([^)]+)\)/);
+  if (!match) return false;
+  const imagePath = match[1];
+  return imageExists(imagePath);
+}
 
 /**
  * Extract image paths from markdown content
@@ -120,12 +136,11 @@ function testBlogPost(filepath) {
       console.log('ℹ️  Note: Title does not contain "micro-monthly" - may not be a newsletter post');
     }
     
-    // Test 2: Check required frontmatter fields
+    // Test 2: Check required frontmatter fields (excluding author for special handling)
     const requiredFields = [
       { name: 'title', validator: (v) => typeof v === 'string' && v.length > 0 },
       { name: 'description', validator: (v) => typeof v === 'string' },
       { name: 'publishDate', validator: isValidDate },
-      { name: 'author', validator: (v) => v && typeof v === 'object' && v.id }
     ];
     
     let allFieldsValid = true;
@@ -134,6 +149,18 @@ function testBlogPost(filepath) {
       console.log(`${isValid ? '✅' : '❌'} ${field.name}: ${JSON.stringify(frontmatter[field.name])}`);
       if (!isValid) allFieldsValid = false;
     }
+
+    // Test 3: Validate author (accept string reference or object with id), case-insensitive
+    const validAuthorSlugs = getValidAuthorSlugs();
+    const authorVal = frontmatter.author;
+    let authorValid = false;
+    if (typeof authorVal === 'string') {
+      authorValid = validAuthorSlugs.has(authorVal.toLowerCase());
+    } else if (authorVal && typeof authorVal === 'object' && authorVal.id) {
+      authorValid = validAuthorSlugs.has(String(authorVal.id).toLowerCase());
+    }
+    console.log(`${authorValid ? '✅' : '❌'} author: ${JSON.stringify(authorVal)}`);
+    if (!authorValid) allFieldsValid = false;
     
     
     // Test 4: Extract and check content
@@ -144,10 +171,8 @@ function testBlogPost(filepath) {
     }
     console.log(`✅ Content length: ${postContent.length} characters`);
     
-    // Test 5: Check if content starts with an image
-
-    //const hasLeadingImage = startsWithImage(postContent);
-const hasLeadingImage = imageExists(imagePath);
+  // Test 5: Check if content starts with an image
+  const hasLeadingImage = startsWithImage(postContent);
 
     console.log(`${hasLeadingImage ? '✅' : '❌'} Content starts with an image`);
     
