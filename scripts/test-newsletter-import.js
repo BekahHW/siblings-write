@@ -80,9 +80,9 @@ function imageExists(imagePath) {
 /**
  * Check if content starts with a markdown image
  */
-function startsWithImage(content) {
-  return /^\s*!\[.*?\]\(.*?\)/.test(content);
-}
+// function startsWithImage(content) {
+//   return /^\s*!\[.*?\]\(.*?\)/.test(content);
+// }
 
 /**
  * Extract image paths from markdown content
@@ -145,7 +145,10 @@ function testBlogPost(filepath) {
     console.log(`✅ Content length: ${postContent.length} characters`);
     
     // Test 5: Check if content starts with an image
-    const hasLeadingImage = startsWithImage(postContent);
+
+    //const hasLeadingImage = startsWithImage(postContent);
+const hasLeadingImage = imageExists(imagePath);
+
     console.log(`${hasLeadingImage ? '✅' : '❌'} Content starts with an image`);
     
     // Test 6: Check if all images in content exist

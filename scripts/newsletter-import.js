@@ -266,7 +266,7 @@ function convertToAstroMarkdown(newsletter) {
     title: extractedTitle || newsletter.name || 'Untitled Newsletter',
     description: newsletter.preview_text || newsletter.subject || '',
     publishDate: formatISO(new Date(newsletter.published_at || newsletter.send_at || newsletter.sent_at || newsletter.created_at || new Date())),
-    author: authorId.toLocaleLowerCase(),
+    author: authorId.toLowerCase(),
   };
   
   // Extract featured image from content
@@ -323,7 +323,7 @@ function mapAuthorNameToId(authorName) {
   if (authorName.includes('Bekah')) return 'bekah';
   if (authorName.includes('Michael') || authorName.includes('Fr.')) return 'frmichael';
   if (authorName.includes('Josh')) return 'josh';
-  if (authorName.includes('Zach')) return 'Zach';
+  if (authorName.includes('zach')) return 'zach';
   
   // Default
   return 'bekah';
