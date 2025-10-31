@@ -2,9 +2,9 @@
 /**
  * Check if a newsletter subject contains the required identifier
  */
-function isValidNewsletterSubject(subject) {
-  if (!subject) return false;
-  return subject.toLowerCase().includes('a hawrot siblings micro-monthly story');
+function isValidNewsletterSubject(description) {
+  if (!description) return false;
+  return description.toLowerCase().includes('a hawrot siblings micro-monthly story');
 }
 /**
  * Fetch recent broadcasts (newsletters) from Kit V4 API
@@ -266,7 +266,7 @@ function convertToAstroMarkdown(newsletter) {
     title: extractedTitle || newsletter.name || 'Untitled Newsletter',
     description: newsletter.preview_text || newsletter.subject || '',
     publishDate: formatISO(new Date(newsletter.published_at || newsletter.send_at || newsletter.sent_at || newsletter.created_at || new Date())),
-    author: authorId
+    author: authorId.toLocaleLowerCase(),
   };
   
   // Extract featured image from content
