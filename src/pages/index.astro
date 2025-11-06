@@ -3,9 +3,10 @@ import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const title = 'Siblings Write';
-const description = 'The Hawrot Siblings Writing Blog.';
+const title = 'Siblings Write - Christmas Novels, YA Fiction & Magical Realism Stories';
+const description = 'Discover enchanting Christmas novels, young adult fiction, and magical realism stories from the Hawrot siblings. Original middle grade and YA stories that capture childhood wonder and family magic.';
 const permalink = Astro.site.href;
+const keywords = 'Christmas novels, YA fiction, middle grade stories, magical realism, family stories, holiday fiction, young adult books, children\'s literature, Christmas stories, sibling authors';
 // Get all blog posts and sort by date (descending)
 const allPosts = await getCollection('blog', ({ data }) => data.hidden !== true);
 const latestPosts = allPosts
@@ -21,7 +22,7 @@ const getAuthorName = (authorId) => {
 ---
 
 <PostHogLayout>
-  <BaseLayout title={title} description={description} permalink={permalink}>
+  <BaseLayout title={title} description={description} permalink={permalink} keywords={keywords}>
     <div class="home-container">
       <div class="home-copy">
         <h1>The Hawrot Siblings</h1>

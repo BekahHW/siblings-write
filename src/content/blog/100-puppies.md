@@ -1,8 +1,12 @@
 ---
 title: 100 Puppies
-description: '📚  100 Puppies:  A Hawrot Siblings Micro-Monthly Story'
+description: 'A magical Christmas story about wishes, consequences, and family. When four-year-old Lola makes a wish at a magical fountain, her week takes an unexpected turn in this heartwarming tale.'
 publishDate: '2025-10-04'
 author: zach
+keywords: 'Christmas stories, magical fountain wishes, family fiction, children stories, magical realism, holiday tales, Christmas magic, wish stories'
+genre: 'Christmas Fiction'
+readingTime: '12 min read'
+excerpt: 'When four-year-old Lola steals coins from a magical fountain to make a Christmas wish, her family discovers that some wishes come with unexpected consequences.'
 ---
 ![100 Puppies image](https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/9UoR4mUeisZzuCHZacrKu5)
 

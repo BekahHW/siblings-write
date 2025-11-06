@@ -7,28 +7,62 @@ export interface Props {
   title: string
   description: string
   permalink: string
+  keywords?: string
+  author?: string
+  publishDate?: string
+  genre?: string
+  readingTime?: string
 }
 
-const { title, description, permalink } = Astro.props
+const { 
+  title, 
+  description, 
+  permalink, 
+  keywords,
+  author,
+  publishDate,
+  genre,
+  readingTime
+} = Astro.props
 const socialUrl = Astro.site.href + 'assets/social.png'
+const siteName = 'Siblings Write'
+const defaultKeywords = 'Christmas novels, YA fiction, middle grade stories, magical realism, family stories, Hawrot siblings, children\'s literature, holiday stories, young adult books'
 ---
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="canonical" href={permalink} />
+<link rel="alternate" type="application/rss+xml" title="Siblings Write RSS Feed" href="/feed.xml" />
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+<meta name="keywords" content={keywords || defaultKeywords} />
+<meta name="robots" content="index, follow" />
+<meta name="language" content="English" />
+<meta name="author" content={author || siteName} />
+{publishDate && <meta name="date" content={publishDate} />}
+{genre && <meta name="genre" content={genre} />}
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={publishDate ? 'article' : 'website'} />
 <meta property="og:url" content={permalink} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={socialUrl} />
+<meta property="og:image:alt" content="Siblings Write - Stories from the Hawrot Siblings" />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="en_US" />
+{author && <meta property="article:author" content={author} />}
+{publishDate && <meta property="article:published_time" content={publishDate} />}
+{genre && <meta property="article:section" content={genre} />}
+<meta property="article:tag" content="Christmas novels" />
+<meta property="article:tag" content="YA fiction" />
+<meta property="article:tag" content="middle grade stories" />
+<meta property="article:tag" content="magical realism" />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
@@ -36,6 +70,60 @@ const socialUrl = Astro.site.href + 'assets/social.png'
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={socialUrl} />
+<meta property="twitter:image:alt" content="Siblings Write - Stories from the Hawrot Siblings" />
+<meta property="twitter:site" content="@siblingswrite" />
+<meta property="twitter:creator" content={author ? `@${author.toLowerCase()}` : '@siblingswrite'} />
+
+<!-- Schema.org structured data for LLM citation -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": publishDate ? "BlogPosting" : "WebSite",
+  "headline": title,
+  "description": description,
+  "url": permalink,
+  "image": socialUrl,
+  "datePublished": publishDate,
+  "dateModified": publishDate,
+  "author": {
+    "@type": "Person",
+    "name": author || "Hawrot Siblings"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": siteName,
+    "url": Astro.site.href,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${Astro.site.href}assets/logo.png`
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": permalink
+  },
+  "genre": genre || "Fiction",
+  "keywords": keywords || defaultKeywords,
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Christmas literature"
+    },
+    {
+      "@type": "Thing", 
+      "name": "Young adult fiction"
+    },
+    {
+      "@type": "Thing",
+      "name": "Middle grade literature"
+    },
+    {
+      "@type": "Thing",
+      "name": "Magical realism"
+    }
+  ]
+})} />
 
 <ViewTransitions />
 

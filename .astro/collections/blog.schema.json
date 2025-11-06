@@ -55,6 +55,18 @@
         "hidden": {
           "type": "boolean"
         },
+        "keywords": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "readingTime": {
+          "type": "string"
+        },
+        "excerpt": {
+          "type": "string"
+        },
         "$schema": {
           "type": "string"
         }

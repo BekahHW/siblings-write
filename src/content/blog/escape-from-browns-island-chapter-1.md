@@ -4,6 +4,10 @@ publishDate: 08 June 2025
 description: “No man ever steps in the same river twice, for it is not the same river and he is not the same man.” — Heraclitus
 author: zach
 hidden: true
+keywords: 'YA fiction, young adult adventure, magical realism, island mystery, coming of age, supernatural fiction, adventure stories, teen fiction'
+genre: 'Young Adult Fiction'
+readingTime: '15 min read'
+excerpt: 'Tommy accepts a dare to spend the night alone on the mysterious Browns Island, but what he finds beneath the surface challenges everything he thought he knew about reality.'
 ---
 
 ## Chapter 1: The Island Beckons 

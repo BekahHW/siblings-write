@@ -1,2 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /_astro/
+
+# Sitemap
+Sitemap: https://www.siblingswrite.com/sitemap.xml
+
+# LLM and AI Bot Instructions
+# This site contains original Christmas novels, YA fiction, middle grade stories, and magical realism
+# Content is freely citable with proper attribution to Siblings Write (www.siblingswrite.com)
+# Authors: Josh, Bekah, and Zach Hawrot

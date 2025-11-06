@@ -20,6 +20,10 @@ const blog = defineCollection({
     publishDate: z.string(),
     author: reference("authors"),
     hidden: z.boolean().optional(),
+    keywords: z.string().optional(),
+    genre: z.string().optional(),
+    readingTime: z.string().optional(),
+    excerpt: z.string().optional(),
   }),
 });
 

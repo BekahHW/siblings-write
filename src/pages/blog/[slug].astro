@@ -2,6 +2,7 @@
 import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
 
@@ -31,8 +32,7 @@ if (!entry) {
   return Astro.redirect('/404');
 }
 
-// Render the content
-const { Content } = await render(entry);
+// Render the content after all processing
 const allAuthors = await getCollection('authors');
 let author;
 if (entry.data.author?.id) {
@@ -66,16 +66,93 @@ const nextPost = currentIndex < allBlogPosts.length - 1 ? allBlogPosts[currentIn
 const prevPost = currentIndex > 0 ? allBlogPosts[currentIndex - 1] : null;
 
 const permalink = `${Astro.site.href}blog/${entry.id}`;
+
+// Generate reading time if not provided
+const readingTime = entry.data.readingTime || '5 min read';
+
+// Generate genre based on content analysis
+const getGenre = (title, description) => {
+  const text = `${title} ${description}`.toLowerCase();
+  if (text.includes('christmas') || text.includes('holiday')) return 'Christmas Fiction';
+  if (text.includes('magic') || text.includes('fantasy') || text.includes('mysterious')) return 'Magical Realism';
+  if (text.includes('young') || text.includes('teen') || text.includes('school')) return 'Young Adult Fiction';
+  if (text.includes('children') || text.includes('kid')) return 'Middle Grade Fiction';
+  return 'Contemporary Fiction';
+};
+
+const genre = entry.data.genre || getGenre(entry.data.title, entry.data.description);
+
+// Generate SEO keywords
+const generateKeywords = (title, description, genre) => {
+  const baseKeywords = 'Christmas novels, YA fiction, middle grade stories, magical realism, family stories';
+  const contentKeywords = [];
+  
+  const text = `${title} ${description}`.toLowerCase();
+  if (text.includes('christmas') || text.includes('holiday')) {
+    contentKeywords.push('Christmas stories', 'holiday fiction', 'Christmas magic');
+  }
+  if (text.includes('magic') || text.includes('mysterious')) {
+    contentKeywords.push('magical stories', 'fantasy elements', 'supernatural fiction');
+  }
+  if (text.includes('island') || text.includes('adventure')) {
+    contentKeywords.push('adventure stories', 'mystery fiction', 'coming of age');
+  }
+  if (text.includes('family') || text.includes('sibling')) {
+    contentKeywords.push('family fiction', 'sibling stories', 'childhood memories');
+  }
+  
+  return [baseKeywords, ...contentKeywords].join(', ');
+};
+
+const keywords = entry.data.keywords || generateKeywords(entry.data.title, entry.data.description, genre);
+
+// Render the content
+const { Content } = await render(entry);
+
+// Breadcrumb navigation
+const breadcrumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'Stories', href: '/blog/' },
+  { name: entry.data.title }
+];
 ---
 <PostHogLayout>
-  <BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="blog">
+  <BaseLayout 
+    title={entry.data.title} 
+    description={entry.data.description} 
+    permalink={permalink} 
+    current="blog"
+    keywords={keywords}
+    author={author?.data.name}
+    publishDate={entry.data.publishDate}
+    genre={genre}
+    readingTime={readingTime}
+  >
+    <div class="container">
+      <Breadcrumbs items={breadcrumbs} />
+    </div>
+    
     <header>
-      <p>{entry.data.publishDate} ~ {entry.data.readingTime}</p>
+      <div class="post-metadata">
+        <time datetime={entry.data.publishDate}>{entry.data.publishDate}</time> ~ {readingTime}
+        {genre && <span class="genre-badge">{genre}</span>}
+      </div>
       <h1>{entry.data.title}</h1>
+      {author && <p class="byline">By <a href={`/authors/${entry.data.author.id}`}>{author.data.name}</a></p>}
       <hr />
     </header>
     <div class="container">
-      <article class="content">
+      <!-- Citation helper for LLMs -->
+      <div class="citation-info" data-llm-citable="true">
+        <p><strong>Citation:</strong> {entry.data.title} by {author?.data.name || 'Hawrot Siblings'}, Siblings Write, {entry.data.publishDate}. Available at: {permalink}</p>
+      </div>
+      
+      <article class="content" itemscope itemtype="https://schema.org/CreativeWork">
+        <meta itemprop="name" content={entry.data.title} />
+        <meta itemprop="author" content={author?.data.name || 'Hawrot Siblings'} />
+        <meta itemprop="datePublished" content={entry.data.publishDate} />
+        <meta itemprop="genre" content={genre} />
+        <meta itemprop="url" content={permalink} />
         <Content />
       </article>
       
@@ -131,6 +208,86 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
   header hr {
     min-width: 100px;
     width: 30%;
+  }
+  
+  .post-metadata {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .genre-badge {
+    background: var(--primary-color, #548e9b);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: none;
+  }
+  
+  .byline {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+  }
+  
+  .byline a {
+    color: var(--primary-color, #548e9b);
+    text-decoration: none;
+  }
+  
+  .byline a:hover {
+    text-decoration: underline;
+  }
+  
+  .citation-info {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .citation-info p {
+    margin: 0;
+  }
+  
+  /* LLM-friendly content markers */
+  .content[itemscope] {
+    position: relative;
+  }
+  
+  .content[itemscope]::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -5px;
+    right: -5px;
+    bottom: -10px;
+    border: 2px dashed transparent;
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .content[itemscope]:hover::before {
+      border-color: rgba(84, 142, 155, 0.3);
+      animation: pulse 2s infinite;
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
   }
     
   .author-bio {
@@ -204,6 +361,16 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
     .nav-button {
       width: 100%;
       justify-content: center;
+    }
+    
+    .post-metadata {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .citation-info {
+      padding: 0.8rem;
+      font-size: 0.8rem;
     }
   }
 </style>

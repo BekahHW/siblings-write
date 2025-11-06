@@ -3,9 +3,10 @@ import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
 
-const title = 'Stories';
-const description = 'Latest stories.';
+const title = 'Christmas Novels & YA Fiction Stories | Siblings Write';
+const description = 'Explore our collection of Christmas novels, young adult fiction, magical realism, and middle grade stories. Original tales of wonder, family, and adventure from the Hawrot siblings.';
 const permalink = `${Astro.site.href}blog`;
+const keywords = 'Christmas novels, YA fiction stories, middle grade literature, magical realism tales, family stories, holiday fiction, young adult short stories, children\'s literature';
 const allPosts = await getCollection('blog', ({ data }) => data.hidden !== true);
 const sortedPosts = allPosts.sort((a, b) => 
   new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
@@ -16,24 +17,42 @@ const getAuthorName = (authorId) => {
   const author = authorEntries.find(a => a.id === authorId);
   return author ? author.data.name : authorId; // Fallback to ID if author not found
 };
+
+// Generate genre based on content analysis
+const getGenre = (title, description) => {
+  const text = `${title} ${description}`.toLowerCase();
+  if (text.includes('christmas') || text.includes('holiday')) return 'Christmas Fiction';
+  if (text.includes('magic') || text.includes('fantasy') || text.includes('mysterious')) return 'Magical Realism';
+  if (text.includes('young') || text.includes('teen') || text.includes('school')) return 'Young Adult Fiction';
+  if (text.includes('children') || text.includes('kid')) return 'Middle Grade Fiction';
+  return 'Contemporary Fiction';
+};
 ---
 <PostHogLayout>
-  <BaseLayout title={title} description={description} permalink={permalink} current="blog">
+  <BaseLayout title={title} description={description} permalink={permalink} current="blog" keywords={keywords}>
     <div class="container">
-      <h1>Our Short Stories</h1>
+      <h1>Christmas Novels, YA Fiction & Magical Stories</h1>
+      <p class="page-intro">Discover original Christmas novels, young adult fiction, and magical realism stories that capture the wonder of childhood and family. Each tale is crafted with love by the Hawrot siblings.</p>
       {sortedPosts.map((post, index) => {
         return (
           <div>
             { index !== 0 && <hr /> }
-            <div class="post-item">
-              <h2>
-                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+            <div class="post-item" itemscope itemtype="https://schema.org/BlogPosting">
+              <meta itemprop="author" content={getAuthorName(post.data.author.id)} />
+              <meta itemprop="datePublished" content={post.data.publishDate} />
+              <meta itemprop="genre" content={getGenre(post.data.title, post.data.description)} />
+              <h2 itemprop="headline">
+                <a href={`/blog/${post.id}`} itemprop="url">{post.data.title}</a>
               </h2>
-              <p>{post.data.description}</p>
-              <span class="post-item-author">
-                By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a>
-              </span>
-              <span class="post-item-date">— {post.data.publishDate}</span>
+              <div class="post-meta">
+                <span class="genre-badge">{getGenre(post.data.title, post.data.description)}</span>
+                <span class="post-item-author">
+                  By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a>
+                </span>
+                <span class="post-item-date">— {post.data.publishDate}</span>
+              </div>
+              <p itemprop="description">{post.data.description}</p>
+              <a href={`/blog/${post.id}`} class="read-more">Read full story →</a>
             </div>
           </div>
         )
@@ -43,25 +62,111 @@ const getAuthorName = (authorId) => {
 </PostHogLayout>
 
 <style>
+  .page-intro {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    text-align: center;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
   h2,
   .post-item-footer {
     font-family: var(--font-family-sans);
     font-weight: 700;
+  }
+  
+  .post-item {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .post-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .genre-badge {
+    background: var(--primary-color, #548e9b);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: none;
   }
 
   .post-item-date {
     color: var(--text-secondary);
     text-align: left;
     text-transform: uppercase;
-    margin-right: 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
   }
    
- .post-item-author {
+  .post-item-author {
     color: var(--text-primary);
-    margin-right: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .post-item-author a {
+    color: var(--primary-color, #548e9b);
+    text-decoration: none;
+  }
+  
+  .post-item-author a:hover {
+    text-decoration: underline;
+  }
+  
+  .post-item p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #555;
+  }
+  
+  .read-more {
+    display: inline-block;
+    color: var(--primary-color, #548e9b);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  
+  .read-more:hover {
+    color: #4a7d88;
+    text-decoration: underline;
   }
 
   hr {
     margin: 60px auto;
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #ddd, transparent);
+  }
+  
+  @media (max-width: 768px) {
+    .post-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    
+    .post-item {
+      padding: 1rem;
+    }
   }
 </style>
