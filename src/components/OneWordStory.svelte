@@ -6,12 +6,15 @@
   let storyId = '';
   let wordInput = '';
   let contributorId = '';
+  let contributorName = '';
+  let contributorUrl = '';
+  let showContributorFields = false;
   let isSubmitting = false;
   let errorMessage = '';
   let successMessage = '';
   let isLoading = true;
 
-  // Generate or retrieve contributor ID
+  // Generate or retrieve contributor ID and info
   onMount(() => {
     if (typeof localStorage !== 'undefined') {
       let id = localStorage.getItem('oneWordStoryContributorId');
@@ -21,6 +24,18 @@
         localStorage.setItem('oneWordStoryContributorId', id);
       }
       contributorId = id;
+
+      // Load saved contributor info
+      const savedName = localStorage.getItem('oneWordStoryContributorName');
+      const savedUrl = localStorage.getItem('oneWordStoryContributorUrl');
+      if (savedName) {
+        contributorName = savedName;
+        showContributorFields = true;
+      }
+      if (savedUrl) {
+        contributorUrl = savedUrl;
+        showContributorFields = true;
+      }
     }
     fetchStory();
   });
@@ -57,6 +72,16 @@
     errorMessage = '';
     successMessage = '';
 
+    // Save contributor info to localStorage
+    if (typeof localStorage !== 'undefined') {
+      if (contributorName.trim()) {
+        localStorage.setItem('oneWordStoryContributorName', contributorName.trim());
+      }
+      if (contributorUrl.trim()) {
+        localStorage.setItem('oneWordStoryContributorUrl', contributorUrl.trim());
+      }
+    }
+
     try {
       const response = await fetch('/api/one-word-story', {
         method: 'POST',
@@ -65,7 +90,9 @@
         },
         body: JSON.stringify({
           word: wordInput.trim(),
-          contributorId: contributorId
+          contributorId: contributorId,
+          contributorName: contributorName.trim() || undefined,
+          contributorUrl: contributorUrl.trim() || undefined
         })
       });
 
@@ -163,6 +190,48 @@
     >
       {isSubmitting ? 'Submitting...' : 'Add Word'}
     </button>
+  </div>
+
+  <div class="contributor-section">
+    <button
+      class="toggle-contributor-button"
+      on:click={() => showContributorFields = !showContributorFields}
+      type="button"
+    >
+      {showContributorFields ? '▼' : '►'} {contributorName ? `Contributing as ${contributorName}` : 'Add your name (optional)'}
+    </button>
+
+    {#if showContributorFields}
+      <div class="contributor-fields">
+        <div class="field-group">
+          <label for="contributor-name">Your Name</label>
+          <input
+            id="contributor-name"
+            type="text"
+            bind:value={contributorName}
+            placeholder="e.g., Jane Doe"
+            disabled={isSubmitting}
+            maxlength="50"
+            class="contributor-input"
+          />
+          <span class="field-hint">Your name will appear in the credits when the story is complete</span>
+        </div>
+
+        <div class="field-group">
+          <label for="contributor-url">Your Website or Social Link</label>
+          <input
+            id="contributor-url"
+            type="url"
+            bind:value={contributorUrl}
+            placeholder="https://example.com or https://twitter.com/username"
+            disabled={isSubmitting}
+            maxlength="200"
+            class="contributor-input"
+          />
+          <span class="field-hint">Optional: Link to your website, Twitter, LinkedIn, etc.</span>
+        </div>
+      </div>
+    {/if}
   </div>
 
   {#if errorMessage}
@@ -325,6 +394,81 @@
   .submit-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  .contributor-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .toggle-contributor-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .toggle-contributor-button:hover {
+    color: var(--text-color);
+  }
+
+  .contributor-fields {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary, #f9f9f9);
+    border-radius: 4px;
+    border: 1px solid var(--border-color, #e0e0e0);
+  }
+
+  .field-group {
+    margin-bottom: 1rem;
+  }
+
+  .field-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .field-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .contributor-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    background-color: var(--bg-primary, #ffffff);
+    color: var(--text-color);
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+
+  .contributor-input:focus {
+    outline: none;
+    border-color: var(--accent-color, #4a9eff);
+  }
+
+  .contributor-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .field-hint {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    font-style: italic;
   }
 
   .message {

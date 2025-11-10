@@ -69,7 +69,7 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { word, contributorId } = body;
+    const { word, contributorId, contributorName, contributorUrl } = body;
 
     // Validate required fields
     if (!word || !contributorId) {
@@ -100,7 +100,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Sanitize and add the word
     const sanitizedWord = sanitizeWord(word);
-    const result = StoryDatabase.addWord(contributorId, sanitizedWord);
+    const result = StoryDatabase.addWord(
+      contributorId,
+      sanitizedWord,
+      contributorName,
+      contributorUrl
+    );
 
     if (!result.success) {
       return new Response(JSON.stringify({
@@ -192,6 +197,26 @@ async function createStoryPullRequest(story: any): Promise<void> {
       fs.mkdirSync(collabsDir, { recursive: true });
     }
 
+    // Get contributors
+    const contributors = StoryDatabase.getStoryContributors(story.story_id);
+    const contributorCount = StoryDatabase.getStoryContributorCount(story.story_id);
+
+    // Build contributor list
+    let contributorList = '';
+    if (contributors.length > 0) {
+      const namedContributors = contributors.filter(c => c.name);
+      if (namedContributors.length > 0) {
+        contributorList = '\n\n### Contributors\n\n';
+        namedContributors.forEach(contributor => {
+          if (contributor.url) {
+            contributorList += `- [${contributor.name}](${contributor.url})\n`;
+          } else {
+            contributorList += `- ${contributor.name}\n`;
+          }
+        });
+      }
+    }
+
     // Create the story markdown file
     const storyContent = `---
 title: "One Word Story - ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}"
@@ -204,7 +229,7 @@ ${story.words}
 
 ---
 
-*This story was collaboratively written by ${StoryDatabase.getContributions(story.story_id).length} contributors, one word at a time.*
+*This story was collaboratively written by ${contributorCount} ${contributorCount === 1 ? 'contributor' : 'contributors'}, one word at a time.*${contributorList}
 `;
 
     // Write the story file

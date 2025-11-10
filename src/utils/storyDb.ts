@@ -26,6 +26,14 @@ db.exec(`
     is_active INTEGER DEFAULT 1
   );
 
+  CREATE TABLE IF NOT EXISTS contributors (
+    contributor_id TEXT PRIMARY KEY,
+    name TEXT,
+    url TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS contributions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id TEXT NOT NULL,
@@ -33,7 +41,8 @@ db.exec(`
     word TEXT NOT NULL,
     word_position INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (story_id) REFERENCES story(story_id)
+    FOREIGN KEY (story_id) REFERENCES story(story_id),
+    FOREIGN KEY (contributor_id) REFERENCES contributors(contributor_id)
   );
 
   CREATE INDEX IF NOT EXISTS idx_story_active ON story(is_active);
@@ -52,6 +61,14 @@ export interface Story {
   is_active: number;
 }
 
+export interface Contributor {
+  contributor_id: string;
+  name: string | null;
+  url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Contribution {
   id: number;
   story_id: string;
@@ -59,6 +76,11 @@ export interface Contribution {
   word: string;
   word_position: number;
   created_at: string;
+}
+
+export interface ContributionWithContributor extends Contribution {
+  contributor_name: string | null;
+  contributor_url: string | null;
 }
 
 export class StoryDatabase {
@@ -86,9 +108,41 @@ export class StoryDatabase {
   }
 
   /**
+   * Add or update a contributor
+   */
+  static upsertContributor(contributorId: string, name?: string, url?: string): void {
+    const checkStmt = db.prepare('SELECT contributor_id FROM contributors WHERE contributor_id = ?');
+    const exists = checkStmt.get(contributorId);
+
+    if (exists) {
+      // Update if name or url is provided
+      if (name || url) {
+        const updateStmt = db.prepare(`
+          UPDATE contributors
+          SET name = COALESCE(?, name), url = COALESCE(?, url), updated_at = CURRENT_TIMESTAMP
+          WHERE contributor_id = ?
+        `);
+        updateStmt.run(name || null, url || null, contributorId);
+      }
+    } else {
+      // Insert new contributor
+      const insertStmt = db.prepare(`
+        INSERT INTO contributors (contributor_id, name, url)
+        VALUES (?, ?, ?)
+      `);
+      insertStmt.run(contributorId, name || null, url || null);
+    }
+  }
+
+  /**
    * Add a word to the current story
    */
-  static addWord(contributorId: string, word: string): { success: boolean; story?: Story; error?: string } {
+  static addWord(
+    contributorId: string,
+    word: string,
+    contributorName?: string,
+    contributorUrl?: string
+  ): { success: boolean; story?: Story; error?: string } {
     let currentStory = this.getCurrentStory();
 
     // If no active story exists, create one
@@ -100,6 +154,9 @@ export class StoryDatabase {
     if (currentStory.last_contributor_id === contributorId) {
       return { success: false, error: 'You cannot submit two consecutive words' };
     }
+
+    // Add or update contributor info
+    this.upsertContributor(contributorId, contributorName, contributorUrl);
 
     // Add the word to the story
     const newWords = currentStory.words ? `${currentStory.words} ${word}` : word;
@@ -146,6 +203,33 @@ export class StoryDatabase {
   static getContributions(storyId: string): Contribution[] {
     const stmt = db.prepare('SELECT * FROM contributions WHERE story_id = ? ORDER BY word_position ASC');
     return stmt.all(storyId) as Contribution[];
+  }
+
+  /**
+   * Get unique contributors for a story with their info
+   */
+  static getStoryContributors(storyId: string): Contributor[] {
+    const stmt = db.prepare(`
+      SELECT DISTINCT c.contributor_id, c.name, c.url, c.created_at, c.updated_at
+      FROM contributors c
+      INNER JOIN contributions co ON c.contributor_id = co.contributor_id
+      WHERE co.story_id = ?
+      ORDER BY c.name ASC
+    `);
+    return stmt.all(storyId) as Contributor[];
+  }
+
+  /**
+   * Get contributor count for a story
+   */
+  static getStoryContributorCount(storyId: string): number {
+    const stmt = db.prepare(`
+      SELECT COUNT(DISTINCT contributor_id) as count
+      FROM contributions
+      WHERE story_id = ?
+    `);
+    const result = stmt.get(storyId) as { count: number };
+    return result.count;
   }
 
   /**
