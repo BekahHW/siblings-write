@@ -1,48 +1,61 @@
 ---
 import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection, getEntry } from 'astro:content';
 
-const title = 'Our Work';
+// Get all works and sort by order
+const allWorks = await getCollection('works');
+const sortedWorks = allWorks.sort((a, b) => a.data.order - b.data.order);
+const featuredWorks = sortedWorks.filter(work => work.data.featured);
+const otherWorks = sortedWorks.filter(work => !work.data.featured);
+
+// Get page settings
+const worksSettings = await getEntry('pages', 'works');
+
+const title = worksSettings?.data.title || 'Our Work';
 const description = 'Discover our projects and stories.';
 const permalink = `${Astro.site.href}work`;
+const intro = worksSettings?.data.intro || "We're passionate about creating adventurous stories, that spark your imagination and bring joy to our readers. Here's a look at some of the work we've done and what we're currently working on.";
+const featuredTitle = worksSettings?.data.featuredTitle || 'Featured Work';
+const otherProjectsTitle = worksSettings?.data.otherProjectsTitle || 'Other Projects';
 ---
 
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink} current="work">
     <div class="container-new">
-      <h1>Our Work</h1>
-      <!-- <figure class="work-image">
-        <img src="/assets/work-illustration.webp" alt="Illustration of teamwork" width="330">
-      
-      </figure> -->
-      <p>
-        We’re passionate about creating adventurous stories, that spark your imagination and bring joy to our readers. Here's a look at some of the work we’ve done and what we’re currently working on.
-      </p>
+      <h1>{title}</h1>
+      <p>{intro}</p>
 
-      <!-- Book Section -->
-      <h2>Featured Work</h2>
-      <div class="book-section">
-        <img src="/assets/nutcracker.jpg" alt="The Battle for Christmas: Reign of the Nutcrackers" width="200">
-        <div>
-          <p><strong>The Battle for Christmas: Reign of the Nutcrackers</strong></br>Join Tim on a captivating adventure of hope, family, and the enduring magic of Christmas. Perfect for fans of holiday adventures and heartwarming tales, this story reminds us that even in the darkest times, the light of Christmas can shine the brightest.</p>
-          <a href="https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1/ref=sr_1_2?crid=I5DWDTES3YWX&dib=eyJ2IjoiMSJ9.DmJrhZrdQtB7pGWH9IvAZKZKTx1gMCkYEPuD3R0WX61de458GtTsEU7eVXeBvtgq-ikR04xVMyItbmk5eu2hRwvXcnlkuTGBT1NyUZ0ZiYjxhNrhle14RDmzfNmve3CsJ0KaCLfWQA8qGiy2wjFdAU6Y-SUqDtIbFA6B3i7DVTkGbbHQNdBib5hfzkTbU-XqEhoNi52bsDk4GLZ95oosu4Wmi-HMtR3h5A-MGwG9Esw.j8WZZczBoKaGv4glN4hzV_Iu_NbsDX8-O58knWrr9Qo&dib_tag=se&keywords=battle+for+christmas&qid=1737934190&sprefix=battle+for+christ%2Caps%2C123&sr=8-2" target="_blank" rel="noopener" class="buy-button">Buy Now on Amazon</a>
-        </div>
-      </div>
+      <!-- Featured Works Section -->
+      {featuredWorks.length > 0 && (
+        <>
+          <h2>{featuredTitle}</h2>
+          {featuredWorks.map((work) => (
+            <div class="book-section">
+              <img src={work.data.image} alt={work.data.title} width="200">
+              <div>
+                <p><strong>{work.data.title}</strong><br/>{work.data.description}</p>
+                <a href={work.data.link} target="_blank" rel="noopener" class="buy-button">Buy Now on Amazon</a>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
 
-      <div class="book-section">
-        <img src="/assets/brownsisland.jpg" alt="Escape from Browns Island" width="200">
-        <div>
-          <p><strong>Escape from Browns Island</strong></br>Every small town has legends—but not every kid gets the chance to rewrite them. This novelette starts off with a simple dare: 17-year-old Tommy must spend one summer night alone on Browns Island, an abandoned, 4-mile-long island in the heart of the Ohio River. What he wants is a peaceful night to himself. What he needs is an escape from the chaos he just caused his family. What he finds is an island that isn't abandoned. It is alive and waiting for his arrival.</p>
-          <a href="https://dub.sh/browns-island" target="_blank" rel="noopener" class="buy-button">Find it Now on Amazon</a>
-        </div>
-      </div>
-
-      <h2>Other Projects</h2>
-      <ul>
-        <li><strong><a href="https://www.amazon.com/Wild-Adventure-Mitch-Sand-Bridge-ebook/dp/B0CJKVK2ZD?ref_=ast_author_dp_rw&dib=eyJ2IjoiMSJ9.StVAtmZ_WxfszMkfO8IdYnWixPuFOSx7YoQ7SNBx0jCwZSEEoXq-bkZV66ABiBf0.P2071nbAUipjZTyl4AfsSG7biKX73gJxnBGXuF1SMyc&dib_tag=AUTHOR">The Wild Adventure of Mitch and the Sand Bridge by Zach Hawrot</a></strong><em> Welcome to summer vacation! The time for good memories, great beaches, and — invasions?</em></li>
-        <!-- <li><strong>Project 2:</strong> Community storytelling workshops for aspiring writers.</li>
-        <li><strong>Project 3:</strong> Seasonal stories celebrating traditions and togetherness.</li> -->
-      </ul>
+      <!-- Other Projects Section -->
+      {otherWorks.length > 0 && (
+        <>
+          <h2>{otherProjectsTitle}</h2>
+          <ul>
+            {otherWorks.map((work) => (
+              <li>
+                <strong><a href={work.data.link} target="_blank" rel="noopener">{work.data.title}</a></strong>
+                <em> {work.data.description}</em>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   </BaseLayout>
 </PostHogLayout>

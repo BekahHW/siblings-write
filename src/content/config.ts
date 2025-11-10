@@ -23,5 +23,32 @@ const blog = defineCollection({
   }),
 });
 
+// Define the schema for the works collection
+const works = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/works" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    image: z.string(),
+    link: z.string(),
+    featured: z.boolean().default(false),
+    order: z.number().default(0),
+  }),
+});
+
+// Define the schema for the pages collection (JSON files)
+const pages = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/content/pages" }),
+  schema: z.object({
+    title: z.string().optional(),
+    subtitle: z.string().optional(),
+    about: z.string().optional(),
+    newsletterIntro: z.string().optional(),
+    intro: z.string().optional(),
+    featuredTitle: z.string().optional(),
+    otherProjectsTitle: z.string().optional(),
+  }),
+});
+
 // Export the collections
-export const collections = { authors, blog };
+export const collections = { authors, blog, works, pages };
