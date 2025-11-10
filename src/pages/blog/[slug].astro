@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
+import YouTubeEmbed from '../../components/YouTubeEmbed.astro';
 
 export async function getStaticPaths() {
   try {
@@ -78,7 +79,15 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
       <article class="content">
         <Content />
       </article>
-      
+
+      {entry.data.youtubeId && (
+        <div class="youtube-cta">
+          <h3>Watch This Story on YouTube</h3>
+          <p>Experience this tale brought to life by The Hawrot Siblings!</p>
+          <YouTubeEmbed videoId={entry.data.youtubeId} title={entry.data.title} />
+        </div>
+      )}
+
       <div class="post-navigation">
         {prevPost && (
         <a href={`/blog/${prevPost.id}`} class="nav-button prev-button">
@@ -132,7 +141,28 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
     min-width: 100px;
     width: 30%;
   }
-    
+
+  .youtube-cta {
+    margin: 3rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+    border-radius: 12px;
+    border: 2px solid rgba(255, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .youtube-cta h3 {
+    margin: 0 0 0.5rem 0;
+    color: #ff0000;
+    font-size: 1.6rem;
+  }
+
+  .youtube-cta p {
+    margin: 0 0 1.5rem 0;
+    color: #555;
+    font-size: 1.1rem;
+  }
+
   .author-bio {
     margin-top: 2rem;
     padding-top: 1rem;

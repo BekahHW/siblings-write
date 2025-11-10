@@ -1,0 +1,220 @@
+---
+interface Video {
+  id: string;
+  title: string;
+  publishedAt: string;
+  thumbnail: string;
+  description?: string;
+}
+
+interface Props {
+  videos: Video[];
+  limit?: number;
+}
+
+const { videos, limit = 3 } = Astro.props;
+const displayVideos = videos.slice(0, limit);
+---
+
+<section class="youtube-section">
+  <div class="youtube-header">
+    <h2 class="section-title">Watch Our Stories Come to Life</h2>
+    <p class="youtube-intro">Experience our tales on YouTube - where imagination meets storytelling</p>
+    <a href="https://www.youtube.com/@TheHawrotSiblings" target="_blank" rel="noopener noreferrer" class="channel-link">
+      <svg class="youtube-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+      </svg>
+      Visit Our YouTube Channel
+    </a>
+  </div>
+
+  <div class="videos-grid">
+    {displayVideos.map((video) => (
+      <a href={`https://www.youtube.com/watch?v=${video.id}`} target="_blank" rel="noopener noreferrer" class="video-card">
+        <div class="video-thumbnail">
+          <img src={video.thumbnail} alt={video.title} />
+          <div class="play-button">
+            <svg viewBox="0 0 24 24" fill="white">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="video-info">
+          <h3 class="video-title">{video.title}</h3>
+          <p class="video-date">{new Date(video.publishedAt).toLocaleDateString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric'
+          })}</p>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>
+
+<style>
+  .youtube-section {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 4rem 2rem;
+    border-radius: 16px;
+    margin: 3rem 0;
+  }
+
+  .youtube-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-family: "Playwrite HU", cursive;
+    font-size: 2.2em;
+    margin-bottom: 0.5em;
+    color: #333;
+  }
+
+  .youtube-intro {
+    font-size: 1.2em;
+    color: #555;
+    margin-bottom: 1.5em;
+  }
+
+  .channel-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: #ff0000;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+  }
+
+  .channel-link:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+  }
+
+  .youtube-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .video-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .video-thumbnail {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    overflow: hidden;
+    background: #000;
+  }
+
+  .video-thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+
+  .video-card:hover .video-thumbnail img {
+    opacity: 0.8;
+  }
+
+  .play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 0, 0, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .video-card:hover .play-button {
+    background: rgba(255, 0, 0, 1);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .play-button svg {
+    width: 24px;
+    height: 24px;
+    margin-left: 3px;
+  }
+
+  .video-info {
+    padding: 1.2rem;
+  }
+
+  .video-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-date {
+    font-size: 0.9rem;
+    color: #777;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .youtube-section {
+      padding: 3rem 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+    }
+
+    .youtube-intro {
+      font-size: 1em;
+    }
+
+    .videos-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .channel-link {
+      font-size: 1rem;
+      padding: 0.7rem 1.2rem;
+    }
+  }
+</style>
