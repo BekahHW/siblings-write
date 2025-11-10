@@ -23,5 +23,16 @@ const blog = defineCollection({
   }),
 });
 
+// Define the schema for the collabs collection (collaborative stories)
+const collabs = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/collabs" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    publishDate: z.string(),
+    hidden: z.boolean().optional(),
+  }),
+});
+
 // Export the collections
-export const collections = { authors, blog };
+export const collections = { authors, blog, collabs };

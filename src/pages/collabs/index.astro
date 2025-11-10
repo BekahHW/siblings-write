@@ -1,0 +1,102 @@
+---
+import PostHogLayout from '../../layouts/PostHogLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const title = 'Collaborative Stories';
+const description = 'Stories created one word at a time by the Siblings Write community.';
+const permalink = `${Astro.site.href}collabs`;
+const allCollabs = await getCollection('collabs', ({ data }) => data.hidden !== true);
+const sortedCollabs = allCollabs.sort((a, b) =>
+  new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
+);
+---
+<PostHogLayout>
+  <BaseLayout title={title} description={description} permalink={permalink} current="collabs">
+    <div class="container">
+      <h1>Collaborative Stories</h1>
+      <p class="intro">
+        These stories were created one word at a time by members of the Siblings Write community.
+        Each story is a unique collaborative effort, with contributors adding one word at a time
+        until reaching 900 words. <a href="/one-word-story">Join the current story!</a>
+      </p>
+      {sortedCollabs.length === 0 ? (
+        <div class="empty-state">
+          <p>No collaborative stories have been completed yet.</p>
+          <p><a href="/one-word-story">Be part of the first one!</a></p>
+        </div>
+      ) : (
+        sortedCollabs.map((story, index) => {
+          return (
+            <div>
+              { index !== 0 && <hr /> }
+              <div class="story-item">
+                <h2>
+                  <a href={`/collabs/${story.id}`}>{story.data.title}</a>
+                </h2>
+                <p>{story.data.description}</p>
+                <span class="story-item-date">{story.data.publishDate}</span>
+              </div>
+            </div>
+          )
+        })
+      )}
+    </div>
+  </BaseLayout>
+</PostHogLayout>
+
+<style>
+  .intro {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
+  }
+
+  .intro a {
+    color: var(--accent-color, #4a9eff);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .intro a:hover {
+    text-decoration: underline;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--text-secondary);
+  }
+
+  .empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state a {
+    color: var(--accent-color, #4a9eff);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .empty-state a:hover {
+    text-decoration: underline;
+  }
+
+  h2,
+  .story-item-footer {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+  }
+
+  .story-item-date {
+    color: var(--text-secondary);
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  hr {
+    margin: 60px auto;
+  }
+</style>

@@ -17,12 +17,15 @@
   "dependencies": {
     "22": "^0.0.0",
     "@astrojs/mdx": "^4.2.1",
+    "@astrojs/node": "^9.5.0",
     "@astrojs/svelte": "^7.0.6",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "astro": "^5.5.3",
+    "bad-words": "^4.0.0",
+    "better-sqlite3": "^12.4.1",
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "js-yaml": "^4.1.0",
@@ -35,6 +38,7 @@
     "remark-smartypants": "^2.0.0",
     "svelte": "^5.23.1",
     "typescript": "^5.8.2",
+    "uuid": "^13.0.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

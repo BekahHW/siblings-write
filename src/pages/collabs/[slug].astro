@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const collabs = await getCollection('collabs');
+  return collabs.map((story) => ({
+    params: { slug: story.id },
+    props: { story },
+  }));
+}
+
+type Props = {
+  story: CollectionEntry<'collabs'>;
+};
+
+const { story } = Astro.props;
+const { Content } = await story.render();
+
+const title = story.data.title;
+const description = story.data.description;
+const permalink = `${Astro.site}collabs/${story.id}`;
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="collabs">
+  <article>
+    <header>
+      <h1>{story.data.title}</h1>
+      <time>{story.data.publishDate}</time>
+    </header>
+    <div class="content">
+      <Content />
+    </div>
+    <footer>
+      <a href="/collabs" class="back-link">← Back to Collaborative Stories</a>
+      <a href="/one-word-story" class="contribute-link">Contribute to the current story →</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  article {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+  }
+
+  time {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+  }
+
+  .content {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    text-align: justify;
+    margin-bottom: 3rem;
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color, #e0e0e0);
+    margin-top: 3rem;
+  }
+
+  .back-link,
+  .contribute-link {
+    color: var(--accent-color, #4a9eff);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover,
+  .contribute-link:hover {
+    color: var(--accent-color-hover, #3a8eef);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 2rem;
+    }
+
+    footer {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+</style>

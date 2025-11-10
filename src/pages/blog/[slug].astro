@@ -5,6 +5,8 @@ import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
 
+export const prerender = true;
+
 export async function getStaticPaths() {
   try {
     const blogEntries = await getCollection('blog');
