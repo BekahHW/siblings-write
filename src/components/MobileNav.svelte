@@ -32,6 +32,7 @@
 <nav class="mobile-nav" class:active={menuOpen}>
   <a class={current === "" ? "selected" : ""} href='/'>home</a>
   <a class={current === "blog" ? "selected" : ""} href='/blog'>shorts</a>
+  <a class={current === "cyoa" ? "selected" : ""} href='/cyoa'>CYOA</a>
   <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
   <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
   <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
