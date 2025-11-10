@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import StoryDatabase from '../../utils/storyDb';
 import { validateWord, sanitizeWord } from '../../utils/wordFilter';
-import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
 
@@ -15,11 +14,11 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ request }) => {
   try {
-    const story = StoryDatabase.getCurrentStory();
+    const story = await StoryDatabase.getCurrentStory();
 
     if (!story) {
       // Create a new story if none exists
-      const newStory = StoryDatabase.createNewStory();
+      const newStory = await StoryDatabase.createNewStory();
       return new Response(JSON.stringify({
         success: true,
         story: {
@@ -100,7 +99,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Sanitize and add the word
     const sanitizedWord = sanitizeWord(word);
-    const result = StoryDatabase.addWord(
+    const result = await StoryDatabase.addWord(
       contributorId,
       sanitizedWord,
       contributorName,
@@ -122,7 +121,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Check if we've reached the threshold
     if (result.story && result.story.word_count >= WORD_THRESHOLD) {
       // Archive the current story
-      const archivedStory = StoryDatabase.archiveCurrentStory();
+      const archivedStory = await StoryDatabase.archiveCurrentStory();
 
       if (archivedStory) {
         // Create the PR asynchronously (don't wait for it)
@@ -132,7 +131,7 @@ export const POST: APIRoute = async ({ request }) => {
       }
 
       // Create a new story
-      const newStory = StoryDatabase.createNewStory();
+      const newStory = await StoryDatabase.createNewStory();
 
       return new Response(JSON.stringify({
         success: true,
@@ -198,8 +197,8 @@ async function createStoryPullRequest(story: any): Promise<void> {
     }
 
     // Get contributors
-    const contributors = StoryDatabase.getStoryContributors(story.story_id);
-    const contributorCount = StoryDatabase.getStoryContributorCount(story.story_id);
+    const contributors = await StoryDatabase.getStoryContributors(story.story_id);
+    const contributorCount = await StoryDatabase.getStoryContributorCount(story.story_id);
 
     // Build contributor list
     let contributorList = '';

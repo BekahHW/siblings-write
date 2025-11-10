@@ -1,54 +1,14 @@
-import Database from 'better-sqlite3';
-import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
-import fs from 'fs';
+import { createClient } from '@supabase/supabase-js';
 
-const DB_DIR = path.join(process.cwd(), 'data');
-const DB_PATH = path.join(DB_DIR, 'one-word-story.db');
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.SUPABASE_URL || process.env.SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
 
-// Ensure data directory exists
-if (!fs.existsSync(DB_DIR)) {
-  fs.mkdirSync(DB_DIR, { recursive: true });
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables. Please set SUPABASE_URL and SUPABASE_ANON_KEY');
 }
 
-const db = new Database(DB_PATH);
-
-// Initialize database schema
-db.exec(`
-  CREATE TABLE IF NOT EXISTS story (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    story_id TEXT NOT NULL,
-    words TEXT NOT NULL,
-    word_count INTEGER NOT NULL,
-    last_contributor_id TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    is_active INTEGER DEFAULT 1
-  );
-
-  CREATE TABLE IF NOT EXISTS contributors (
-    contributor_id TEXT PRIMARY KEY,
-    name TEXT,
-    url TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS contributions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    story_id TEXT NOT NULL,
-    contributor_id TEXT NOT NULL,
-    word TEXT NOT NULL,
-    word_position INTEGER NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (story_id) REFERENCES story(story_id),
-    FOREIGN KEY (contributor_id) REFERENCES contributors(contributor_id)
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_story_active ON story(is_active);
-  CREATE INDEX IF NOT EXISTS idx_contributions_story ON contributions(story_id);
-  CREATE INDEX IF NOT EXISTS idx_contributions_contributor ON contributions(contributor_id);
-`);
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface Story {
   id: number;
@@ -58,7 +18,7 @@ export interface Story {
   last_contributor_id: string | null;
   created_at: string;
   updated_at: string;
-  is_active: number;
+  is_active: boolean;
 }
 
 export interface Contributor {
@@ -87,67 +47,107 @@ export class StoryDatabase {
   /**
    * Get the current active story
    */
-  static getCurrentStory(): Story | null {
-    const stmt = db.prepare('SELECT * FROM story WHERE is_active = 1 ORDER BY id DESC LIMIT 1');
-    const story = stmt.get() as Story | undefined;
-    return story || null;
+  static async getCurrentStory(): Promise<Story | null> {
+    const { data, error } = await supabase
+      .from('story')
+      .select('*')
+      .eq('is_active', true)
+      .order('id', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned - this is expected when there's no active story
+        return null;
+      }
+      console.error('Error fetching current story:', error);
+      return null;
+    }
+
+    return data;
   }
 
   /**
    * Create a new story
    */
-  static createNewStory(): Story {
-    const storyId = uuidv4();
-    const stmt = db.prepare(`
-      INSERT INTO story (story_id, words, word_count, last_contributor_id, is_active)
-      VALUES (?, ?, ?, ?, 1)
-    `);
-    stmt.run(storyId, '', 0, null);
+  static async createNewStory(): Promise<Story> {
+    const { data, error } = await supabase
+      .from('story')
+      .insert({
+        words: '',
+        word_count: 0,
+        last_contributor_id: null,
+        is_active: true
+      })
+      .select()
+      .single();
 
-    return this.getCurrentStory()!;
+    if (error) {
+      console.error('Error creating new story:', error);
+      throw new Error('Failed to create new story');
+    }
+
+    return data;
   }
 
   /**
    * Add or update a contributor
    */
-  static upsertContributor(contributorId: string, name?: string, url?: string): void {
-    const checkStmt = db.prepare('SELECT contributor_id FROM contributors WHERE contributor_id = ?');
-    const exists = checkStmt.get(contributorId);
+  static async upsertContributor(contributorId: string, name?: string, url?: string): Promise<void> {
+    // Check if contributor exists
+    const { data: existing } = await supabase
+      .from('contributors')
+      .select('contributor_id')
+      .eq('contributor_id', contributorId)
+      .single();
 
-    if (exists) {
+    if (existing) {
       // Update if name or url is provided
       if (name || url) {
-        const updateStmt = db.prepare(`
-          UPDATE contributors
-          SET name = COALESCE(?, name), url = COALESCE(?, url), updated_at = CURRENT_TIMESTAMP
-          WHERE contributor_id = ?
-        `);
-        updateStmt.run(name || null, url || null, contributorId);
+        const updates: any = {};
+        if (name) updates.name = name;
+        if (url) updates.url = url;
+
+        const { error } = await supabase
+          .from('contributors')
+          .update(updates)
+          .eq('contributor_id', contributorId);
+
+        if (error) {
+          console.error('Error updating contributor:', error);
+        }
       }
     } else {
       // Insert new contributor
-      const insertStmt = db.prepare(`
-        INSERT INTO contributors (contributor_id, name, url)
-        VALUES (?, ?, ?)
-      `);
-      insertStmt.run(contributorId, name || null, url || null);
+      const { error } = await supabase
+        .from('contributors')
+        .insert({
+          contributor_id: contributorId,
+          name: name || null,
+          url: url || null
+        });
+
+      if (error) {
+        console.error('Error inserting contributor:', error);
+      }
     }
   }
 
   /**
    * Add a word to the current story
    */
-  static addWord(
+  static async addWord(
     contributorId: string,
     word: string,
     contributorName?: string,
     contributorUrl?: string
-  ): { success: boolean; story?: Story; error?: string } {
-    let currentStory = this.getCurrentStory();
+  ): Promise<{ success: boolean; story?: Story; error?: string }> {
+    let currentStory = await this.getCurrentStory();
 
     // If no active story exists, create one
     if (!currentStory) {
-      currentStory = this.createNewStory();
+      currentStory = await this.createNewStory();
     }
 
     // Check if the contributor is the same as the last contributor
@@ -156,29 +156,47 @@ export class StoryDatabase {
     }
 
     // Add or update contributor info
-    this.upsertContributor(contributorId, contributorName, contributorUrl);
+    await this.upsertContributor(contributorId, contributorName, contributorUrl);
 
     // Add the word to the story
     const newWords = currentStory.words ? `${currentStory.words} ${word}` : word;
     const newWordCount = currentStory.word_count + 1;
 
     // Update the story
-    const updateStmt = db.prepare(`
-      UPDATE story
-      SET words = ?, word_count = ?, last_contributor_id = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE story_id = ?
-    `);
-    updateStmt.run(newWords, newWordCount, contributorId, currentStory.story_id);
+    const { error: updateError } = await supabase
+      .from('story')
+      .update({
+        words: newWords,
+        word_count: newWordCount,
+        last_contributor_id: contributorId
+      })
+      .eq('story_id', currentStory.story_id);
+
+    if (updateError) {
+      console.error('Error updating story:', updateError);
+      return { success: false, error: 'Failed to update story' };
+    }
 
     // Add contribution record
-    const contributionStmt = db.prepare(`
-      INSERT INTO contributions (story_id, contributor_id, word, word_position)
-      VALUES (?, ?, ?, ?)
-    `);
-    contributionStmt.run(currentStory.story_id, contributorId, word, newWordCount);
+    const { error: contributionError } = await supabase
+      .from('contributions')
+      .insert({
+        story_id: currentStory.story_id,
+        contributor_id: contributorId,
+        word: word,
+        word_position: newWordCount
+      });
+
+    if (contributionError) {
+      console.error('Error adding contribution:', contributionError);
+      return { success: false, error: 'Failed to add contribution' };
+    }
 
     // Get updated story
-    const updatedStory = this.getCurrentStory()!;
+    const updatedStory = await this.getCurrentStory();
+    if (!updatedStory) {
+      return { success: false, error: 'Failed to fetch updated story' };
+    }
 
     return { success: true, story: updatedStory };
   }
@@ -186,13 +204,20 @@ export class StoryDatabase {
   /**
    * Archive the current story and create a new one
    */
-  static archiveCurrentStory(): Story | null {
-    const currentStory = this.getCurrentStory();
+  static async archiveCurrentStory(): Promise<Story | null> {
+    const currentStory = await this.getCurrentStory();
     if (!currentStory) return null;
 
     // Mark current story as inactive
-    const stmt = db.prepare('UPDATE story SET is_active = 0 WHERE story_id = ?');
-    stmt.run(currentStory.story_id);
+    const { error } = await supabase
+      .from('story')
+      .update({ is_active: false })
+      .eq('story_id', currentStory.story_id);
+
+    if (error) {
+      console.error('Error archiving story:', error);
+      return null;
+    }
 
     return currentStory;
   }
@@ -200,52 +225,117 @@ export class StoryDatabase {
   /**
    * Get all contributions for a story
    */
-  static getContributions(storyId: string): Contribution[] {
-    const stmt = db.prepare('SELECT * FROM contributions WHERE story_id = ? ORDER BY word_position ASC');
-    return stmt.all(storyId) as Contribution[];
+  static async getContributions(storyId: string): Promise<Contribution[]> {
+    const { data, error } = await supabase
+      .from('contributions')
+      .select('*')
+      .eq('story_id', storyId)
+      .order('word_position', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching contributions:', error);
+      return [];
+    }
+
+    return data || [];
   }
 
   /**
    * Get unique contributors for a story with their info
    */
-  static getStoryContributors(storyId: string): Contributor[] {
-    const stmt = db.prepare(`
-      SELECT DISTINCT c.contributor_id, c.name, c.url, c.created_at, c.updated_at
-      FROM contributors c
-      INNER JOIN contributions co ON c.contributor_id = co.contributor_id
-      WHERE co.story_id = ?
-      ORDER BY c.name ASC
-    `);
-    return stmt.all(storyId) as Contributor[];
+  static async getStoryContributors(storyId: string): Promise<Contributor[]> {
+    const { data, error } = await supabase
+      .from('contributions')
+      .select(`
+        contributor_id,
+        contributors (
+          contributor_id,
+          name,
+          url,
+          created_at,
+          updated_at
+        )
+      `)
+      .eq('story_id', storyId);
+
+    if (error) {
+      console.error('Error fetching story contributors:', error);
+      return [];
+    }
+
+    // Extract unique contributors
+    const contributorsMap = new Map<string, Contributor>();
+    data?.forEach((contribution: any) => {
+      if (contribution.contributors) {
+        const contributor = contribution.contributors;
+        contributorsMap.set(contributor.contributor_id, contributor);
+      }
+    });
+
+    // Sort by name
+    const contributors = Array.from(contributorsMap.values());
+    contributors.sort((a, b) => {
+      if (!a.name && !b.name) return 0;
+      if (!a.name) return 1;
+      if (!b.name) return -1;
+      return a.name.localeCompare(b.name);
+    });
+
+    return contributors;
   }
 
   /**
    * Get contributor count for a story
    */
-  static getStoryContributorCount(storyId: string): number {
-    const stmt = db.prepare(`
-      SELECT COUNT(DISTINCT contributor_id) as count
-      FROM contributions
-      WHERE story_id = ?
-    `);
-    const result = stmt.get(storyId) as { count: number };
-    return result.count;
+  static async getStoryContributorCount(storyId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('contributions')
+      .select('contributor_id', { count: 'exact', head: true })
+      .eq('story_id', storyId);
+
+    if (error) {
+      console.error('Error fetching contributor count:', error);
+      return 0;
+    }
+
+    // Get distinct count using RPC or by fetching all and counting unique
+    const { data } = await supabase
+      .from('contributions')
+      .select('contributor_id')
+      .eq('story_id', storyId);
+
+    const uniqueContributors = new Set(data?.map(c => c.contributor_id));
+    return uniqueContributors.size;
   }
 
   /**
    * Get story statistics
    */
-  static getStats() {
-    const totalStoriesStmt = db.prepare('SELECT COUNT(*) as count FROM story WHERE is_active = 0');
-    const totalContributorsStmt = db.prepare('SELECT COUNT(DISTINCT contributor_id) as count FROM contributions');
-    const totalWordsStmt = db.prepare('SELECT SUM(word_count) as count FROM story WHERE is_active = 0');
+  static async getStats(): Promise<{ totalStories: number; totalContributors: number; totalWords: number }> {
+    // Get total archived stories
+    const { count: totalStories } = await supabase
+      .from('story')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', false);
 
-    const totalStories = (totalStoriesStmt.get() as { count: number }).count;
-    const totalContributors = (totalContributorsStmt.get() as { count: number }).count;
-    const totalWords = (totalWordsStmt.get() as { count: number | null }).count || 0;
+    // Get total unique contributors
+    const { data: allContributions } = await supabase
+      .from('contributions')
+      .select('contributor_id');
+
+    const uniqueContributors = new Set(allContributions?.map(c => c.contributor_id));
+    const totalContributors = uniqueContributors.size;
+
+    // Get total words from archived stories
+    const { data: stories } = await supabase
+      .from('story')
+      .select('word_count')
+      .eq('is_active', false);
+
+    const totalWords = stories?.reduce((sum, story) => sum + story.word_count, 0) || 0;
 
     return {
-      totalStories,
+      totalStories: totalStories || 0,
       totalContributors,
       totalWords
     };
