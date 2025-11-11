@@ -162,18 +162,18 @@
     line-height: 1.8;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: var(--theme-bg-offset);
+    background: rgba(84, 142, 155, 0.05);
     border-radius: 8px;
   }
 
   .story-content.revealed {
-    border-left: 4px solid var(--theme-accent);
+    border-left: 4px solid var(--primary-color);
   }
 
   .choice-indicator {
     margin-bottom: 1rem;
     padding: 0.5rem;
-    background: var(--theme-accent-opacity);
+    background: rgba(84, 142, 155, 0.15);
     border-radius: 4px;
     font-size: 0.9rem;
   }
@@ -186,7 +186,7 @@
     text-align: center;
     font-size: 1.3rem;
     margin-bottom: 1.5rem;
-    color: var(--theme-text);
+    color: var(--text-main);
   }
 
   .choice-buttons {
@@ -200,37 +200,38 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 1.25rem 1.5rem;
-    background: var(--theme-bg-offset);
-    border: 2px solid var(--theme-divider);
+    background: rgba(84, 142, 155, 0.05);
+    border: 2px solid rgba(107, 111, 114, 0.3);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;
     width: 100%;
+    color: var(--text-main);
   }
 
   .choice-button:hover {
-    border-color: var(--theme-accent);
-    background: var(--theme-bg-hover);
+    border-color: var(--primary-color);
+    background: rgba(84, 142, 155, 0.1);
     transform: translateX(4px);
   }
 
   .choice-id {
     font-weight: bold;
-    color: var(--theme-accent);
+    color: var(--primary-color);
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
   }
 
   .choice-title {
     font-size: 1.1rem;
-    color: var(--theme-text);
+    color: var(--text-main);
   }
 
   .completion {
     text-align: center;
     padding: 2rem;
-    background: var(--theme-bg-offset);
+    background: rgba(84, 142, 155, 0.05);
     border-radius: 8px;
     margin: 2rem 0;
   }
@@ -238,19 +239,19 @@
   .completion h3 {
     font-size: 2rem;
     margin-bottom: 1rem;
-    color: var(--theme-accent);
+    color: var(--primary-color);
   }
 
   .completion p {
     font-size: 1.1rem;
     margin-bottom: 1.5rem;
-    color: var(--theme-text);
+    color: var(--text-main);
   }
 
   .reset-button {
     padding: 0.75rem 2rem;
-    background: var(--theme-accent);
-    color: white;
+    background: var(--primary-color);
+    color: #fff;
     border: none;
     border-radius: 6px;
     font-size: 1rem;
