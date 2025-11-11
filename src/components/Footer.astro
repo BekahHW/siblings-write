@@ -1,4 +1,19 @@
+---
+import FontAwesomeIcon from "./FontAwesomeIcon.astro";
+import { faAmazon, faYoutube } from "@fortawesome/free-brands-svg-icons";
+---
+
 <footer>
+  <div class="social-links">
+    <a href="https://www.amazon.com/stores/author/B0FQS3SGZQ" target="_blank" rel="noopener" class="social-link" aria-label="Follow us on Amazon">
+      <FontAwesomeIcon iconName={faAmazon} />
+      <span>Follow on Amazon</span>
+    </a>
+    <a href="https://www.youtube.com/@thehawrotsiblings" target="_blank" rel="noopener" class="social-link" aria-label="Subscribe on YouTube">
+      <FontAwesomeIcon iconName={faYoutube} />
+      <span>Subscribe on YouTube</span>
+    </a>
+  </div>
   <span>
     &copy; {new Date().getFullYear()} Siblings Write.
     Powered by <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>.
@@ -15,5 +30,54 @@
     padding: 1em 2em;
     text-align: center;
     width: 100%;
+  }
+
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2em;
+    margin-bottom: 1.5em;
+    flex-wrap: wrap;
+  }
+
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 1em;
+    background-color: #007acc;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 1.1em;
+  }
+
+  .social-link:hover {
+    background-color: #005a99;
+  }
+
+  .social-link svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .social-link {
+      background-color: #0d7fc4;
+    }
+
+    .social-link:hover {
+      background-color: #007acc;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .social-links {
+      flex-direction: column;
+      gap: 1em;
+      align-items: center;
+    }
   }
 </style>
