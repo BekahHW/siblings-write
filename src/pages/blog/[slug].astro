@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
+import NewsletterCTA from '../../components/NewsletterCTA.astro';
 
 export async function getStaticPaths() {
   try {
@@ -78,7 +79,9 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
       <article class="content">
         <Content />
       </article>
-      
+
+      <NewsletterCTA variant="default" showTestimonials={true} />
+
       <div class="post-navigation">
         {prevPost && (
         <a href={`/blog/${prevPost.id}`} class="nav-button prev-button">

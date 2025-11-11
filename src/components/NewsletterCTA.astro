@@ -1,0 +1,343 @@
+---
+interface Props {
+  variant?: 'default' | 'inline' | 'footer';
+  showTestimonials?: boolean;
+}
+
+const { variant = 'default', showTestimonials = false } = Astro.props;
+
+const testimonials = [
+  {
+    text: "Great story. I love the descriptions of the store and the people. It was heart warming.♥️",
+    story: "Short Stories"
+  },
+  {
+    text: "Escape from Brown's Island bursts off the page like a star running back on a Saturday-night breakaway—fast, thrilling, and impossible to stop. The Hawrot siblings cut, juke, and power through danger with the perfect mix of grit and finesse, turning every chapter into a game-winning drive. A true end-zone celebration of adventure worthy of the record books.",
+    story: "Escape from Brown's Island"
+  },
+  {
+    text: "I decided to give this book a try over the holiday season and I'm so glad I did! This was a huge break from the normal self-help / non-fiction books I like to read, so I wasn't sure what to expect. The authors do a wonderful job of building a world based on their own lives while pushing into fantasy and adventure in so many creative ways! I couldn't put the book down after the halfway point where the story keeps you guessing while filling you with an undeniable Christmas cheer. I'm a grown adult who felt like a kid again while enjoying this story. I've since passed it along to my own son with the same joy shared by the characters in this book! I hope you enjoy it as much as we do!",
+    story: "Battle for Christmas: Reighn of the Nutcrackers"
+  }
+];
+---
+
+<div class={`newsletter-cta newsletter-cta-${variant}`}>
+  {variant === 'default' && (
+    <div class="cta-header">
+      <h3>✨ Enjoyed this story?</h3>
+      <p class="cta-tagline">Stories that make you believe in magic - delivered first to subscribers</p>
+    </div>
+  )}
+
+  {variant === 'footer' && (
+    <div class="cta-header">
+      <h4>Never Miss a Story</h4>
+      <p class="cta-tagline">Stories that make you believe in magic - delivered first to subscribers</p>
+    </div>
+  )}
+
+  <form
+    action="https://app.kit.com/forms/7612128/subscriptions"
+    class="seva-form formkit-form newsletter-form"
+    method="post"
+    data-sv-form="7612128"
+    data-uid="775bb3f6cc"
+    data-format="inline"
+    data-version="5"
+    data-options='{"settings":{"after_subscribe":{"action":"message","success_message":"Success! Now check your email to confirm your subscription.","redirect_url":""},"analytics":{"google":null,"fathom":null,"facebook":null,"segment":null,"pinterest":null,"sparkloop":null,"googletagmanager":null},"powered_by":{"show":false},"recaptcha":{"enabled":true}},"version":"5"}'
+  >
+    <ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul>
+    <div data-element="fields" class="seva-fields formkit-fields newsletter-fields">
+      <div class="formkit-field">
+        <input
+          class="formkit-input newsletter-input"
+          name="email_address"
+          placeholder="your@email.com"
+          required
+          type="email"
+          aria-label="Email Address"
+        >
+      </div>
+      <button
+        data-element="submit"
+        class="formkit-submit newsletter-submit"
+        type="submit"
+      >
+        <div class="formkit-spinner"><div></div><div></div><div></div></div>
+        <span>Subscribe</span>
+      </button>
+    </div>
+  </form>
+
+  {showTestimonials && (
+    <div class="testimonials">
+      <h4>What Readers Say:</h4>
+      <div class="testimonial-grid">
+        {testimonials.map((testimonial) => (
+          <blockquote class="testimonial">
+            <p>"{testimonial.text}"</p>
+            <cite>— Reader of {testimonial.story}</cite>
+          </blockquote>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
+<style>
+  .newsletter-cta {
+    margin: 2em 0;
+  }
+
+  .newsletter-cta-default {
+    background: linear-gradient(135deg, rgba(84, 142, 155, 0.1) 0%, rgba(190, 214, 221, 0.3) 100%);
+    border-radius: 16px;
+    padding: 2.5em;
+    border: 2px solid rgba(84, 142, 155, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .newsletter-cta-footer {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 2em;
+    border: 1px solid rgba(84, 142, 155, 0.15);
+  }
+
+  .newsletter-cta-inline {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 1.5em;
+    border: 2px solid rgba(84, 142, 155, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .cta-header {
+    text-align: center;
+    margin-bottom: 1.5em;
+  }
+
+  .cta-header h3 {
+    font-size: 1.8em;
+    margin-bottom: 0.3em;
+    color: #333;
+    font-family: var(--font-family-serif);
+  }
+
+  .cta-header h4 {
+    font-size: 1.4em;
+    margin-bottom: 0.5em;
+    color: var(--text-color);
+    font-family: var(--font-family-serif);
+  }
+
+  .cta-tagline {
+    font-size: 1.1em;
+    color: #555;
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* ConvertKit Form Overrides */
+  .newsletter-form {
+    box-sizing: border-box;
+  }
+
+  .newsletter-form * {
+    box-sizing: border-box;
+  }
+
+  .formkit-field {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .newsletter-fields {
+    display: flex;
+    gap: 0.8em;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .newsletter-input {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    background: white;
+    color: #333;
+    transition: all 0.3s ease;
+  }
+
+  .newsletter-input:focus {
+    outline: none;
+    border-color: var(--primary-color, #548e9b);
+    box-shadow: 0 0 0 3px rgba(84, 142, 155, 0.1);
+  }
+
+  .newsletter-submit {
+    padding: 12px 24px;
+    background: var(--primary-color, #548e9b);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 110px;
+    flex-shrink: 0;
+  }
+
+  .newsletter-submit:hover {
+    background: #4a7d88;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(84, 142, 155, 0.3);
+  }
+
+  .newsletter-submit:focus {
+    outline: none;
+  }
+
+  .formkit-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+  }
+
+  .formkit-spinner div {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+    animation: formkit-spinner 1.2s infinite ease-in-out;
+    display: inline-block;
+    margin: 0 1px;
+  }
+
+  .formkit-spinner div:nth-child(1) { animation-delay: -0.32s; }
+  .formkit-spinner div:nth-child(2) { animation-delay: -0.16s; }
+  .formkit-spinner div:nth-child(3) { animation-delay: 0s; }
+
+  @keyframes formkit-spinner {
+    0%, 80%, 100% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    40% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .formkit-alert {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.8em 0;
+    font-size: 0.85em;
+    color: #d73527;
+    background: rgba(215, 53, 39, 0.1);
+    border: 1px solid rgba(215, 53, 39, 0.2);
+    border-radius: 6px;
+    padding: 0.5em 0.8em;
+    display: none;
+  }
+
+  .formkit-alert li {
+    margin: 0;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    margin-top: 2.5em;
+    padding-top: 2em;
+    border-top: 1px solid rgba(84, 142, 155, 0.2);
+  }
+
+  .testimonials h4 {
+    text-align: center;
+    font-size: 1.3em;
+    margin-bottom: 1.5em;
+    color: #333;
+    font-family: var(--font-family-serif);
+  }
+
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5em;
+  }
+
+  .testimonial {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1.5em;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color, #548e9b);
+    margin: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .testimonial p {
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #555;
+    margin: 0 0 0.8em 0;
+    font-style: italic;
+  }
+
+  .testimonial cite {
+    font-size: 0.85em;
+    color: #777;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .newsletter-cta-default {
+      padding: 1.5em;
+    }
+
+    .newsletter-fields {
+      flex-direction: column;
+      gap: 0.6em;
+      max-width: none;
+    }
+
+    .newsletter-input {
+      min-width: auto;
+      width: 100%;
+    }
+
+    .newsletter-submit {
+      width: 100%;
+      min-width: auto;
+      flex-shrink: 1;
+    }
+
+    .cta-header h3 {
+      font-size: 1.5em;
+    }
+
+    .cta-tagline {
+      font-size: 1em;
+    }
+
+    .testimonial-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
