@@ -185,10 +185,15 @@ If you run into any issues or have questions:
 2. Contact the developer who set this up
 3. Check the [Decap CMS documentation](https://decapcms.org/docs/)
 
-## Authentication Setup (First Time Only)
+## Authentication & Access
 
-For the CMS to work, you need:
-1. A GitHub account with access to the `BekahHW/siblings-write` repository
-2. To be added as a collaborator on the repository
+To use the CMS, you need:
+1. A GitHub account
+2. Collaborator access to the `BekahHW/siblings-write` repository
+3. The site to be deployed with OAuth configured (usually Netlify)
 
-If you can't log in, ask the repository owner to add you as a collaborator.
+**First time setup?** See the [Authentication Setup Guide](README-CMS-AUTH-SETUP.md) for complete deployment and authentication instructions.
+
+If you can't log in, ask the repository owner to:
+- Add you as a collaborator on GitHub
+- Verify OAuth is properly configured

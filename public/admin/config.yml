@@ -1,14 +1,11 @@
 backend:
   name: github
   repo: BekahHW/siblings-write
-  branch: main # or your default branch
+  branch: main
 
-# For local development, you can use this instead:
-# backend:
-#   name: git-gateway
-
-# For local testing without authentication
-# local_backend: true
+# Enable local testing mode - run "npx decap-server" in terminal
+# then access the CMS to test without authentication
+local_backend: true
 
 media_folder: "public/assets"
 public_folder: "/assets"
