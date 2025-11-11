@@ -1,8 +1,8 @@
 ---
 title: "Escape from Browns Island: Day 6 — The Final Trial"
-publishDate: 25 June 2025
-description: “No man ever steps in the same river twice, for it is not the same river and he is not the same man.” — Heraclitus
-author: zach
+publishDate: "25 June 2025"
+description: '"No man ever steps in the same river twice, for it is not the same river and he is not the same man." — Heraclitus'
+authors: [zach]
 hidden: true
 ---
 
