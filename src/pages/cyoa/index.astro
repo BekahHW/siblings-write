@@ -1,0 +1,116 @@
+---
+import PostHogLayout from '../../layouts/PostHogLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const title = 'Choose Your Own Adventure';
+const description = 'Interactive stories where you control the narrative.';
+const permalink = `${Astro.site.href}cyoa`;
+const allStories = await getCollection('cyoa', ({ data }) => data.hidden !== true);
+const sortedStories = allStories.sort((a, b) =>
+  new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
+);
+// Fetch all author entries
+const authorEntries = await getCollection('authors');
+const getAuthorName = (authorId) => {
+  const author = authorEntries.find(a => a.id === authorId);
+  return author ? author.data.name : authorId;
+};
+---
+<PostHogLayout>
+  <BaseLayout title={title} description={description} permalink={permalink} current="cyoa">
+    <div class="container">
+      <h1>Choose Your Own Adventure</h1>
+      <p class="intro">
+        Welcome to our collection of interactive stories! Each adventure presents you with choices
+        that shape the narrative. Make your decisions carefully—every choice matters.
+      </p>
+
+      {sortedStories.map((story, index) => {
+        return (
+          <div>
+            { index !== 0 && <hr /> }
+            <div class="story-item">
+              <h2>
+                <a href={`/cyoa/${story.id}`}>{story.data.title}</a>
+              </h2>
+              <p>{story.data.description}</p>
+              <div class="story-meta">
+                <span class="story-item-author">
+                  By <a href={`/authors/${story.data.author.id}`}>{getAuthorName(story.data.author.id)}</a>
+                </span>
+                <span class="story-item-date">— {story.data.publishDate}</span>
+              </div>
+              <a href={`/cyoa/${story.id}`} class="start-button">Begin Adventure →</a>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  </BaseLayout>
+</PostHogLayout>
+
+<style>
+  .intro {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  h2,
+  .story-item-footer {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+  }
+
+  .story-item {
+    margin-bottom: 1rem;
+  }
+
+  .story-item h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  .story-item p {
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  .story-meta {
+    margin-bottom: 1rem;
+  }
+
+  .story-item-date {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-right: 16px;
+  }
+
+  .story-item-author {
+    color: var(--text-primary);
+    margin-right: 8px;
+  }
+
+  .start-button {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background: var(--theme-accent, #4A90E2);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .start-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  hr {
+    margin: 60px auto;
+  }
+</style>

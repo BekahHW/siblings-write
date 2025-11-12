@@ -24,5 +24,17 @@ const blog = defineCollection({
   }),
 });
 
+// Define the schema for the CYOA (Choose Your Own Adventure) collection
+const cyoa = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/cyoa" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    publishDate: z.string(),
+    author: reference("authors"),
+    hidden: z.boolean().optional(),
+  }),
+});
+
 // Export the collections
-export const collections = { authors, blog };
+export const collections = { authors, blog, cyoa };
