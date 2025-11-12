@@ -1,13 +1,23 @@
 ---
 import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import YouTubeVideosList from '../components/YouTubeVideosList.astro';
 import youtubeVideos from '../data/youtube-videos.json';
+
+// Get homepage settings
+const homepageSettings = await getEntry('pages', 'homepage');
 
 const title = 'Siblings Write';
 const description = 'Young adult fiction, middle grade adventures, and Christmas novels by the Hawrot Siblings. Discover YA stories like Escape from Browns Island, holiday tales like The Battle for Christmas, and family-friendly adventure fiction.';
 const permalink = Astro.site.href;
+
+// Get page content from settings or use defaults
+const mainTitle = homepageSettings?.data.title || 'The Hawrot Siblings';
+const subtitle = homepageSettings?.data.subtitle || 'Stories from the Siblings Who Never Outgrew Wonder';
+const aboutText = homepageSettings?.data.about || "Josh, Bekah, and Zach grew up chasing fireflies and building snow forts in Steubenville, Ohio. Now we're raising kids of our own (13 total!) and writing stories that capture the magic of our childhood.";
+const newsletterIntro = homepageSettings?.data.newsletterIntro || 'Stay updated with our latest stories:';
+
 // Get all blog posts and sort by date (descending)
 const allPosts = await getCollection('blog', ({ data }) => data.hidden !== true);
 const latestPosts = allPosts
@@ -35,14 +45,14 @@ const getAuthorsDisplay = (authorRefs) => {
   <BaseLayout title={title} description={description} permalink={permalink}>
     <div class="home-container">
       <div class="home-copy">
-        <h1>The Hawrot Siblings</h1>
+        <h1>{mainTitle}</h1>
         <div class="about-content">
-          <h2>Stories from the Siblings Who Never Outgrew Wonder</h2>
-          <p>Josh, Bekah, and Zach grew up chasing fireflies and building snow forts in Steubenville, Ohio. Now we’re raising kids of our own (13 total!) and writing stories that capture the magic of our childhood.</p>
-          
+          <h2>{subtitle}</h2>
+          <p>{aboutText}</p>
+
           <!-- Newsletter Form Integrated -->
           <div class="newsletter-callout">
-            <p class="newsletter-intro">Stories that make you believe in magic - delivered first to subscribers</p>
+            <p class="newsletter-intro">{newsletterIntro}</p>
             <form 
               action="https://app.kit.com/forms/7612128/subscriptions" 
               class="seva-form formkit-form newsletter-form-inline" 
