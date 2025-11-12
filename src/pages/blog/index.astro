@@ -2,10 +2,32 @@
 import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
+import NewsletterCTA from '../../components/NewsletterCTA.astro';
 
 const title = 'Stories';
-const description = 'Latest stories.';
+const description = 'Short stories, fiction, and creative writing by the Hawrot Siblings. Explore original stories featuring adventure, family, and wonder from authors of young adult and middle grade fiction.';
 const permalink = `${Astro.site.href}blog`;
+
+// Breadcrumb structured data
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": Astro.site.href
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Stories",
+      "item": permalink
+    }
+  ]
+};
+
 const allPosts = await getCollection('blog', ({ data }) => data.hidden !== true);
 const sortedPosts = allPosts.sort((a, b) => 
   new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
@@ -16,11 +38,24 @@ const getAuthorName = (authorId) => {
   const author = authorEntries.find(a => a.id === authorId);
   return author ? author.data.name : authorId; // Fallback to ID if author not found
 };
+
+// Helper to get multiple author names formatted
+const getAuthorsDisplay = (authorRefs) => {
+  if (!authorRefs || authorRefs.length === 0) return '';
+  const names = authorRefs.map(ref => getAuthorName(ref.id));
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+};
 ---
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink} current="blog">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
     <div class="container">
       <h1>Our Short Stories</h1>
+
+      <NewsletterCTA variant="default" showTestimonials={false} tagline="Stories that make you believe in magic - delivered first to subscribers" heading="Enjoying our stories?" />
+
       {sortedPosts.map((post, index) => {
         return (
           <div>
@@ -31,7 +66,14 @@ const getAuthorName = (authorId) => {
               </h2>
               <p>{post.data.description}</p>
               <span class="post-item-author">
-                By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a>
+                By {post.data.authors.map((authorRef, idx) => (
+                  <>
+                    <a href={`/authors/${authorRef.id}`}>{getAuthorName(authorRef.id)}</a>
+                    {idx < post.data.authors.length - 1 && (
+                      idx === post.data.authors.length - 2 ? ' and ' : ', '
+                    )}
+                  </>
+                ))}
               </span>
               <span class="post-item-date">— {post.data.publishDate}</span>
             </div>

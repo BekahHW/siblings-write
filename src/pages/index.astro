@@ -1,11 +1,23 @@
 ---
 import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
+import YouTubeVideosList from '../components/YouTubeVideosList.astro';
+import youtubeVideos from '../data/youtube-videos.json';
+
+// Get homepage settings
+const homepageSettings = await getEntry('pages', 'homepage');
 
 const title = 'Siblings Write';
-const description = 'The Hawrot Siblings Writing Blog.';
+const description = 'Young adult fiction, middle grade adventures, and Christmas novels by the Hawrot Siblings. Discover YA stories like Escape from Browns Island, holiday tales like The Battle for Christmas, and family-friendly adventure fiction.';
 const permalink = Astro.site.href;
+
+// Get page content from settings or use defaults
+const mainTitle = homepageSettings?.data.title || 'The Hawrot Siblings';
+const subtitle = homepageSettings?.data.subtitle || 'Stories from the Siblings Who Never Outgrew Wonder';
+const aboutText = homepageSettings?.data.about || "Josh, Bekah, and Zach grew up chasing fireflies and building snow forts in Steubenville, Ohio. Now we're raising kids of our own (13 total!) and writing stories that capture the magic of our childhood.";
+const newsletterIntro = homepageSettings?.data.newsletterIntro || 'Stay updated with our latest stories:';
+
 // Get all blog posts and sort by date (descending)
 const allPosts = await getCollection('blog', ({ data }) => data.hidden !== true);
 const latestPosts = allPosts
@@ -18,20 +30,29 @@ const getAuthorName = (authorId) => {
   const author = authorEntries.find(a => a.id === authorId);
   return author ? author.data.name : authorId; // Fallback to ID if author not found
 };
+
+// Helper to get multiple author names formatted
+const getAuthorsDisplay = (authorRefs) => {
+  if (!authorRefs || authorRefs.length === 0) return '';
+  const names = authorRefs.map(ref => getAuthorName(ref.id));
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+};
 ---
 
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink}>
     <div class="home-container">
       <div class="home-copy">
-        <h1>The Hawrot Siblings</h1>
+        <h1>{mainTitle}</h1>
         <div class="about-content">
-          <h2>Stories from the Siblings Who Never Outgrew Wonder</h2>
-          <p>Josh, Bekah, and Zach grew up chasing fireflies and building snow forts in Steubenville, Ohio. Now we’re raising kids of our own (13 total!) and writing stories that capture the magic of our childhood.</p>
-          
+          <h2>{subtitle}</h2>
+          <p>{aboutText}</p>
+
           <!-- Newsletter Form Integrated -->
           <div class="newsletter-callout">
-            <p class="newsletter-intro">Stay updated with our latest stories:</p>
+            <p class="newsletter-intro">{newsletterIntro}</p>
             <form 
               action="https://app.kit.com/forms/7612128/subscriptions" 
               class="seva-form formkit-form newsletter-form-inline" 
@@ -71,7 +92,7 @@ const getAuthorName = (authorId) => {
       <div class="hero-image-container">
         <picture>
           <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
-          <img class="hero-image" alt="the Hawrot Siblings" src="/assets/Hawrot-Siblings.png" width="550" height="466">
+          <img class="hero-image" alt="The Hawrot Siblings - Josh, Bekah, and Zach - authors of young adult fiction, middle grade adventures, and Christmas novels" src="/assets/Hawrot-Siblings.png" width="550" height="466">
         </picture>
       </div>
     </div>
@@ -89,7 +110,14 @@ const getAuthorName = (authorId) => {
                 <h3>{post.data.title}</h3>
                 <div class="post-meta">
                   <span class="post-item-author">
-                    By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a> | 
+                    By {post.data.authors.map((authorRef, idx) => (
+                      <>
+                        <a href={`/authors/${authorRef.id}`}>{getAuthorName(authorRef.id)}</a>
+                        {idx < post.data.authors.length - 1 && (
+                          idx === post.data.authors.length - 2 ? ' and ' : ', '
+                        )}
+                      </>
+                    ))} |
                   </span>
                   <span class="post-date">
                     {new Date(post.data.publishDate).toLocaleDateString(undefined, {
@@ -105,7 +133,9 @@ const getAuthorName = (authorId) => {
         ))}
       </ul>
     </section>
-    
+
+    <YouTubeVideosList videos={youtubeVideos} limit={4} />
+
     <!-- Success Modal -->
     <div id="success-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content">

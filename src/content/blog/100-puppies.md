@@ -2,7 +2,7 @@
 title: 100 Puppies
 description: '📚  100 Puppies:  A Hawrot Siblings Micro-Monthly Story'
 publishDate: '2025-10-04'
-author: zach
+authors: [zach]
 ---
 ![100 Puppies image](https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/9UoR4mUeisZzuCHZacrKu5)
 

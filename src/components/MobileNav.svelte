@@ -1,14 +1,13 @@
 <!-- A Svelte component for mobile navigation -->
 <script>
-  import ThemeToggleButton from './ThemeToggleButton.svelte';
-  
   export let current = '';
-  
+  export let showCyoa = false;
+
   let menuOpen = false;
-  
+
   function toggleMenu() {
     menuOpen = !menuOpen;
-    
+
     if (menuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -33,12 +32,12 @@
   <a class={current === "" ? "selected" : ""} href='/'>home</a>
   <a class={current === "blog" ? "selected" : ""} href='/blog'>shorts</a>
   <a class={current === "one-word-story" ? "selected" : ""} href='/one-word-story'>collab</a>
+  {#if showCyoa}
+    <a class={current === "cyoa" ? "selected" : ""} href='/cyoa'>CYOA</a>
+  {/if}
   <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
   <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
   <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
-  <div class="theme-toggle-container mobile-theme-toggle">
-    <ThemeToggleButton />
-  </div>
 </nav>
 
 <style>
@@ -128,10 +127,6 @@
     transform: scaleX(1);
   }
 
-  .mobile-theme-toggle {
-    margin: 20px auto;
-  }
-  
   /* Mobile overlay */
   .mobile-overlay {
     position: fixed;

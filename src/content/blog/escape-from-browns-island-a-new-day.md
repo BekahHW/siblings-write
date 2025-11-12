@@ -1,8 +1,8 @@
 ---
 title: "Escape from Browns Island: A New Day"
-publishDate: 18 June 2025
-description: “No man ever steps in the same river twice, for it is not the same river and he is not the same man.” — Heraclitus
-author: zach
+publishDate: "18 June 2025"
+description: '"No man ever steps in the same river twice, for it is not the same river and he is not the same man." — Heraclitus'
+authors: [zach]
 hidden: true
 ---
 

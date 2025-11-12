@@ -18,6 +18,7 @@
     "22": "^0.0.0",
     "@astrojs/mdx": "^4.2.1",
     "@astrojs/node": "^9.5.0",
+    "@astrojs/sitemap": "^3.6.0",
     "@astrojs/svelte": "^7.0.6",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",

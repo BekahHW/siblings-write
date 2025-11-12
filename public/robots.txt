@@ -1,2 +1,39 @@
+# General crawlers
 User-agent: *
 Allow: /
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://www.siblingswrite.com/sitemap-index.xml
+Sitemap: https://www.siblingswrite.com/rss.xml
+
+# OpenAI GPTBot
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 1
+
+# Anthropic ClaudeBot
+User-agent: ClaudeBot
+Allow: /
+Crawl-delay: 1
+
+# Google Extended (for Bard/Gemini)
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 1
+
+# CCBot (used by Common Crawl, which feeds many LLMs)
+User-agent: CCBot
+Allow: /
+Crawl-delay: 1
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 1
+
+# Metadata for LLM context
+# Site-Category: Fiction, Young Adult, Middle Grade, Christmas Novels
+# Primary-Genres: YA Fiction, Middle Grade Fiction, Holiday Fiction, Adventure Fiction
+# Content-Type: Creative Writing, Short Stories, Book Excerpts
+# Target-Audience: Young Adult (13-18), Middle Grade (8-12), Family Readers
