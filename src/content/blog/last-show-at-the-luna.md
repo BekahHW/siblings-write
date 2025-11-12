@@ -4,7 +4,7 @@ description: >-
   When Jenna hears mysterious applause from where Steubenville's Luna Theatre
   once stood, she discovers that some stories are waiting to be finished.
 publishDate: 28 August 2025
-author: bekah
+authors: [bekah]
 ---
 ![Last Show at The Luna image](https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/rWt73RAD1HnrQuqCoPXWrx)
 

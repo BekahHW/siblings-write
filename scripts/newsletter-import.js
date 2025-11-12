@@ -266,7 +266,7 @@ function convertToAstroMarkdown(newsletter) {
     title: extractedTitle || newsletter.name || 'Untitled Newsletter',
     description: newsletter.preview_text || newsletter.subject || '',
     publishDate: formatISO(new Date(newsletter.published_at || newsletter.send_at || newsletter.sent_at || newsletter.created_at || new Date())),
-    author: authorId.toLowerCase(),
+    authors: [authorId.toLowerCase()],
   };
   
   // Extract featured image from content
@@ -410,17 +410,17 @@ async function testCreatedPost(filepath) {
     
     // Check for required elements
     const hasTitle = content.includes('title:');
-    const hasAuthor = content.includes('author:');
+    const hasAuthors = content.includes('authors:');
     const hasPublishDate = content.includes('publishDate:');
     const hasDescription = content.includes('description:');
     const hasContent = content.split('---').length > 2 && content.split('---')[2].trim().length > 0;
-    
+
     // Check if all elements are present
-    const allElementsPresent = hasTitle && hasAuthor && hasPublishDate && hasDescription && hasContent;
-    
+    const allElementsPresent = hasTitle && hasAuthors && hasPublishDate && hasDescription && hasContent;
+
     console.log(`Test results for ${path.basename(filepath)}:`);
     console.log(`- Title: ${hasTitle ? '✅' : '❌'}`);
-    console.log(`- Author: ${hasAuthor ? '✅' : '❌'}`);
+    console.log(`- Authors: ${hasAuthors ? '✅' : '❌'}`);
     console.log(`- Publish Date: ${hasPublishDate ? '✅' : '❌'}`);
     console.log(`- Description: ${hasDescription ? '✅' : '❌'}`);
     console.log(`- Content: ${hasContent ? '✅' : '❌'}`);

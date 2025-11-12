@@ -18,6 +18,15 @@ const getAuthorName = (authorId) => {
   const author = authorEntries.find(a => a.id === authorId);
   return author ? author.data.name : authorId; // Fallback to ID if author not found
 };
+
+// Helper to get multiple author names formatted
+const getAuthorsDisplay = (authorRefs) => {
+  if (!authorRefs || authorRefs.length === 0) return '';
+  const names = authorRefs.map(ref => getAuthorName(ref.id));
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+};
 ---
 
 <PostHogLayout>
@@ -31,7 +40,7 @@ const getAuthorName = (authorId) => {
           
           <!-- Newsletter Form Integrated -->
           <div class="newsletter-callout">
-            <p class="newsletter-intro">Stay updated with our latest stories:</p>
+            <p class="newsletter-intro">Stories that make you believe in magic - delivered first to subscribers</p>
             <form 
               action="https://app.kit.com/forms/7612128/subscriptions" 
               class="seva-form formkit-form newsletter-form-inline" 
@@ -89,7 +98,14 @@ const getAuthorName = (authorId) => {
                 <h3>{post.data.title}</h3>
                 <div class="post-meta">
                   <span class="post-item-author">
-                    By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a> | 
+                    By {post.data.authors.map((authorRef, idx) => (
+                      <>
+                        <a href={`/authors/${authorRef.id}`}>{getAuthorName(authorRef.id)}</a>
+                        {idx < post.data.authors.length - 1 && (
+                          idx === post.data.authors.length - 2 ? ' and ' : ', '
+                        )}
+                      </>
+                    ))} |
                   </span>
                   <span class="post-date">
                     {new Date(post.data.publishDate).toLocaleDateString(undefined, {

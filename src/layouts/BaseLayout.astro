@@ -10,8 +10,9 @@ export interface Props {
   description: string;
   permalink: string;
   current?: string;
+  hideNewsletterFooter?: boolean;
 }
-const { title, description, permalink, current } = Astro.props;
+const { title, description, permalink, current, hideNewsletterFooter = false } = Astro.props;
 ---
 <html lang="en">
 <head>
@@ -69,7 +70,7 @@ const { title, description, permalink, current } = Astro.props;
       <slot />
     </main>
 
-    <Footer />
+    <Footer hideNewsletter={hideNewsletterFooter} />
   </div>
 </body>
 </html>
