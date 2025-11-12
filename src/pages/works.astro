@@ -13,15 +13,50 @@ const otherWorks = sortedWorks.filter(work => !work.data.featured);
 const worksSettings = await getEntry('pages', 'works');
 
 const title = worksSettings?.data.title || 'Our Work';
-const description = 'Discover our projects and stories.';
+const description = worksSettings?.data.description || 'Discover our young adult fiction, middle grade adventures, and Christmas novels. Browse YA fiction like Escape from Browns Island, holiday stories like The Battle for Christmas, and middle grade adventures by the Hawrot siblings.';
 const permalink = `${Astro.site.href}work`;
 const intro = worksSettings?.data.intro || "We're passionate about creating adventurous stories, that spark your imagination and bring joy to our readers. Here's a look at some of the work we've done and what we're currently working on.";
 const featuredTitle = worksSettings?.data.featuredTitle || 'Featured Work';
 const otherProjectsTitle = worksSettings?.data.otherProjectsTitle || 'Other Projects';
+
+// Generate structured data for all works
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://www.siblingswrite.com/works#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.siblingswrite.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Our Work",
+          "item": "https://www.siblingswrite.com/works"
+        }
+      ]
+    },
+    ...featuredWorks.map(work => ({
+      "@type": "Book",
+      "@id": `https://www.siblingswrite.com/work#${work.id}`,
+      "name": work.data.title,
+      "description": work.data.description,
+      "image": `https://www.siblingswrite.com${work.data.image}`,
+      "url": work.data.link,
+      "inLanguage": "en-US"
+    }))
+  ]
+};
 ---
 
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink} current="work">
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     <div class="container-new">
       <h1>{title}</h1>
       <p>{intro}</p>
@@ -31,13 +66,29 @@ const otherProjectsTitle = worksSettings?.data.otherProjectsTitle || 'Other Proj
         <>
           <h2>{featuredTitle}</h2>
           {featuredWorks.map((work) => (
-            <div class="book-section">
-              <img src={work.data.image} alt={work.data.title} width="200">
+            <article class="book-section" itemscope itemtype="https://schema.org/Book">
+              <img
+                src={work.data.image}
+                alt={`Book cover for ${work.data.title}`}
+                width="200"
+                itemprop="image"
+              >
               <div>
-                <p><strong>{work.data.title}</strong><br/>{work.data.description}</p>
-                <a href={work.data.link} target="_blank" rel="noopener" class="buy-button">Buy Now on Amazon</a>
+                <p>
+                  <strong itemprop="name">{work.data.title}</strong><br/>
+                  <span itemprop="description">{work.data.description}</span>
+                </p>
+                <a
+                  href={work.data.link}
+                  target="_blank"
+                  rel="noopener"
+                  class="buy-button"
+                  itemprop="url"
+                >
+                  Buy Now on Amazon
+                </a>
               </div>
-            </div>
+            </article>
           ))}
         </>
       )}

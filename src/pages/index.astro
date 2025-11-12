@@ -9,7 +9,7 @@ import youtubeVideos from '../data/youtube-videos.json';
 const homepageSettings = await getEntry('pages', 'homepage');
 
 const title = 'Siblings Write';
-const description = 'The Hawrot Siblings Writing Blog.';
+const description = 'Young adult fiction, middle grade adventures, and Christmas novels by the Hawrot Siblings. Discover YA stories like Escape from Browns Island, holiday tales like The Battle for Christmas, and family-friendly adventure fiction.';
 const permalink = Astro.site.href;
 
 // Get page content from settings or use defaults
@@ -92,7 +92,7 @@ const getAuthorsDisplay = (authorRefs) => {
       <div class="hero-image-container">
         <picture>
           <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
-          <img class="hero-image" alt="the Hawrot Siblings" src="/assets/Hawrot-Siblings.png" width="550" height="466">
+          <img class="hero-image" alt="The Hawrot Siblings - Josh, Bekah, and Zach - authors of young adult fiction, middle grade adventures, and Christmas novels" src="/assets/Hawrot-Siblings.png" width="550" height="466">
         </picture>
       </div>
     </div>
