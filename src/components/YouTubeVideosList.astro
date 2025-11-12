@@ -52,10 +52,32 @@ const displayVideos = videos.slice(0, limit);
 
 <style>
   .youtube-section {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.15) 100%);
     padding: 4rem 2rem;
-    border-radius: 16px;
+    border-radius: 24px;
     margin: 3rem 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0, 200, 254, 0.1);
+  }
+
+  .youtube-section::before {
+    content: '🎬';
+    position: absolute;
+    font-size: 5em;
+    top: 10px;
+    right: 20px;
+    opacity: 0.1;
+    animation: float-camera 4s ease-in-out infinite;
+  }
+
+  @keyframes float-camera {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(5deg);
+    }
   }
 
   .youtube-header {
@@ -64,16 +86,20 @@ const displayVideos = videos.slice(0, limit);
   }
 
   .section-title {
-    font-family: "Playwrite HU", cursive;
-    font-size: 2.2em;
+    font-family: var(--font-family-display, 'Fredoka', cursive);
+    font-size: 2.5em;
     margin-bottom: 0.5em;
-    color: #333;
+    background: var(--dream-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .youtube-intro {
-    font-size: 1.2em;
+    font-size: 1.3em;
     color: #555;
     margin-bottom: 2em;
+    font-style: italic;
   }
 
   .youtube-cta {
@@ -83,21 +109,38 @@ const displayVideos = videos.slice(0, limit);
 
   .cta-link {
     display: inline-block;
-    padding: 1rem 2.5rem;
-    background: #ff0000;
+    padding: 1.2rem 3rem;
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
     color: white;
     text-decoration: none;
     border-radius: 50px;
     font-weight: 700;
     font-size: 1.3rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(255, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .cta-link:hover::before {
+    left: 100%;
   }
 
   .cta-link:hover {
-    background: #cc0000;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+    background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(255, 0, 0, 0.5);
   }
 
   .videos-grid {
@@ -109,18 +152,20 @@ const displayVideos = videos.slice(0, limit);
   }
 
   .video-card {
-    background: white;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    border-radius: 16px;
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.15);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(79, 172, 254, 0.1);
   }
 
   .video-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px) rotate(1deg);
+    box-shadow: 0 20px 40px rgba(79, 172, 254, 0.3);
+    border-color: rgba(79, 172, 254, 0.4);
   }
 
   .video-thumbnail {
