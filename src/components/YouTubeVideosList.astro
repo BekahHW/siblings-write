@@ -86,14 +86,36 @@ const displayVideos = videos.slice(0, limit);
   }
 
   .section-title {
-    font-family: var(--font-family-display, 'Cormorant Garamond', serif);
+    font-family: 'Fira Code', monospace;
     font-size: 2.8em;
     font-weight: 700;
     margin-bottom: 0.5em;
-    background: var(--dream-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #667eea;
+    text-align: center;
+    position: relative;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+  }
+
+  .section-title.typing {
+    width: 0;
+    border-right: 2px solid #667eea;
+    animation: type-section 2s steps(40, end) forwards;
+  }
+
+  @keyframes type-section {
+    0% {
+      width: 0;
+    }
+    99% {
+      border-right: 2px solid #667eea;
+    }
+    100% {
+      width: 100%;
+      border-right: none;
+    }
   }
 
   .youtube-intro {

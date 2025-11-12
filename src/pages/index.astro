@@ -41,9 +41,17 @@ const getAuthorsDisplay = (authorRefs) => {
         </div>
         <div class="about-content">
           <div class="typewriter-text"></div>
-          
-          <!-- Newsletter Form Integrated -->
-          <div class="newsletter-callout">
+        </div>
+      </div>
+
+      <div class="hero-image-container">
+        <picture>
+          <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
+          <img class="hero-image" alt="the Hawrot Siblings" src="/assets/Hawrot-Siblings.png" width="550" height="466">
+        </picture>
+
+        <!-- Newsletter Form Below Picture -->
+        <div class="newsletter-callout">
             <p class="newsletter-intro">Stories that make you believe in magic - delivered first to subscribers</p>
             <form 
               action="https://app.kit.com/forms/7612128/subscriptions" 
@@ -78,14 +86,6 @@ const getAuthorsDisplay = (authorRefs) => {
               </div>
             </form>
           </div>
-        </div>
-      </div>
-
-      <div class="hero-image-container">
-        <picture>
-          <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
-          <img class="hero-image" alt="the Hawrot Siblings" src="/assets/Hawrot-Siblings.png" width="550" height="466">
-        </picture>
       </div>
     </div>
 
@@ -165,14 +165,16 @@ const getAuthorsDisplay = (authorRefs) => {
   min-width: 0;
 }
 
-/* Newsletter Callout - Integrated into home container */
+/* Newsletter Callout - Below picture */
 .newsletter-callout {
-  margin-top: 2em;
+  margin-top: 1.5em;
   padding: 1.5em;
   background: rgba(255, 255, 255, 0.7);
   border-radius: 12px;
   border: 2px solid rgba(84, 142, 155, 0.2);
   backdrop-filter: blur(10px);
+  width: 100%;
+  max-width: 550px;
 }
 
 .newsletter-intro {
@@ -474,40 +476,38 @@ const getAuthorsDisplay = (authorRefs) => {
 }
 
 .section-title {
-  font-family: var(--font-family-display, 'Cormorant Garamond', serif);
+  font-family: 'Fira Code', monospace;
   font-size: 2.8em;
   font-weight: 700;
   margin-bottom: 0.8em;
-  background: linear-gradient(135deg, #667eea 0%, #4a5568 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #667eea;
   text-align: center;
   position: relative;
-  display: inline-block;
   width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
 }
 
-.section-title::after {
-  content: '✨';
-  position: absolute;
-  right: -40px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.6em;
-  animation: twinkle 2s ease-in-out infinite;
+.section-title.typing {
+  width: 0;
+  border-right: 2px solid #667eea;
+  animation: type-section 2s steps(40, end) forwards;
 }
 
-@keyframes twinkle {
-  0%, 100% {
-    opacity: 0.3;
-    transform: translateY(-50%) scale(0.8);
+@keyframes type-section {
+  0% {
+    width: 0;
   }
-  50% {
-    opacity: 1;
-    transform: translateY(-50%) scale(1.2);
+  99% {
+    border-right: 2px solid #667eea;
+  }
+  100% {
+    width: 100%;
+    border-right: none;
   }
 }
+
 
 .post-list {
   list-style: none;
@@ -643,48 +643,38 @@ const getAuthorsDisplay = (authorRefs) => {
   transition: all 0.5s ease;
 }
 
-.home-container::before {
-  content: '✨';
+.home-container::before,
+.home-container::after {
+  content: '';
   position: absolute;
-  font-size: 3em;
-  top: 20px;
-  right: 30px;
-  animation: float-sparkle 3s ease-in-out infinite;
-  opacity: 0.7;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
+  animation: sparkle-animation 3s ease-in-out infinite;
 }
 
-.home-container::before:hover {
-  transform: scale(1.5) rotate(20deg);
-  opacity: 1;
+.home-container::before {
+  top: 20%;
+  right: 15%;
+  animation-delay: 0s;
 }
 
 .home-container::after {
-  content: '🌙';
-  position: absolute;
-  font-size: 2.5em;
-  bottom: 30px;
-  left: 40px;
-  animation: float-moon 4s ease-in-out infinite;
-  opacity: 0.6;
+  bottom: 25%;
+  left: 10%;
+  animation-delay: 1.5s;
 }
 
-@keyframes float-sparkle {
+@keyframes sparkle-animation {
   0%, 100% {
-    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+    transform: scale(0);
   }
   50% {
-    transform: translateY(-15px) rotate(10deg);
-  }
-}
-
-@keyframes float-moon {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(10px) rotate(-5deg);
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -700,7 +690,7 @@ const getAuthorsDisplay = (authorRefs) => {
 
 .title-container {
   width: 100%;
-  margin: 0 auto 2em;
+  margin: 0 auto 1em;
   text-align: center;
 }
 
@@ -722,7 +712,7 @@ const getAuthorsDisplay = (authorRefs) => {
 .title-line-2 {
   opacity: 0;
   font-family: var(--font-family-display, 'Cormorant Garamond', serif);
-  margin: 0.2em auto 0;
+  margin: 0 auto;
   background: linear-gradient(to right, #667eea 0%, #764ba2 50%, #f093fb 100%);
   font-weight: 800;
   font-size: 4em;
@@ -746,7 +736,7 @@ const getAuthorsDisplay = (authorRefs) => {
     border-right: 2px solid #667eea;
   }
   100% {
-    width: 10ch;
+    width: 15ch;
     border-right: none;
   }
 }
@@ -772,7 +762,7 @@ const getAuthorsDisplay = (authorRefs) => {
   100% {
     background-position: 100% center;
     opacity: 1;
-    width: 17ch;
+    width: 18ch;
     border-right: none;
   }
 }
@@ -825,38 +815,32 @@ const getAuthorsDisplay = (authorRefs) => {
   font-size: 1.1em;
   line-height: 1.8;
   margin-bottom: 1.5em;
-  color: #555;
-  min-height: 400px;
+  min-height: 200px;
 }
 
 .typewriter-text p {
   margin-bottom: 1em;
   opacity: 0;
-  animation: fade-in 0.3s ease-in forwards;
+  background: linear-gradient(90deg, #667eea 0%, #555 50%, #2d2d3f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  animation: fade-in-gradient 3s ease-out forwards;
 }
 
-@keyframes fade-in {
-  to {
-    opacity: 1;
-  }
-}
-
-.typewriter-cursor {
-  display: inline-block;
-  width: 2px;
-  height: 1em;
-  background-color: #667eea;
-  margin-left: 2px;
-  animation: blink 0.7s infinite;
-  vertical-align: text-bottom;
-}
-
-@keyframes blink {
-  0%, 49% {
-    opacity: 1;
-  }
-  50%, 100% {
+@keyframes fade-in-gradient {
+  0% {
     opacity: 0;
+    background-position: 0% 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    background-position: 100% 0;
   }
 }
 
@@ -1043,66 +1027,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 2000);
   }
 
-  // Typewriter effect for the story
+  // Fade-in effect for the story with fireflies and snowballs
   const typewriterContainer = document.querySelector('.typewriter-text');
   if (typewriterContainer) {
-    const storyText = "Once upon a time, in a small town called Steubenville, Ohio, there lived three siblings named Josh, Bekah, and Zach who spent their childhood chasing fireflies through summer twilights and building snow forts that felt like castles. The years turned, as they always do, and those three children grew up and became parents to thirteen little ones of their own. But here's the secret about some people: they never quite stop being children in the ways that matter most. So Josh, Bekah, and Zach did what all storytellers do when they want to keep the magic alive. They began writing down the wonder they remembered, creating stories that tasted like childhood and felt like home, because some people never outgrow wonder. They just learn to share.";
+    const storyText = "Once upon a time, in a small town called Steubenville, Ohio, there lived three siblings named Josh, Bekah, and Zach who spent their childhood chasing fireflies through summer twilights and building snow forts that felt like castles in the winter. The years turned, as they always do, and those three children grew up and became parents to thirteen little ones of their own. But here's the secret: they never quite stopped being children in the ways that matter most. So they began writing down the wonder they remembered, creating stories that tasted like childhood, because some people never outgrow wonder. They just learn to share it.";
 
-    let currentChar = 0;
-    let currentElement = null;
-    let cursorElement = null;
-    let fireflyInterval = null;
-    let snowballInterval = null;
+    // Create paragraph with story text
+    const storyParagraph = document.createElement('p');
+    storyParagraph.textContent = storyText;
+    typewriterContainer.appendChild(storyParagraph);
 
-    function typeWriter() {
-      if (currentChar >= storyText.length) {
-        // Remove cursor when done
-        if (cursorElement) {
-          cursorElement.remove();
-        }
-        // Stop creating fireflies and snowballs
-        if (fireflyInterval) clearInterval(fireflyInterval);
-        if (snowballInterval) clearInterval(snowballInterval);
-        return;
-      }
+    // Start creating fireflies and snowballs during fade-in
+    const fireflyInterval = setInterval(createFirefly, 800);
+    const snowballInterval = setInterval(createSnowball, 1200);
 
-      // Create paragraph element if needed
-      if (!currentElement) {
-        currentElement = document.createElement('p');
-        typewriterContainer.appendChild(currentElement);
-
-        // Add cursor
-        cursorElement = document.createElement('span');
-        cursorElement.className = 'typewriter-cursor';
-        currentElement.appendChild(cursorElement);
-
-        // Start creating fireflies and snowballs
-        fireflyInterval = setInterval(createFirefly, 800);
-        snowballInterval = setInterval(createSnowball, 1200);
-      }
-
-      // Insert character before cursor
-      const textNode = document.createTextNode(storyText.charAt(currentChar));
-      currentElement.insertBefore(textNode, cursorElement);
-      currentChar++;
-
-      // Variable speed: faster for spaces, slower for punctuation
-      let speed = 25; // Base speed
-      if (storyText.charAt(currentChar - 1) === ' ') {
-        speed = 15;
-      } else if (['.', '!', '?'].includes(storyText.charAt(currentChar - 1))) {
-        speed = 350;
-      } else if ([',', ';', ':'].includes(storyText.charAt(currentChar - 1))) {
-        speed = 180;
-      }
-
-      setTimeout(typeWriter, speed);
-    }
-
-    // Start typing after the title animations complete (4.2 seconds)
+    // Stop animations after story fade completes (7.5 seconds total: 4.5s delay + 3s fade)
     setTimeout(() => {
-      typeWriter();
-    }, 4500);
+      clearInterval(fireflyInterval);
+      clearInterval(snowballInterval);
+    }, 7500);
   }
 });
 
@@ -1434,7 +1377,7 @@ function requestTick() {
 
 window.addEventListener('scroll', requestTick, { passive: true });
 
-// Scroll reveal animations
+// Scroll reveal animations with typewriter effects
 const observerOptions = {
   threshold: 0.15,
   rootMargin: '0px 0px -100px 0px'
@@ -1445,6 +1388,13 @@ const observer = new IntersectionObserver((entries) => {
     if (entry.isIntersecting) {
       entry.target.style.opacity = '1';
       entry.target.style.transform = 'translateY(0)';
+
+      // Add typing animation to section titles
+      const sectionTitle = entry.target.querySelector('.section-title');
+      if (sectionTitle && !sectionTitle.classList.contains('typed')) {
+        sectionTitle.classList.add('typing');
+        sectionTitle.classList.add('typed');
+      }
     }
   });
 }, observerOptions);
