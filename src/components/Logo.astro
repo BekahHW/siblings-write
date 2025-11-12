@@ -3,7 +3,6 @@
     text-decoration: none;
     color: inherit;
     display: block;
-    position: relative;
   }
 
   .logo-text {
@@ -12,68 +11,11 @@
     font-size: 1.5rem;
     letter-spacing: -0.5px;
     color: var(--text-main);
-    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    position: relative;
-    display: inline-block;
+    transition: color 0.3s ease;
   }
 
   .logo-link:hover .logo-text {
-    font-family: var(--font-family-storybook);
-    letter-spacing: 1px;
-    color: #5d4e37;
-    transform: scale(1.1);
-  }
-
-  /* Vine decorations that appear on hover */
-  .logo-text::before,
-  .logo-text::after {
-    content: '🌿';
-    position: absolute;
-    font-size: 1.2em;
-    opacity: 0;
-    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  }
-
-  .logo-text::before {
-    left: -25px;
-    top: 50%;
-    transform: translateY(-50%) rotate(-45deg) scale(0);
-  }
-
-  .logo-text::after {
-    right: -25px;
-    top: 50%;
-    transform: translateY(-50%) rotate(45deg) scale(0);
-  }
-
-  .logo-link:hover .logo-text::before {
-    opacity: 1;
-    transform: translateY(-50%) rotate(-45deg) scale(1);
-    animation: vine-sway-left 2s ease-in-out infinite;
-  }
-
-  .logo-link:hover .logo-text::after {
-    opacity: 1;
-    transform: translateY(-50%) rotate(45deg) scale(1);
-    animation: vine-sway-right 2s ease-in-out infinite;
-  }
-
-  @keyframes vine-sway-left {
-    0%, 100% {
-      transform: translateY(-50%) rotate(-45deg) scale(1);
-    }
-    50% {
-      transform: translateY(-50%) rotate(-35deg) scale(1.05);
-    }
-  }
-
-  @keyframes vine-sway-right {
-    0%, 100% {
-      transform: translateY(-50%) rotate(45deg) scale(1);
-    }
-    50% {
-      transform: translateY(-50%) rotate(35deg) scale(1.05);
-    }
+    color: var(--primary-color);
   }
 
   @media screen and (max-width: 520px) {
