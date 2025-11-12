@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Story table: stores the current and archived stories
 CREATE TABLE IF NOT EXISTS story (
   id BIGSERIAL PRIMARY KEY,
-  story_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+  story_id UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
   words TEXT NOT NULL DEFAULT '',
   word_count INTEGER NOT NULL DEFAULT 0,
   last_contributor_id TEXT,
