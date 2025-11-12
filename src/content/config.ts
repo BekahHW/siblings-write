@@ -18,7 +18,7 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string(),
     publishDate: z.string(),
-    author: reference("authors"),
+    authors: z.array(reference("authors")),
     hidden: z.boolean().optional(),
     youtubeId: z.string().optional(),
   }),

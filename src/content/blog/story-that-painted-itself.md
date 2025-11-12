@@ -2,7 +2,7 @@
 title: "The Story that Painted Itself"
 publishDate: 4 April 2025
 description: What's painted on the surface might lead to what's buried beneath.
-author: bekah
+authors: [bekah]
 youtubeId: "XWv_UUHLBVE"
 ---
 
