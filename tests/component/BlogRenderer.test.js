@@ -12,7 +12,7 @@ const mockBlogPosts = [
       title: 'Test Post',
       description: 'This is a test post',
       publishDate: new Date('2023-01-01'),
-      author: { id: 'bekah' },
+      authors: [{ id: 'bekah' }],
       image: { src: '/assets/blog/test-image.jpg', alt: 'Test image' }
     }
   }
@@ -71,7 +71,7 @@ const mockRenderBlogPost = async (post) => {
     title: post.data.title,
     description: post.data.description,
     publishDate: post.data.publishDate,
-    author: post.data.author,
+    authors: post.data.authors,
     image: post.data.image,
     content: post.body,
     // Add other properties as needed
@@ -122,8 +122,9 @@ describe('Blog Post Component Rendering', () => {
       expect(renderedPost.publishDate).toBeDefined();
     });
 
-    it('should render the author information', () => {
-      expect(renderedPost.author).toEqual(originalPost.data.author);
+    it('should render the authors information', () => {
+      expect(renderedPost.authors).toEqual(originalPost.data.authors);
+      expect(Array.isArray(renderedPost.authors)).toBe(true);
     });
 
     it('should render the content', () => {
