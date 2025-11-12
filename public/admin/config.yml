@@ -1,9 +1,8 @@
 backend:
-  name: github
-  repo: BekahHW/siblings-write
+  name: git-gateway
   branch: main
 
-# Enable local testing mode - run "npx decap-server" in terminal
+# Enable local testing mode - run "npm run cms:local" in terminal
 # then access the CMS to test without authentication
 local_backend: true
 

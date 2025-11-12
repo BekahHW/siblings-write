@@ -12,9 +12,11 @@ Decap CMS is a user-friendly content management system that lets you edit websit
 
 1. Go to your website URL followed by `/admin`
    - Example: `https://yoursite.com/admin`
-2. Click "Login with GitHub"
-3. Authorize the application with your GitHub account
+2. Click "Login with Netlify Identity"
+3. Enter your email and password (you'll receive these from the site admin)
 4. You're in! You'll see a dashboard with all the content you can edit
+
+**First time?** You'll receive an email invitation with a link to set your password.
 
 ## What You Can Edit
 
@@ -188,12 +190,15 @@ If you run into any issues or have questions:
 ## Authentication & Access
 
 To use the CMS, you need:
-1. A GitHub account
-2. Collaborator access to the `BekahHW/siblings-write` repository
-3. The site to be deployed with OAuth configured (usually Netlify)
+1. An email address
+2. An invitation from the site administrator
+3. To set a password when you receive the invitation email
 
-**First time setup?** See the [Authentication Setup Guide](README-CMS-AUTH-SETUP.md) for complete deployment and authentication instructions.
+**No GitHub account needed!** Authentication is handled through Netlify Identity.
 
-If you can't log in, ask the repository owner to:
-- Add you as a collaborator on GitHub
-- Verify OAuth is properly configured
+**First time setup (for site admin only)?** See the [Quick Netlify Setup Guide](NETLIFY-CMS-SETUP.md) for enabling authentication.
+
+If you can't log in:
+- Check your spam folder for the invitation email
+- Make sure you've set your password via the invitation link
+- Contact the site administrator to resend your invitation
