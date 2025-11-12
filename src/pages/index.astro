@@ -50,14 +50,6 @@ const getAuthorsDisplay = (authorRefs) => {
       <div class="firefly"></div>
     </div>
 
-    <!-- Snowballs Container -->
-    <div class="snowballs-container">
-      <div class="snowball"></div>
-      <div class="snowball"></div>
-      <div class="snowball"></div>
-      <div class="snowball"></div>
-    </div>
-
     <div class="home-container">
       <div class="home-copy">
         <div class="title-container">
@@ -76,9 +68,10 @@ const getAuthorsDisplay = (authorRefs) => {
           <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
           <img class="hero-image" alt="the Hawrot Siblings" src="/assets/Hawrot-Siblings.png" width="550" height="466">
         </picture>
+      </div>
 
-        <!-- Newsletter Form Below Picture -->
-        <div class="newsletter-callout">
+      <!-- Newsletter Form Below Picture -->
+      <div class="newsletter-callout">
             <p class="newsletter-intro">Stories that make you believe in magic - delivered first to subscribers</p>
             <form 
               action="https://app.kit.com/forms/7612128/subscriptions" 
@@ -112,7 +105,6 @@ const getAuthorsDisplay = (authorRefs) => {
                 </button>
               </div>
             </form>
-          </div>
       </div>
     </div>
 
@@ -230,7 +222,7 @@ const getAuthorsDisplay = (authorRefs) => {
   min-width: 0;
 }
 
-/* Newsletter Callout - Below picture */
+/* Newsletter Callout - Part of home container */
 .newsletter-callout {
   margin-top: 1.5em;
   padding: 1.5em;
@@ -240,6 +232,7 @@ const getAuthorsDisplay = (authorRefs) => {
   backdrop-filter: blur(10px);
   width: 100%;
   max-width: 550px;
+  margin: 1em;
 }
 
 .newsletter-intro {
@@ -878,12 +871,6 @@ const getAuthorsDisplay = (authorRefs) => {
   margin-top: 1.5em;
 }
 
-.about-content p {
-  font-size: 1.1em;
-  line-height: 1.6;
-  margin-bottom: 1em;
-}
-
 .typewriter-text {
   font-size: 1.1em;
   line-height: 1.8;
@@ -895,16 +882,16 @@ const getAuthorsDisplay = (authorRefs) => {
   margin: 0;
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.1em;
-  background: linear-gradient(90deg, #667eea 0%, #667eea 10%, #555 50%, #555 100%);
+  background: linear-gradient(90deg, #10b981 0%, #10b981 10%, #3b82f6 40%, #8b5cf6 70%, #8b5cf6 100%);
   background-size: 200% 100%;
   background-position: 0% 0;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-fade-to-dark 7s ease-out forwards;
+  animation: gradient-fade-colorful 7s ease-out forwards;
 }
 
-@keyframes gradient-fade-to-dark {
+@keyframes gradient-fade-colorful {
   0% {
     background-position: 0% 0;
   }
@@ -1067,117 +1054,13 @@ const getAuthorsDisplay = (authorRefs) => {
   100% { transform: translateX(20vw) translateY(-15vh) scale(0.8); }
 }
 
-/* Snowballs */
-.snowball {
-  position: fixed;
-  width: 20px;
-  height: 20px;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.6), rgba(232, 244, 248, 0.4));
-  border-radius: 50%;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  pointer-events: none;
-  z-index: 1;
-  animation: ease 15s infinite;
-  left: -50px;
-  top: 50%;
-  opacity: 0.7;
-}
-
-.snowball:nth-child(1) { animation-name: snowball-throw1; animation-delay: 0s; }
-.snowball:nth-child(2) { animation-name: snowball-throw2; animation-delay: 3s; }
-.snowball:nth-child(3) { animation-name: snowball-throw3; animation-delay: 6s; }
-.snowball:nth-child(4) { animation-name: snowball-throw4; animation-delay: 9s; }
-
-@keyframes snowball-throw1 {
-  0% {
-    opacity: 0;
-    transform: translateX(0) translateY(0) rotate(0deg);
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(40vw) translateY(-30vh) rotate(360deg);
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(80vw) translateY(20vh) rotate(720deg);
-  }
-}
-
-@keyframes snowball-throw2 {
-  0% {
-    opacity: 0;
-    transform: translateX(0) translateY(-10vh) rotate(0deg);
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(45vw) translateY(-35vh) rotate(400deg);
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(90vw) translateY(15vh) rotate(800deg);
-  }
-}
-
-@keyframes snowball-throw3 {
-  0% {
-    opacity: 0;
-    transform: translateX(0) translateY(5vh) rotate(0deg);
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(35vw) translateY(-25vh) rotate(320deg);
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(70vw) translateY(25vh) rotate(640deg);
-  }
-}
-
-@keyframes snowball-throw4 {
-  0% {
-    opacity: 0;
-    transform: translateX(0) translateY(-5vh) rotate(0deg);
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(50vw) translateY(-40vh) rotate(450deg);
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(100vw) translateY(30vh) rotate(900deg);
-  }
-}
-
 @media (max-width: 1200px) {
   p {
     font-size: 1.2em;
   }
-  .about-content p {
-    font-size: 1em;
-  }
 
   .typewriter-text {
-    font-size: 1em;
+    font-size: 1.1em;
     min-height: 350px;
   }
 
@@ -1202,6 +1085,7 @@ const getAuthorsDisplay = (authorRefs) => {
     padding-bottom: 1em;
     text-align: center;
     padding: 0;
+    order: 1;
   }
 
   .about-content {
@@ -1210,7 +1094,7 @@ const getAuthorsDisplay = (authorRefs) => {
   }
 
   .typewriter-text {
-    font-size: 0.95em;
+    font-size: 1.1em;
     min-height: 300px;
     text-align: left;
   }
@@ -1224,8 +1108,8 @@ const getAuthorsDisplay = (authorRefs) => {
   }
 
   .hero-image-container {
-    margin: 1em 0 0 0;
-    order: -1;
+    margin: 1em 0;
+    order: 2;
   }
 
   .hero-image {
@@ -1234,7 +1118,8 @@ const getAuthorsDisplay = (authorRefs) => {
   }
 
   .newsletter-callout {
-    margin-top: 1.5em;
+    margin-top: 1em;
+    order: 3;
   }
 }
 </style>
