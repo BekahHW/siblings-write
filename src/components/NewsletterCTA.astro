@@ -2,9 +2,14 @@
 interface Props {
   variant?: 'default' | 'inline' | 'footer';
   showTestimonials?: boolean;
+  tagline?: string;
 }
 
-const { variant = 'default', showTestimonials = false } = Astro.props;
+const {
+  variant = 'default',
+  showTestimonials = false,
+  tagline = 'Stories that make you believe in magic - delivered first to subscribers'
+} = Astro.props;
 
 const testimonials = [
   {
@@ -26,14 +31,13 @@ const testimonials = [
   {variant === 'default' && (
     <div class="cta-header">
       <h3>✨ Enjoyed this story?</h3>
-      <p class="cta-tagline">Stories that make you believe in magic - delivered first to subscribers</p>
+      <p class="cta-tagline">{tagline}</p>
     </div>
   )}
 
   {variant === 'footer' && (
     <div class="cta-header">
-      <h4>Never Miss a Story</h4>
-      <p class="cta-tagline">Stories that make you believe in magic - delivered first to subscribers</p>
+      <h4>{tagline}</h4>
     </div>
   )}
 

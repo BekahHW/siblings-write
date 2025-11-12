@@ -1,11 +1,19 @@
 ---
 import NewsletterCTA from './NewsletterCTA.astro';
+
+interface Props {
+  hideNewsletter?: boolean;
+}
+
+const { hideNewsletter = false } = Astro.props;
 ---
 
 <footer>
-  <div class="footer-newsletter">
-    <NewsletterCTA variant="footer" showTestimonials={false} />
-  </div>
+  {!hideNewsletter && (
+    <div class="footer-newsletter">
+      <NewsletterCTA variant="footer" showTestimonials={false} tagline="Never Miss a Story. Subscribe Today" />
+    </div>
+  )}
 
   <div class="footer-credits">
     <span>
