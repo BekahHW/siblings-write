@@ -12,11 +12,11 @@ Decap CMS is a user-friendly content management system that lets you edit websit
 
 1. Go to your website URL followed by `/admin`
    - Example: `https://yoursite.com/admin`
-2. Click "Login with Netlify Identity"
-3. Enter your email and password (you'll receive these from the site admin)
+2. Click "Login with GitHub"
+3. If prompted, authorize the application with your GitHub account
 4. You're in! You'll see a dashboard with all the content you can edit
 
-**First time?** You'll receive an email invitation with a link to set your password.
+**First time?** Make sure you've accepted the GitHub collaborator invitation from the repository owner.
 
 ## What You Can Edit
 
@@ -190,15 +190,16 @@ If you run into any issues or have questions:
 ## Authentication & Access
 
 To use the CMS, you need:
-1. An email address
-2. An invitation from the site administrator
-3. To set a password when you receive the invitation email
+1. A free GitHub account (create one at https://github.com/join)
+2. Collaborator access to the `BekahHW/siblings-write` repository
+3. To accept the collaborator invitation email from GitHub
 
-**No GitHub account needed!** Authentication is handled through Netlify Identity.
+**Completely free!** No paid plans or upgrades needed.
 
-**First time setup (for site admin only)?** See the [Quick Netlify Setup Guide](NETLIFY-CMS-SETUP.md) for enabling authentication.
+**First time setup (for site admin only)?** See the [Free CMS Setup Guide](CMS-SETUP-FREE.md) for adding team members.
 
 If you can't log in:
-- Check your spam folder for the invitation email
-- Make sure you've set your password via the invitation link
-- Contact the site administrator to resend your invitation
+- Make sure you've been added as a collaborator on GitHub
+- Check your email for the GitHub invitation and accept it
+- Log out of GitHub and log back in, then try again
+- Contact the repository owner to verify your collaborator access
