@@ -90,19 +90,24 @@ const displayVideos = videos.slice(0, limit);
     font-size: 2.8em;
     font-weight: 700;
     margin-bottom: 0.5em;
-    color: #667eea;
     text-align: center;
     position: relative;
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
     display: inline-block;
+    background: linear-gradient(90deg, #667eea 0%, #667eea 10%, #555 50%, #555 100%);
+    background-size: 200% 100%;
+    background-position: 0% 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .section-title.typing {
     width: 0;
     border-right: 2px solid #667eea;
-    animation: type-section 2s steps(40, end) forwards;
+    animation: type-section 2s steps(40, end) forwards, gradient-fade-to-dark 7s ease-out forwards;
   }
 
   @keyframes type-section {
@@ -115,6 +120,15 @@ const displayVideos = videos.slice(0, limit);
     100% {
       width: 100%;
       border-right: none;
+    }
+  }
+
+  @keyframes gradient-fade-to-dark {
+    0% {
+      background-position: 0% 0;
+    }
+    100% {
+      background-position: 100% 0;
     }
   }
 
