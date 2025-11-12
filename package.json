@@ -9,6 +9,7 @@
     "astro": "astro",
     "import-newsletter": "node scripts/newsletter-import.js",
     "import-newsletter:dry": "node scripts/newsletter-import.js --dry-run",
+    "fetch-youtube": "node scripts/youtube-fetch.js",
     "test": "vitest run --config vitest.config.mjs",
     "test:watch": "vitest --config vitest.config.mjs",
     "test:blog": "vitest run --config vitest.config.mjs tests/blog-content.test.js",

@@ -58,6 +58,9 @@
         "hidden": {
           "type": "boolean"
         },
+        "youtubeId": {
+          "type": "string"
+        },
         "$schema": {
           "type": "string"
         }

@@ -3,6 +3,7 @@ title: "Running For Dear Life!"
 publishDate: 10 May 2025
 description: If you want to live, there's no holding back.
 authors: [josh]
+youtubeId: "sESkBnVhB0E"
 ---
 ![Illustration of a woman running up stone steps](/assets/blog/running-blog.jpg)
 

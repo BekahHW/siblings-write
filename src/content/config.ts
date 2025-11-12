@@ -20,6 +20,7 @@ const blog = defineCollection({
     publishDate: z.string(),
     authors: z.array(reference("authors")),
     hidden: z.boolean().optional(),
+    youtubeId: z.string().optional(),
   }),
 });
 
