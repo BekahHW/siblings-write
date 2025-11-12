@@ -757,6 +757,9 @@ const getAuthorsDisplay = (authorRefs) => {
   width: 100%;
   margin: 0 auto 1em;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .title-line-1 {
@@ -769,7 +772,7 @@ const getAuthorsDisplay = (authorRefs) => {
   white-space: nowrap;
   overflow: hidden;
   width: 0;
-  display: inline-block;
+  display: block;
   animation: type-line-1 2s steps(40, end) forwards;
   border-right: 2px solid #667eea;
 }
@@ -788,7 +791,7 @@ const getAuthorsDisplay = (authorRefs) => {
   white-space: nowrap;
   overflow: hidden;
   width: 0;
-  display: inline-block;
+  display: block;
   animation: type-line-2 2.2s steps(40, end) 2s forwards;
   border-right: 2px solid #764ba2;
 }
@@ -887,16 +890,16 @@ const getAuthorsDisplay = (authorRefs) => {
   margin: 0;
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.1em;
-  background: linear-gradient(90deg, #667eea 0%, #667eea 10%, #2d2d3f 50%, #2d2d3f 100%);
+  background: linear-gradient(90deg, #667eea 0%, #667eea 10%, #555 50%, #555 100%);
   background-size: 200% 100%;
   background-position: 0% 0;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-fade-to-black 4s ease-out forwards;
+  animation: gradient-fade-to-dark 7s ease-out forwards;
 }
 
-@keyframes gradient-fade-to-black {
+@keyframes gradient-fade-to-dark {
   0% {
     background-position: 0% 0;
   }
@@ -915,7 +918,8 @@ const getAuthorsDisplay = (authorRefs) => {
   margin: -0.2vw 0 0 9.8vw;
   animation: ease 200s alternate infinite;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 1;
+  opacity: 0.6;
 }
 
 .firefly::before,
@@ -929,15 +933,15 @@ const getAuthorsDisplay = (authorRefs) => {
 }
 
 .firefly::before {
-  background: black;
-  opacity: 0.4;
+  background: #ccaa00;
+  opacity: 0.3;
   animation: drift ease alternate infinite;
 }
 
 .firefly::after {
-  background: white;
+  background: #ffeb3b;
   opacity: 0;
-  box-shadow: 0 0 0vw 0vw yellow;
+  box-shadow: 0 0 0vw 0vw #ffeb3b;
   animation: drift ease alternate infinite, flash ease infinite;
 }
 
@@ -952,12 +956,12 @@ const getAuthorsDisplay = (authorRefs) => {
 
 @keyframes flash {
   0%, 30%, 100% {
-    opacity: 0;
-    box-shadow: 0 0 0vw 0vw yellow;
+    opacity: 0.2;
+    box-shadow: 0 0 0vw 0vw #ccaa00;
   }
   5% {
     opacity: 1;
-    box-shadow: 0 0 2vw 0.4vw yellow;
+    box-shadow: 0 0 2vw 0.4vw #ffeb3b;
   }
 }
 
@@ -1063,14 +1067,15 @@ const getAuthorsDisplay = (authorRefs) => {
   position: fixed;
   width: 20px;
   height: 20px;
-  background: radial-gradient(circle at 30% 30%, #ffffff, #e8f4f8);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.6), rgba(232, 244, 248, 0.4));
   border-radius: 50%;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   pointer-events: none;
-  z-index: 1000;
+  z-index: 1;
   animation: ease 15s infinite;
   left: -50px;
   top: 50%;
+  opacity: 0.7;
 }
 
 .snowball:nth-child(1) { animation-name: snowball-throw1; animation-delay: 0s; }
