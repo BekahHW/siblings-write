@@ -2,8 +2,6 @@ backend:
   name: github
   repo: BekahHW/siblings-write
   branch: main
-  # Enable open authoring for contributors
-  open_authoring: true
 
 # Enable local testing mode - run "npm run cms:local" in terminal
 # then access the CMS to test without authentication
