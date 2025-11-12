@@ -1,7 +1,13 @@
 ---
 import ThemeToggleButton from './ThemeToggleButton.svelte';
 import MobileNav from './MobileNav.svelte';
+import { getCollection } from 'astro:content';
+
 const { current = '' } = Astro.props;
+
+// Check if there are any visible CYOA stories
+const cyoaStories = await getCollection('cyoa', ({ data }) => data.hidden !== true);
+const showCyoa = cyoaStories.length > 0;
 ---
 
 <style>
@@ -79,7 +85,7 @@ const { current = '' } = Astro.props;
   <div class="nav-links">
   <a class={current === "" ? "selected" : ""} href='/'>home</a>
   <a class={current === "blog" ? "selected" : ""} href='/blog'>shorts</a>
-  <a class={current === "cyoa" ? "selected" : ""} href='/cyoa'>CYOA</a>
+  {showCyoa && <a class={current === "cyoa" ? "selected" : ""} href='/cyoa'>CYOA</a>}
   <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
   <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
   <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
@@ -87,7 +93,7 @@ const { current = '' } = Astro.props;
   <div class="theme-toggle-container">
     <ThemeToggleButton client:load />
   </div>
-  <MobileNav client:load current={current} />
+  <MobileNav client:load current={current} showCyoa={showCyoa} />
 </nav>
 
 <!-- Mobile overlay -->
