@@ -56,6 +56,25 @@ const otherProjectsTitle = worksSettings?.data.otherProjectsTitle || 'Other Proj
           </ul>
         </>
       )}
+
+      <!-- Reader Testimonials -->
+      <h2>What Readers Are Saying</h2>
+      <div class="testimonials-section">
+        <blockquote class="testimonial">
+          <p>"Great story. I love the descriptions of the store and the people. It was heart warming.♥️"</p>
+          <cite>— Reader of our Short Stories</cite>
+        </blockquote>
+
+        <blockquote class="testimonial">
+          <p>"Escape from Brown's Island bursts off the page like a star running back on a Saturday-night breakaway—fast, thrilling, and impossible to stop. The Hawrot siblings cut, juke, and power through danger with the perfect mix of grit and finesse, turning every chapter into a game-winning drive. A true end-zone celebration of adventure worthy of the record books."</p>
+          <cite>— Reader of Escape from Brown's Island</cite>
+        </blockquote>
+
+        <blockquote class="testimonial">
+          <p>"I decided to give this book a try over the holiday season and I'm so glad I did! This was a huge break from the normal self-help / non-fiction books I like to read, so I wasn't sure what to expect. The authors do a wonderful job of building a world based on their own lives while pushing into fantasy and adventure in so many creative ways! I couldn't put the book down after the halfway point where the story keeps you guessing while filling you with an undeniable Christmas cheer. I'm a grown adult who felt like a kid again while enjoying this story. I've since passed it along to my own son with the same joy shared by the characters in this book! I hope you enjoy it as much as we do!"</p>
+          <cite>— Reader of Battle for Christmas: Reign of the Nutcrackers</cite>
+        </blockquote>
+      </div>
     </div>
   </BaseLayout>
 </PostHogLayout>
@@ -106,6 +125,49 @@ const otherProjectsTitle = worksSettings?.data.otherProjectsTitle || 'Other Proj
     background-color: #005fa3;
   }
 
+  .testimonials-section {
+    margin-top: 4em;
+    padding: 3em 2em;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    background: rgba(249, 250, 251, 0.8);
+    border-radius: 16px;
+    border-top: 3px solid var(--primary-color, #548e9b);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .testimonial {
+    background: linear-gradient(135deg, rgba(84, 142, 155, 0.08) 0%, rgba(190, 214, 221, 0.2) 100%);
+    padding: 2em;
+    border-radius: 12px;
+    border-left: 5px solid var(--primary-color, #548e9b);
+    margin: 0;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .testimonial:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  .testimonial p {
+    font-size: 0.95em;
+    line-height: 1.7;
+    color: #333;
+    font-style: italic;
+    margin: 0 0 1em 0;
+  }
+
+  .testimonial cite {
+    font-size: 0.95em;
+    color: #666;
+    font-style: normal;
+    font-weight: 600;
+    display: block;
+  }
+
   @media (max-width: 1020px) {
     .work-image {
       float: none;
@@ -120,6 +182,11 @@ const otherProjectsTitle = worksSettings?.data.otherProjectsTitle || 'Other Proj
     .book-section img {
       width: 100%;
       max-width: 250px;
+    }
+
+    .testimonials-section {
+      padding: 2em 1.5em;
+      margin-top: 3em;
     }
   }
 </style>

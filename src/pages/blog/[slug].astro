@@ -4,6 +4,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
+import YouTubeEmbed from '../../components/YouTubeEmbed.astro';
+import NewsletterCTA from '../../components/NewsletterCTA.astro';
 
 export async function getStaticPaths() {
   try {
@@ -34,17 +36,22 @@ if (!entry) {
 // Render the content
 const { Content } = await render(entry);
 const allAuthors = await getCollection('authors');
-let author;
-if (entry.data.author?.id) {
-  try {
-    author = await getEntry('authors', entry.data.author.id);
-    if (author) {
-      console.log(`Found author for ${entry.data.author.id}`);
-    } else {
-      console.error(`Author not found: ${entry.data.author.id}`);
+
+// Fetch all authors for the post
+const authors = [];
+if (entry.data.authors && Array.isArray(entry.data.authors)) {
+  for (const authorRef of entry.data.authors) {
+    try {
+      const author = await getEntry('authors', authorRef.id);
+      if (author) {
+        authors.push(author);
+        console.log(`Found author for ${authorRef.id}`);
+      } else {
+        console.error(`Author not found: ${authorRef.id}`);
+      }
+    } catch (error) {
+      console.error(`Error fetching author: ${error.message}`);
     }
-  } catch (error) {
-    console.error(`Error fetching author: ${error.message}`);
   }
 }
 
@@ -78,7 +85,17 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
       <article class="content">
         <Content />
       </article>
-      
+
+      {entry.data.youtubeId && (
+        <div class="youtube-cta">
+          <h3>Listen to This Story</h3>
+          <p>Hear this tale brought to life by The Hawrot Siblings</p>
+          <YouTubeEmbed videoId={entry.data.youtubeId} title={entry.data.title} />
+        </div>
+      )}
+
+      <NewsletterCTA variant="default" showTestimonials={false} />
+
       <div class="post-navigation">
         {prevPost && (
         <a href={`/blog/${prevPost.id}`} class="nav-button prev-button">
@@ -96,14 +113,16 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
       </div>
       
       <hr />
-      {author && (
+      {authors.length > 0 && (
         <div class="author-bio">
-          <h3>About the Author</h3>
-          <Bio 
-            name={author.data.name}
-            bio={author.data.bio}
-            avatar={author.data.avatar}
-          />
+          <h3>About the {authors.length > 1 ? 'Authors' : 'Author'}</h3>
+          {authors.map(author => (
+            <Bio
+              name={author.data.name}
+              bio={author.data.bio}
+              avatar={author.data.avatar}
+            />
+          ))}
         </div>
       )}
       
@@ -132,7 +151,28 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
     min-width: 100px;
     width: 30%;
   }
-    
+
+  .youtube-cta {
+    margin: 3rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f0f8f9 0%, #d4e9ed 100%);
+    border-radius: 12px;
+    border: 2px solid rgba(84, 142, 155, 0.2);
+    text-align: center;
+  }
+
+  .youtube-cta h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color, #548e9b);
+    font-size: 1.6rem;
+  }
+
+  .youtube-cta p {
+    margin: 0 0 1.5rem 0;
+    color: #555;
+    font-size: 1.1rem;
+  }
+
   .author-bio {
     margin-top: 2rem;
     padding-top: 1rem;

@@ -4,14 +4,334 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = 'Subscribe';
 const description = 'Subscribe to get our short stories first!';
-const permalink = `${Astro.site.href}about`;
+const permalink = `${Astro.site.href}subscribe`;
 ---
 
 <PostHogLayout>
-  <BaseLayout title={title} description={description} permalink={permalink} current="about">
-    <div class="container">
-      <h1>Subscribe</h1>
-    
-     <!-- Newsletter Form -->
-     <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
-       <form action="https://app.kit.com/forms/7612128/subscriptions" class="seva-form formkit-form" method="post" data-sv-form="7612128" data-uid="775bb3f6cc" data-format="inline" data-version="5" data-options="{&quot;settings&quot;:{&quot;after_subscribe&quot;:{&quot;action&quot;:&quot;message&quot;,&quot;success_message&quot;:&quot;Success! Now check your email to confirm your subscription.&quot;,&quot;redirect_url&quot;:&quot;&quot;},&quot;analytics&quot;:{&quot;google&quot;:null,&quot;fathom&quot;:null,&quot;facebook&quot;:null,&quot;segment&quot;:null,&quot;pinterest&quot;:null,&quot;sparkloop&quot;:null,&quot;googletagmanager&quot;:null},&quot;modal&quot;:{&quot;trigger&quot;:&quot;timer&quot;,&quot;scroll_percentage&quot;:null,&quot;timer&quot;:5,&quot;devices&quot;:&quot;all&quot;,&quot;show_once_every&quot;:15},&quot;powered_by&quot;:{&quot;show&quot;:true,&quot;url&quot;:&quot;https://kit.com/features/forms?utm_campaign=poweredby&amp;utm_content=form&amp;utm_medium=referral&amp;utm_source=dynamic&quot;},&quot;recaptcha&quot;:{&quot;enabled&quot;:false},&quot;return_visitor&quot;:{&quot;action&quot;:&quot;show&quot;,&quot;custom_content&quot;:&quot;&quot;},&quot;slide_in&quot;:{&quot;display_in&quot;:&quot;bottom_right&quot;,&quot;trigger&quot;:&quot;timer&quot;,&quot;scroll_percentage&quot;:null,&quot;timer&quot;:5,&quot;devices&quot;:&quot;all&quot;,&quot;show_once_every&quot;:15},&quot;sticky_bar&quot;:{&quot;display_in&quot;:&quot;top&quot;,&quot;trigger&quot;:&quot;timer&quot;,&quot;scroll_percentage&quot;:null,&quot;timer&quot;:5,&quot;devices&quot;:&quot;all&quot;,&quot;show_once_every&quot;:15}},&quot;version&quot;:&quot;5&quot;}" min-width="400 500 600 700 800" style="background-color: rgb(255, 255, 255); border-radius: 6px;"><div data-style="full"><div data-element="column" class="formkit-column" style="background-color: rgb(249, 250, 251);"><div class="formkit-background" style="opacity: 0.3;"></div><div class="formkit-header" data-element="header" style="color: rgb(77, 77, 77); font-size: 20px; font-weight: 700;"><h2>Join the Siblings Write Newsletter</h2></div><div class="formkit-subheader" data-element="subheader" style="color: rgb(104, 104, 104); font-size: 15px;">Subscribe to get our latest content by email.</div><div class="formkit-image formkit-image relative focus:outline-none" role="button" tabindex="0"><img class="cursor-pointer focus:outline-blue " src="https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/hZC1EMJPmd6q7H9t54m6qi" style="max-width: 100%;"></div></div><div data-element="column" class="formkit-column"><ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul><div data-element="fields" class="seva-fields formkit-fields"><div class="formkit-field"><input class="formkit-input" name="email_address" aria-label="Email Address" placeholder="Email Address" required="" type="email" style="color: rgb(0, 0, 0); border-color: rgb(227, 227, 227); border-radius: 4px; font-weight: 400;"></div><button data-element="submit" class="formkit-submit formkit-submit" style="color: rgb(255, 255, 255); background-color: rgb(22, 119, 190); border-radius: 24px; font-weight: 700;"><div class="formkit-spinner"><div></div><div></div><div></div></div><span class="">Subscribe</span></button></div><div class="formkit-guarantee" data-element="guarantee" style="color: rgb(77, 77, 77); font-size: 13px; font-weight: 400;">We respect your privacy. Unsubscribe at any time.</div><div class="formkit-powered-by-convertkit-container"><a href="https://kit.com/features/forms?utm_campaign=poweredby&amp;utm_content=form&amp;utm_medium=referral&amp;utm_source=dynamic" data-element="powered-by" class="formkit-powered-by-convertkit" data-variant="dark" target="_blank" rel="nofollow">Built with Kit</a></div></div></div><style>.formkit-form[data-uid="775bb3f6cc"] *{box-sizing:border-box;}.formkit-form[data-uid="775bb3f6cc"]{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}.formkit-form[data-uid="775bb3f6cc"] legend{border:none;font-size:inherit;margin-bottom:10px;padding:0;position:relative;display:table;}.formkit-form[data-uid="775bb3f6cc"] fieldset{border:0;padding:0.01em 0 0 0;margin:0;min-width:0;}.formkit-form[data-uid="775bb3f6cc"] body:not(:-moz-handler-blocked) fieldset{display:table-cell;}.formkit-form[data-uid="775bb3f6cc"] h1,.formkit-form[data-uid="775bb3f6cc"] h2,.formkit-form[data-uid="775bb3f6cc"] h3,.formkit-form[data-uid="775bb3f6cc"] h4,.formkit-form[data-uid="775bb3f6cc"] h5,.formkit-form[data-uid="775bb3f6cc"] h6{color:inherit;font-size:inherit;font-weight:inherit;}.formkit-form[data-uid="775bb3f6cc"] h2{font-size:1.5em;margin:1em 0;}.formkit-form[data-uid="775bb3f6cc"] h3{font-size:1.17em;margin:1em 0;}.formkit-form[data-uid="775bb3f6cc"] p{color:inherit;font-size:inherit;font-weight:inherit;}.formkit-form[data-uid="775bb3f6cc"] ol:not([template-default]),.formkit-form[data-uid="775bb3f6cc"] ul:not([template-default]),.formkit-form[data-uid="775bb3f6cc"] blockquote:not([template-default]){text-align:left;}.formkit-form[data-uid="775bb3f6cc"] p:not([template-default]),.formkit-form[data-uid="775bb3f6cc"] hr:not([template-default]),.formkit-form[data-uid="775bb3f6cc"] blockquote:not([template-default]),.formkit-form[data-uid="775bb3f6cc"] ol:not([template-default]),.formkit-form[data-uid="775bb3f6cc"] ul:not([template-default]){color:inherit;font-style:initial;}.formkit-form[data-uid="775bb3f6cc"] .ordered-list,.formkit-form[data-uid="775bb3f6cc"] .unordered-list{list-style-position:outside !important;padding-left:1em;}.formkit-form[data-uid="775bb3f6cc"] .list-item{padding-left:0;}.formkit-form[data-uid="775bb3f6cc"][data-format="modal"]{display:none;}.formkit-form[data-uid="775bb3f6cc"][data-format="slide in"]{display:none;}.formkit-form[data-uid="775bb3f6cc"][data-format="sticky bar"]{display:none;}.formkit-sticky-bar .formkit-form[data-uid="775bb3f6cc"][data-format="sticky bar"]{display:block;}.formkit-form[data-uid="775bb3f6cc"] .formkit-input,.formkit-form[data-uid="775bb3f6cc"] .formkit-select,.formkit-form[data-uid="775bb3f6cc"] .formkit-checkboxes{width:100%;}.formkit-form[data-uid="775bb3f6cc"] .formkit-button,.formkit-form[data-uid="775bb3f6cc"] .formkit-submit{border:0;border-radius:5px;color:#ffffff;cursor:pointer;display:inline-block;text-align:center;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:15px;overflow:hidden;padding:0;position:relative;vertical-align:middle;}.formkit-form[data-uid="775bb3f6cc"] .formkit-button:hover,.formkit-form[data-uid="775bb3f6cc"] .formkit-submit:hover,.formkit-form[data-uid="775bb3f6cc"] .formkit-button:focus,.formkit-form[data-uid="775bb3f6cc"] .formkit-submit:focus{outline:none;}.formkit-form[data-uid="775bb3f6cc"] .formkit-button:hover > span,.formkit-form[data-uid="775bb3f6cc"] .formkit-submit:hover > span,.formkit-form[data-uid="775bb3f6cc"] .formkit-button:focus > span,.formkit-form[data-uid="775bb3f6cc"] .formkit-submit:focus > span{background-color:rgba(0,0,0,0.1);}.formkit-form[data-uid="775bb3f6cc"] .formkit-button > span,.formkit-form[data-uid="775bb3f6cc"] .formkit-submit > span{display:block;-webkit-transition:all 300ms ease-in-out;transition:all 300ms ease-in-out;padding:12px 24px;}.formkit-form[data-uid="775bb3f6cc"] .formkit-input{background:#ffffff;font-size:15px;padding:12px;border:1px solid #e3e3e3;-webkit-flex:1 0 auto;-ms-flex:1 0 auto;flex:1 0 auto;line-height:1.4;margin:0;-webkit-transition:border-color ease-out 300ms;transition:border-color ease-out 300ms;}.formkit-form[data-uid="775bb3f6cc"] .formkit-input:focus{outline:none;border-color:#1677be;-webkit-transition:border-color ease 300ms;transition:border-color ease 300ms;}.formkit-form[data-uid="775bb3f6cc"] .formkit-input::-webkit-input-placeholder{color:inherit;opacity:0.8;}.formkit-form[data-uid="775bb3f6cc"] .formkit-input::-moz-placeholder{color:inherit;opacity:0.8;}.formkit-form[data-uid="775bb3f6cc"] .formkit-input:-ms-inputplaceholder{color:inherit;opacity:0.8;}.formkit-form[data-uid="775bb3f6cc"] .formkit-input::placeholder{color:inherit;opacity:0.8;}.formkit-form[data-uid="775bb3f6cc"] [data-group="dropdown"]{position:relative;display:inline-block;width:100%;}.formkit-form[data-uid="775bb3f6cc"] [data-group="dropdown"]::before{content:"";top:calc(50% - 2.5px);right:10px;position:absolute;pointer-events:none;border-color:#4f4f4f transparent transparent transparent;border-style:solid;border-width:6px 6px 0 6px;height:0;width:0;z-index:999;}.n``` (truncated for brevity)```
+  <BaseLayout title={title} description={description} permalink={permalink} current="about" hideNewsletterFooter={true}>
+    <div class="subscribe-page">
+      <!-- Hero Section -->
+      <div class="subscribe-hero">
+        <h1>Join the Siblings Write Newsletter</h1>
+        <p class="hero-tagline">Stories that make you believe in magic - delivered first to subscribers</p>
+        <div class="hero-image">
+          <img src="https://embed.filekitcdn.com/e/fgWVG8FeiA5L2P954Z7wAZ/hZC1EMJPmd6q7H9t54m6qi" alt="Siblings Write Newsletter" />
+        </div>
+      </div>
+
+      <!-- Benefits Section -->
+      <div class="benefits-section">
+        <h2>What You'll Get</h2>
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon">✨</div>
+            <h3>Stories First</h3>
+            <p>Be the first to read our new stories before they're published on the website</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">📚</div>
+            <h3>Exclusive Content</h3>
+            <p>Get behind-the-scenes insights and updates about our writing journey</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🎁</div>
+            <h3>No Spam</h3>
+            <p>We respect your inbox. Quality stories, not clutter. Unsubscribe anytime.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscription Form -->
+      <div class="form-section">
+        <h2>Subscribe Today.</h2>
+        <form
+          action="https://app.kit.com/forms/7612128/subscriptions"
+          class="seva-form formkit-form subscribe-form"
+          method="post"
+          data-sv-form="7612128"
+          data-uid="775bb3f6cc"
+          data-format="inline"
+          data-version="5"
+          data-options='{"settings":{"after_subscribe":{"action":"message","success_message":"Success! Now check your email to confirm your subscription.","redirect_url":""},"analytics":{"google":null,"fathom":null,"facebook":null,"segment":null,"pinterest":null,"sparkloop":null,"googletagmanager":null},"powered_by":{"show":false},"recaptcha":{"enabled":true}},"version":"5"}'
+        >
+          <ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul>
+          <div data-element="fields" class="seva-fields formkit-fields">
+            <div class="formkit-field">
+              <input
+                class="formkit-input"
+                name="email_address"
+                placeholder="Enter your email address"
+                required
+                type="email"
+                aria-label="Email Address"
+              >
+            </div>
+            <button
+              data-element="submit"
+              class="formkit-submit"
+              type="submit"
+            >
+              <div class="formkit-spinner"><div></div><div></div><div></div></div>
+              <span>Subscribe</span>
+            </button>
+          </div>
+          <p class="privacy-note">We respect your privacy. Unsubscribe at any time.</p>
+        </form>
+      </div>
+    </div>
+  </BaseLayout>
+</PostHogLayout>
+
+<script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
+
+<style>
+  .subscribe-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2em;
+  }
+
+  /* Hero Section */
+  .subscribe-hero {
+    text-align: center;
+    padding: 3em 0;
+    background: linear-gradient(135deg, rgba(84, 142, 155, 0.1) 0%, rgba(190, 214, 221, 0.3) 100%);
+    border-radius: 20px;
+    margin-bottom: 3em;
+  }
+
+  .subscribe-hero h1 {
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+    color: #333;
+    font-family: var(--font-family-serif);
+  }
+
+  .hero-tagline {
+    font-size: 1.3em;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 2em;
+    padding: 0 1em;
+  }
+
+  .hero-image {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .hero-image img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Benefits Section */
+  .benefits-section {
+    margin: 4em 0;
+  }
+
+  .benefits-section h2 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 2em;
+    color: #333;
+    font-family: var(--font-family-serif);
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2em;
+    margin-bottom: 3em;
+  }
+
+  .benefit-card {
+    background: white;
+    padding: 2em;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .benefit-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .benefit-icon {
+    font-size: 3em;
+    margin-bottom: 0.5em;
+  }
+
+  .benefit-card h3 {
+    font-size: 1.3em;
+    margin-bottom: 0.5em;
+    color: var(--primary-color, #548e9b);
+    font-family: var(--font-family-serif);
+  }
+
+  .benefit-card p {
+    color: #666;
+    line-height: 1.6;
+  }
+
+  /* Form Section */
+  .form-section {
+    background: linear-gradient(135deg, rgba(84, 142, 155, 0.08) 0%, rgba(190, 214, 221, 0.2) 100%);
+    padding: 3em;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-section h2 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 1.5em;
+    color: #333;
+    font-family: var(--font-family-serif);
+  }
+
+  .subscribe-form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .formkit-fields {
+    display: flex;
+    gap: 1em;
+    margin-bottom: 1em;
+  }
+
+  .formkit-field {
+    flex: 1;
+  }
+
+  .formkit-input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    background: white;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .formkit-input:focus {
+    outline: none;
+    border-color: var(--primary-color, #548e9b);
+    box-shadow: 0 0 0 4px rgba(84, 142, 155, 0.1);
+  }
+
+  .formkit-submit {
+    padding: 14px 32px;
+    background: var(--primary-color, #548e9b);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .formkit-submit:hover {
+    background: #4a7d88;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(84, 142, 155, 0.3);
+  }
+
+  .formkit-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+  }
+
+  .formkit-spinner div {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    animation: formkit-spinner 1.2s infinite ease-in-out;
+    display: inline-block;
+    margin: 0 2px;
+  }
+
+  .formkit-spinner div:nth-child(1) { animation-delay: -0.32s; }
+  .formkit-spinner div:nth-child(2) { animation-delay: -0.16s; }
+  .formkit-spinner div:nth-child(3) { animation-delay: 0s; }
+
+  @keyframes formkit-spinner {
+    0%, 80%, 100% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    40% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .formkit-alert {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1em 0;
+    font-size: 0.9em;
+    color: #d73527;
+    background: rgba(215, 53, 39, 0.1);
+    border: 1px solid rgba(215, 53, 39, 0.2);
+    border-radius: 8px;
+    padding: 0.8em 1em;
+    display: none;
+  }
+
+  .privacy-note {
+    text-align: center;
+    font-size: 0.9em;
+    color: #777;
+    margin-top: 1em;
+  }
+
+  @media (max-width: 768px) {
+    .subscribe-page {
+      padding: 1em;
+    }
+
+    .subscribe-hero {
+      padding: 2em 1em;
+    }
+
+    .subscribe-hero h1 {
+      font-size: 2em;
+    }
+
+    .hero-tagline {
+      font-size: 1.1em;
+    }
+
+    .benefits-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5em;
+    }
+
+    .form-section {
+      padding: 2em 1.5em;
+    }
+
+    .formkit-fields {
+      flex-direction: column;
+    }
+
+    .formkit-submit {
+      width: 100%;
+    }
+  }
+</style>
