@@ -18,14 +18,8 @@ const displayVideos = videos.slice(0, limit);
 
 <section class="youtube-section">
   <div class="youtube-header">
-    <h2 class="section-title">Watch Our Stories Come to Life</h2>
-    <p class="youtube-intro">Experience our tales on YouTube - where imagination meets storytelling</p>
-    <a href="https://www.youtube.com/@TheHawrotSiblings" target="_blank" rel="noopener noreferrer" class="channel-link">
-      <svg class="youtube-icon" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-      </svg>
-      Visit Our YouTube Channel
-    </a>
+    <h2 class="section-title">Listen to Our Stories</h2>
+    <p class="youtube-intro">Close your eyes and let our voices carry you into the tale</p>
   </div>
 
   <div class="videos-grid">
@@ -47,6 +41,12 @@ const displayVideos = videos.slice(0, limit);
         </div>
       </a>
     ))}
+  </div>
+
+  <div class="youtube-cta">
+    <a href="https://www.youtube.com/@TheHawrotSiblings" target="_blank" rel="noopener noreferrer" class="cta-link">
+      Hear more now →
+    </a>
   </div>
 </section>
 
@@ -73,33 +73,31 @@ const displayVideos = videos.slice(0, limit);
   .youtube-intro {
     font-size: 1.2em;
     color: #555;
-    margin-bottom: 1.5em;
+    margin-bottom: 2em;
   }
 
-  .channel-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.8rem 1.5rem;
+  .youtube-cta {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  .cta-link {
+    display: inline-block;
+    padding: 1rem 2.5rem;
     background: #ff0000;
     color: white;
     text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1.1rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.3rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
   }
 
-  .channel-link:hover {
+  .cta-link:hover {
     background: #cc0000;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
-  }
-
-  .youtube-icon {
-    width: 24px;
-    height: 24px;
   }
 
   .videos-grid {
@@ -212,9 +210,9 @@ const displayVideos = videos.slice(0, limit);
       gap: 1.5rem;
     }
 
-    .channel-link {
-      font-size: 1rem;
-      padding: 0.7rem 1.2rem;
+    .cta-link {
+      font-size: 1.1rem;
+      padding: 0.9rem 2rem;
     }
   }
 </style>

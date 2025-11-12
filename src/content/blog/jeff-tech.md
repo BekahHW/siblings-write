@@ -3,6 +3,7 @@ title: "The Jeff Tech Files: A Small Town Cover-up"
 publishDate: 4 February 2025
 description: Every conspiracy theory has a hometown tale.
 author: zach
+youtubeId: "dsH4k4SGvP4"
 ---
 
 ![Illustration of woman using a meditation app](/assets/blog/no_sledding.jpeg)
