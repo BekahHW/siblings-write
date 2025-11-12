@@ -33,6 +33,31 @@ const getAuthorsDisplay = (authorRefs) => {
 
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink}>
+    <!-- Background Animation Container -->
+    <div class="bg-animation">
+      <div id="stars"></div>
+    </div>
+
+    <!-- Fireflies Container -->
+    <div class="fireflies-container">
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+    </div>
+
+    <!-- Snowballs Container -->
+    <div class="snowballs-container">
+      <div class="snowball"></div>
+      <div class="snowball"></div>
+      <div class="snowball"></div>
+      <div class="snowball"></div>
+    </div>
+
     <div class="home-container">
       <div class="home-copy">
         <div class="title-container">
@@ -40,7 +65,9 @@ const getAuthorsDisplay = (authorRefs) => {
           <h1 class="title-line-2">Hawrot Siblings.</h1>
         </div>
         <div class="about-content">
-          <div class="typewriter-text"></div>
+          <div class="typewriter-text">
+            <p>Once upon a time, in a small town called Steubenville, Ohio, there lived three siblings named Josh, Bekah, and Zach who spent their childhood chasing fireflies through summer twilights and building snow forts that felt like castles in the winter. The years turned, as they always do, and those three children grew up and became parents to thirteen little ones of their own. But here's the secret: they never quite stopped being children in the ways that matter most. So they began writing down the wonder they remembered, creating stories that tasted like childhood, because some people never outgrow wonder. They just learn to share it.</p>
+          </div>
         </div>
       </div>
 
@@ -149,6 +176,44 @@ const getAuthorsDisplay = (authorRefs) => {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Limelight&family=Playwrite+HU:wght@100..400&display=swap');
+
+/* Background Stars Animation */
+.bg-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#stars {
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: 1780px 1349px #FFF, 1487px 732px #FFF, 1994px 1305px #FFF, 1237px 1594px #FFF, 840px 623px #FFF, 1075px 638px #FFF, 1531px 1902px #FFF, 1058px 1119px #FFF, 1849px 1411px #FFF, 1327px 870px #FFF, 1164px 1671px #FFF, 1572px 1499px #FFF, 670px 1672px #FFF, 1039px 1354px #FFF, 1388px 1768px #FFF, 765px 1857px #FFF, 1889px 1415px #FFF, 1698px 1923px #FFF, 371px 1331px #FFF, 1491px 956px #FFF, 1997px 1751px #FFF, 1945px 559px #FFF, 686px 1065px #FFF, 1622px 841px #FFF, 1158px 1203px #FFF, 1869px 1395px #FFF, 1469px 1196px #FFF, 1455px 1253px #FFF, 897px 630px #FFF, 989px 1733px #FFF, 1531px 1304px #FFF, 1980px 1569px #FFF, 1104px 830px #FFF, 1529px 1729px #FFF, 1647px 1543px #FFF, 1304px 988px #FFF, 1367px 1040px #FFF, 1941px 1371px #FFF, 528px 1539px #FFF, 1980px 1586px #FFF;
+  animation: animStar 100s linear infinite;
+}
+
+#stars:after {
+  content: " ";
+  position: absolute;
+  top: 2000px;
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: 1780px 1349px #FFF, 1487px 732px #FFF, 1994px 1305px #FFF, 1237px 1594px #FFF, 840px 623px #FFF, 1075px 638px #FFF, 1531px 1902px #FFF, 1058px 1119px #FFF, 1849px 1411px #FFF, 1327px 870px #FFF, 1164px 1671px #FFF, 1572px 1499px #FFF, 670px 1672px #FFF, 1039px 1354px #FFF, 1388px 1768px #FFF, 765px 1857px #FFF, 1889px 1415px #FFF, 1698px 1923px #FFF, 371px 1331px #FFF, 1491px 956px #FFF, 1997px 1751px #FFF, 1945px 559px #FFF, 686px 1065px #FFF, 1622px 841px #FFF, 1158px 1203px #FFF, 1869px 1395px #FFF, 1469px 1196px #FFF, 1455px 1253px #FFF, 897px 630px #FFF, 989px 1733px #FFF, 1531px 1304px #FFF, 1980px 1569px #FFF, 1104px 830px #FFF, 1529px 1729px #FFF, 1647px 1543px #FFF, 1304px 988px #FFF, 1367px 1040px #FFF, 1941px 1371px #FFF, 528px 1539px #FFF, 1980px 1586px #FFF;
+}
+
+@keyframes animStar {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-2000px);
+  }
+}
 
 /* ConvertKit Form Overrides */
 .newsletter-callout .formkit-form {
@@ -819,27 +884,23 @@ const getAuthorsDisplay = (authorRefs) => {
 }
 
 .typewriter-text p {
-  margin-bottom: 1em;
-  opacity: 0;
-  background: linear-gradient(90deg, #667eea 0%, #555 50%, #2d2d3f 100%);
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1em;
+  background: linear-gradient(90deg, #667eea 0%, #667eea 10%, #2d2d3f 50%, #2d2d3f 100%);
+  background-size: 200% 100%;
+  background-position: 0% 0;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  background-size: 200% 100%;
-  background-position: 100% 0;
-  animation: fade-in-gradient 3s ease-out forwards;
+  animation: gradient-fade-to-black 4s ease-out forwards;
 }
 
-@keyframes fade-in-gradient {
+@keyframes gradient-fade-to-black {
   0% {
-    opacity: 0;
     background-position: 0% 0;
   }
-  20% {
-    opacity: 1;
-  }
   100% {
-    opacity: 1;
     background-position: 100% 0;
   }
 }
@@ -847,51 +908,154 @@ const getAuthorsDisplay = (authorRefs) => {
 /* Fireflies */
 .firefly {
   position: fixed;
-  width: 8px;
-  height: 8px;
-  background: #ffeb3b;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffeb3b, 0 0 30px #ffeb3b;
+  left: 50%;
+  top: 50%;
+  width: 0.4vw;
+  height: 0.4vw;
+  margin: -0.2vw 0 0 9.8vw;
+  animation: ease 200s alternate infinite;
   pointer-events: none;
   z-index: 1000;
-  animation: firefly-float 4s ease-in-out infinite;
-  opacity: 0;
 }
 
-@keyframes firefly-float {
-  0%, 100% {
-    opacity: 0;
-    transform: translateY(0) translateX(0);
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-    transform: translateY(-100px) translateX(50px);
-  }
-  90% {
-    opacity: 1;
-  }
-}
-
-.firefly::before {
+.firefly::before,
+.firefly::after {
   content: '';
   position: absolute;
   width: 100%;
   height: 100%;
-  background: inherit;
   border-radius: 50%;
-  animation: firefly-glow 2s ease-in-out infinite alternate;
+  transform-origin: -10vw;
 }
 
-@keyframes firefly-glow {
+.firefly::before {
+  background: black;
+  opacity: 0.4;
+  animation: drift ease alternate infinite;
+}
+
+.firefly::after {
+  background: white;
+  opacity: 0;
+  box-shadow: 0 0 0vw 0vw yellow;
+  animation: drift ease alternate infinite, flash ease infinite;
+}
+
+@keyframes drift {
   0% {
-    box-shadow: 0 0 5px #ffeb3b;
+    transform: rotate(0deg);
   }
   100% {
-    box-shadow: 0 0 20px #ffeb3b, 0 0 30px #ffeb3b;
+    transform: rotate(360deg);
   }
+}
+
+@keyframes flash {
+  0%, 30%, 100% {
+    opacity: 0;
+    box-shadow: 0 0 0vw 0vw yellow;
+  }
+  5% {
+    opacity: 1;
+    box-shadow: 0 0 2vw 0.4vw yellow;
+  }
+}
+
+/* Individual firefly animations */
+.firefly:nth-child(1) { animation-name: move1; }
+.firefly:nth-child(1)::before { animation-duration: 10s; }
+.firefly:nth-child(1)::after { animation-duration: 10s, 7000ms; animation-delay: 0ms, 2000ms; }
+
+.firefly:nth-child(2) { animation-name: move2; }
+.firefly:nth-child(2)::before { animation-duration: 12s; }
+.firefly:nth-child(2)::after { animation-duration: 12s, 8000ms; animation-delay: 0ms, 3000ms; }
+
+.firefly:nth-child(3) { animation-name: move3; }
+.firefly:nth-child(3)::before { animation-duration: 9s; }
+.firefly:nth-child(3)::after { animation-duration: 9s, 6500ms; animation-delay: 0ms, 1500ms; }
+
+.firefly:nth-child(4) { animation-name: move4; }
+.firefly:nth-child(4)::before { animation-duration: 11s; }
+.firefly:nth-child(4)::after { animation-duration: 11s, 9000ms; animation-delay: 0ms, 4000ms; }
+
+.firefly:nth-child(5) { animation-name: move5; }
+.firefly:nth-child(5)::before { animation-duration: 13s; }
+.firefly:nth-child(5)::after { animation-duration: 13s, 7500ms; animation-delay: 0ms, 2500ms; }
+
+.firefly:nth-child(6) { animation-name: move6; }
+.firefly:nth-child(6)::before { animation-duration: 10s; }
+.firefly:nth-child(6)::after { animation-duration: 10s, 8500ms; animation-delay: 0ms, 3500ms; }
+
+.firefly:nth-child(7) { animation-name: move7; }
+.firefly:nth-child(7)::before { animation-duration: 14s; }
+.firefly:nth-child(7)::after { animation-duration: 14s, 6000ms; animation-delay: 0ms, 1000ms; }
+
+.firefly:nth-child(8) { animation-name: move8; }
+.firefly:nth-child(8)::before { animation-duration: 11s; }
+.firefly:nth-child(8)::after { animation-duration: 11s, 9500ms; animation-delay: 0ms, 4500ms; }
+
+@keyframes move1 {
+  0% { transform: translateX(-20vw) translateY(-15vh) scale(0.5); }
+  25% { transform: translateX(10vw) translateY(20vh) scale(0.7); }
+  50% { transform: translateX(-15vw) translateY(-10vh) scale(0.9); }
+  75% { transform: translateX(25vw) translateY(15vh) scale(0.6); }
+  100% { transform: translateX(-20vw) translateY(-15vh) scale(0.5); }
+}
+
+@keyframes move2 {
+  0% { transform: translateX(30vw) translateY(10vh) scale(0.6); }
+  25% { transform: translateX(-10vw) translateY(-20vh) scale(0.8); }
+  50% { transform: translateX(20vw) translateY(15vh) scale(0.5); }
+  75% { transform: translateX(-25vw) translateY(-5vh) scale(0.7); }
+  100% { transform: translateX(30vw) translateY(10vh) scale(0.6); }
+}
+
+@keyframes move3 {
+  0% { transform: translateX(-30vw) translateY(20vh) scale(0.7); }
+  25% { transform: translateX(15vw) translateY(-15vh) scale(0.9); }
+  50% { transform: translateX(-20vw) translateY(10vh) scale(0.6); }
+  75% { transform: translateX(10vw) translateY(-20vh) scale(0.8); }
+  100% { transform: translateX(-30vw) translateY(20vh) scale(0.7); }
+}
+
+@keyframes move4 {
+  0% { transform: translateX(25vw) translateY(-20vh) scale(0.8); }
+  25% { transform: translateX(-15vw) translateY(15vh) scale(0.6); }
+  50% { transform: translateX(30vw) translateY(-10vh) scale(0.9); }
+  75% { transform: translateX(-20vw) translateY(20vh) scale(0.7); }
+  100% { transform: translateX(25vw) translateY(-20vh) scale(0.8); }
+}
+
+@keyframes move5 {
+  0% { transform: translateX(-25vw) translateY(-10vh) scale(0.9); }
+  25% { transform: translateX(20vw) translateY(25vh) scale(0.5); }
+  50% { transform: translateX(-30vw) translateY(-15vh) scale(0.7); }
+  75% { transform: translateX(15vw) translateY(10vh) scale(0.8); }
+  100% { transform: translateX(-25vw) translateY(-10vh) scale(0.9); }
+}
+
+@keyframes move6 {
+  0% { transform: translateX(15vw) translateY(15vh) scale(0.6); }
+  25% { transform: translateX(-20vw) translateY(-25vh) scale(0.8); }
+  50% { transform: translateX(25vw) translateY(20vh) scale(0.7); }
+  75% { transform: translateX(-10vw) translateY(-15vh) scale(0.9); }
+  100% { transform: translateX(15vw) translateY(15vh) scale(0.6); }
+}
+
+@keyframes move7 {
+  0% { transform: translateX(-15vw) translateY(25vh) scale(0.7); }
+  25% { transform: translateX(30vw) translateY(-10vh) scale(0.5); }
+  50% { transform: translateX(-25vw) translateY(15vh) scale(0.8); }
+  75% { transform: translateX(20vw) translateY(-20vh) scale(0.6); }
+  100% { transform: translateX(-15vw) translateY(25vh) scale(0.7); }
+}
+
+@keyframes move8 {
+  0% { transform: translateX(20vw) translateY(-15vh) scale(0.8); }
+  25% { transform: translateX(-25vw) translateY(20vh) scale(0.6); }
+  50% { transform: translateX(15vw) translateY(-25vh) scale(0.9); }
+  75% { transform: translateX(-30vw) translateY(10vh) scale(0.7); }
+  100% { transform: translateX(20vw) translateY(-15vh) scale(0.8); }
 }
 
 /* Snowballs */
@@ -904,22 +1068,93 @@ const getAuthorsDisplay = (authorRefs) => {
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   pointer-events: none;
   z-index: 1000;
-  animation: snowball-throw 1.5s ease-out forwards;
-  opacity: 0;
+  animation: ease 15s infinite;
+  left: -50px;
+  top: 50%;
 }
 
-@keyframes snowball-throw {
+.snowball:nth-child(1) { animation-name: snowball-throw1; animation-delay: 0s; }
+.snowball:nth-child(2) { animation-name: snowball-throw2; animation-delay: 3s; }
+.snowball:nth-child(3) { animation-name: snowball-throw3; animation-delay: 6s; }
+.snowball:nth-child(4) { animation-name: snowball-throw4; animation-delay: 9s; }
+
+@keyframes snowball-throw1 {
   0% {
-    opacity: 1;
+    opacity: 0;
     transform: translateX(0) translateY(0) rotate(0deg);
   }
-  50% {
+  10% {
     opacity: 1;
-    transform: translateX(200px) translateY(-150px) rotate(180deg);
+  }
+  50% {
+    transform: translateX(40vw) translateY(-30vh) rotate(360deg);
+  }
+  90% {
+    opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translateX(400px) translateY(100px) rotate(360deg);
+    transform: translateX(80vw) translateY(20vh) rotate(720deg);
+  }
+}
+
+@keyframes snowball-throw2 {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(-10vh) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(45vw) translateY(-35vh) rotate(400deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(90vw) translateY(15vh) rotate(800deg);
+  }
+}
+
+@keyframes snowball-throw3 {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(5vh) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(35vw) translateY(-25vh) rotate(320deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(70vw) translateY(25vh) rotate(640deg);
+  }
+}
+
+@keyframes snowball-throw4 {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(-5vh) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(50vw) translateY(-40vh) rotate(450deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100vw) translateY(30vh) rotate(900deg);
   }
 }
 
@@ -997,58 +1232,6 @@ const getAuthorsDisplay = (authorRefs) => {
 <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
 
 <script>
-// Typewriter Effects with Fireflies and Snowballs
-document.addEventListener('DOMContentLoaded', function() {
-  // Helper functions for animations
-  function createFirefly() {
-    const firefly = document.createElement('div');
-    firefly.className = 'firefly';
-    firefly.style.left = Math.random() * window.innerWidth + 'px';
-    firefly.style.top = (window.innerHeight * 0.3) + (Math.random() * window.innerHeight * 0.4) + 'px';
-    firefly.style.animationDelay = Math.random() * 2 + 's';
-    firefly.style.animationDuration = (3 + Math.random() * 2) + 's';
-    document.body.appendChild(firefly);
-
-    setTimeout(() => {
-      firefly.remove();
-    }, 5000);
-  }
-
-  function createSnowball() {
-    const snowball = document.createElement('div');
-    snowball.className = 'snowball';
-    snowball.style.left = (Math.random() * (window.innerWidth * 0.3)) + 'px';
-    snowball.style.top = (window.innerHeight * 0.2) + (Math.random() * window.innerHeight * 0.3) + 'px';
-    snowball.style.animationDelay = Math.random() * 0.5 + 's';
-    document.body.appendChild(snowball);
-
-    setTimeout(() => {
-      snowball.remove();
-    }, 2000);
-  }
-
-  // Fade-in effect for the story with fireflies and snowballs
-  const typewriterContainer = document.querySelector('.typewriter-text');
-  if (typewriterContainer) {
-    const storyText = "Once upon a time, in a small town called Steubenville, Ohio, there lived three siblings named Josh, Bekah, and Zach who spent their childhood chasing fireflies through summer twilights and building snow forts that felt like castles in the winter. The years turned, as they always do, and those three children grew up and became parents to thirteen little ones of their own. But here's the secret: they never quite stopped being children in the ways that matter most. So they began writing down the wonder they remembered, creating stories that tasted like childhood, because some people never outgrow wonder. They just learn to share it.";
-
-    // Create paragraph with story text
-    const storyParagraph = document.createElement('p');
-    storyParagraph.textContent = storyText;
-    typewriterContainer.appendChild(storyParagraph);
-
-    // Start creating fireflies and snowballs during fade-in
-    const fireflyInterval = setInterval(createFirefly, 800);
-    const snowballInterval = setInterval(createSnowball, 1200);
-
-    // Stop animations after story fade completes (7.5 seconds total: 4.5s delay + 3s fade)
-    setTimeout(() => {
-      clearInterval(fireflyInterval);
-      clearInterval(snowballInterval);
-    }, 7500);
-  }
-});
-
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('.newsletter-form-inline') as HTMLFormElement;
   const modal = document.getElementById('success-modal');
