@@ -113,10 +113,15 @@ const permalink = `${Astro.site.href}work`;
   }
 
   .testimonials-section {
-    margin-top: 2em;
+    margin-top: 4em;
+    padding: 3em 2em;
     display: flex;
     flex-direction: column;
     gap: 2em;
+    background: rgba(249, 250, 251, 0.8);
+    border-radius: 16px;
+    border-top: 3px solid var(--primary-color, #548e9b);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
   }
 
   .testimonial {
@@ -164,6 +169,11 @@ const permalink = `${Astro.site.href}work`;
     .book-section img {
       width: 100%;
       max-width: 250px;
+    }
+
+    .testimonials-section {
+      padding: 2em 1.5em;
+      margin-top: 3em;
     }
   }
 </style>
