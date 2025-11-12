@@ -2,6 +2,7 @@
 import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
+import NewsletterCTA from '../../components/NewsletterCTA.astro';
 
 const title = 'Stories';
 const description = 'Latest stories.';
@@ -30,6 +31,9 @@ const getAuthorsDisplay = (authorRefs) => {
   <BaseLayout title={title} description={description} permalink={permalink} current="blog">
     <div class="container">
       <h1>Our Short Stories</h1>
+
+      <NewsletterCTA variant="default" showTestimonials={false} tagline="Stories that make you believe in magic - delivered first to subscribers" heading="Enjoying our stories?" />
+
       {sortedPosts.map((post, index) => {
         return (
           <div>
