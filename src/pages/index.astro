@@ -779,17 +779,34 @@ const getAuthorsDisplay = (authorRefs) => {
 @media (max-width: 800px) {
   .home-container {
     flex-direction: column;
+    padding: 1.5rem 1rem;
+    margin: 1rem;
   }
 
   .home-copy {
     flex: 0;
     padding-bottom: 1em;
     text-align: center;
+    padding: 0;
   }
-  
+
   .about-content {
     max-width: 600px;
     margin: 0 auto;
+  }
+
+  .hero-image-container {
+    margin: 1em 0 0 0;
+    order: -1;
+  }
+
+  .hero-image {
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+
+  .newsletter-callout {
+    margin-top: 1.5em;
   }
 }
 </style>

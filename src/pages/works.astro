@@ -68,7 +68,7 @@ const permalink = `${Astro.site.href}work`;
 
 <style>
   .container-new {
-    max-width: 80%;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 2em;
   }
@@ -96,6 +96,11 @@ const permalink = `${Astro.site.href}work`;
     border: 2px solid rgba(124, 58, 237, 0.1);
   }
 
+  .book-section > div {
+    flex: 1;
+    min-width: 0;
+  }
+
   .book-section:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(124, 58, 237, 0.2);
@@ -105,8 +110,11 @@ const permalink = `${Astro.site.href}work`;
   .book-section img {
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    margin: 12px;
+    margin: 0;
     transition: all 0.3s ease;
+    flex-shrink: 0;
+    width: 200px;
+    height: auto;
   }
 
   .book-section:hover img {
@@ -210,6 +218,11 @@ const permalink = `${Astro.site.href}work`;
   }
 
   @media (max-width: 1020px) {
+    .container-new {
+      padding: 1.5em;
+      max-width: 100%;
+    }
+
     .work-image {
       float: none;
       margin: 0 auto 2em;
@@ -217,17 +230,44 @@ const permalink = `${Astro.site.href}work`;
 
     .book-section {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
+      text-align: center;
+      padding: 1.5em;
+      margin: 2em 0;
     }
 
     .book-section img {
       width: 100%;
-      max-width: 250px;
+      max-width: 200px;
+      margin: 0 0 1.5em 0;
     }
 
     .testimonials-section {
       padding: 2em 1.5em;
       margin-top: 3em;
+    }
+
+    .testimonial {
+      padding: 1.5em;
+    }
+
+    .testimonial::before {
+      font-size: 4em;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .container-new {
+      padding: 1em;
+    }
+
+    .book-section {
+      padding: 1em;
+      gap: 1em;
+    }
+
+    .testimonials-section {
+      padding: 1.5em 1em;
     }
   }
 </style>
