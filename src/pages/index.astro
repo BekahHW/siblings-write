@@ -35,10 +35,9 @@ const getAuthorsDisplay = (authorRefs) => {
   <BaseLayout title={title} description={description} permalink={permalink}>
     <div class="home-container">
       <div class="home-copy">
-        <h1>The Hawrot Siblings</h1>
+        <h1 class="drawn-title">The Hawrot Siblings</h1>
         <div class="about-content">
-          <h2>Stories from the Siblings Who Never Outgrew Wonder</h2>
-          <p>Josh, Bekah, and Zach grew up chasing fireflies and building snow forts in Steubenville, Ohio. Now we’re raising kids of our own (13 total!) and writing stories that capture the magic of our childhood.</p>
+          <div class="typewriter-text"></div>
           
           <!-- Newsletter Form Integrated -->
           <div class="newsletter-callout">
@@ -701,13 +700,48 @@ const getAuthorsDisplay = (authorRefs) => {
   font-weight: 700;
   margin-bottom: 0.5em;
   line-height: 1.3;
-  background: var(--primary-gradient);
+  position: relative;
+}
+
+.drawn-title {
+  color: #667eea;
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-shift 5s ease infinite;
-  background-size: 200% 200%;
-  position: relative;
+}
+
+.drawn-title::before {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  color: transparent;
+  -webkit-text-stroke: 2px #667eea;
+  text-stroke: 2px #667eea;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-in 3s ease-out forwards;
+  z-index: 1;
+}
+
+@keyframes draw-in {
+  0% {
+    stroke-dashoffset: 1000;
+    opacity: 1;
+  }
+  50% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
 }
 
 @keyframes gradient-shift {
@@ -763,12 +797,56 @@ const getAuthorsDisplay = (authorRefs) => {
   margin-bottom: 1em;
 }
 
+.typewriter-text {
+  font-size: 1.1em;
+  line-height: 1.8;
+  margin-bottom: 1.5em;
+  color: #555;
+  min-height: 400px;
+}
+
+.typewriter-text p {
+  margin-bottom: 1em;
+  opacity: 0;
+  animation: fade-in 0.3s ease-in forwards;
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: #667eea;
+  margin-left: 2px;
+  animation: blink 0.7s infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 1200px) {
   p {
     font-size: 1.2em;
   }
   .about-content p {
     font-size: 1em;
+  }
+
+  .typewriter-text {
+    font-size: 1em;
+    min-height: 350px;
   }
 
   .hero-image {
@@ -795,6 +873,12 @@ const getAuthorsDisplay = (authorRefs) => {
     margin: 0 auto;
   }
 
+  .typewriter-text {
+    font-size: 0.95em;
+    min-height: 300px;
+    text-align: left;
+  }
+
   .hero-image-container {
     margin: 1em 0 0 0;
     order: -1;
@@ -814,6 +898,90 @@ const getAuthorsDisplay = (authorRefs) => {
 <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
 
 <script>
+// Draw-in and Typewriter Effects
+document.addEventListener('DOMContentLoaded', function() {
+  // Set data-text attribute for draw-in effect
+  const drawnTitle = document.querySelector('.drawn-title');
+  if (drawnTitle) {
+    drawnTitle.setAttribute('data-text', drawnTitle.textContent);
+  }
+
+  // Typewriter effect for the story
+  const typewriterContainer = document.querySelector('.typewriter-text');
+  if (typewriterContainer) {
+    const storyParagraphs = [
+      "Once upon a time, in a small town called Steubenville, Ohio, there lived three siblings named Josh, Bekah, and Zach. They spent their days running through backyards with mason jars, catching fireflies that blinked like tiny stars in their hands. When winter came, they built snow forts so grand they could have been castles, with walls thick enough to stop any snowball attack from the neighborhood kids.",
+      "The years passed, as years always do, and those three children grew up. But here's the thing about some people: they never quite stop being children, not in the ways that matter most. Josh, Bekah, and Zach became parents themselves, and now thirteen little ones call them Mom and Dad. Thirteen pairs of eyes that light up at bedtime stories. Thirteen hearts that still believe in magic.",
+      "And so the siblings decided to do what storytellers have always done. They began writing down the wonder they remembered from those firefly summers and snow fort winters. They wrote stories that tasted like childhood, stories that remembered what it felt like to believe anything was possible.",
+      "Because some people, you see, never outgrow wonder. They just learn to share it."
+    ];
+
+    let currentParagraph = 0;
+    let currentChar = 0;
+    let currentElement = null;
+    let cursorElement = null;
+
+    function typeWriter() {
+      if (currentParagraph >= storyParagraphs.length) {
+        // Remove cursor when done
+        if (cursorElement) {
+          cursorElement.remove();
+        }
+        return;
+      }
+
+      // Create new paragraph element if needed
+      if (!currentElement) {
+        currentElement = document.createElement('p');
+        typewriterContainer.appendChild(currentElement);
+
+        // Add cursor if not exists
+        if (!cursorElement) {
+          cursorElement = document.createElement('span');
+          cursorElement.className = 'typewriter-cursor';
+          currentElement.appendChild(cursorElement);
+        } else {
+          currentElement.appendChild(cursorElement);
+        }
+      }
+
+      const text = storyParagraphs[currentParagraph];
+
+      if (currentChar < text.length) {
+        // Insert character before cursor
+        const textNode = document.createTextNode(text.charAt(currentChar));
+        currentElement.insertBefore(textNode, cursorElement);
+        currentChar++;
+
+        // Variable speed: faster for spaces, slower for punctuation
+        let speed = 30; // Base speed
+        if (text.charAt(currentChar - 1) === ' ') {
+          speed = 15;
+        } else if (['.', '!', '?'].includes(text.charAt(currentChar - 1))) {
+          speed = 400;
+        } else if ([',', ';', ':'].includes(text.charAt(currentChar - 1))) {
+          speed = 200;
+        }
+
+        setTimeout(typeWriter, speed);
+      } else {
+        // Move to next paragraph
+        currentParagraph++;
+        currentChar = 0;
+        currentElement = null;
+
+        // Pause between paragraphs
+        setTimeout(typeWriter, 500);
+      }
+    }
+
+    // Start typing after the draw-in animation completes (3 seconds)
+    setTimeout(() => {
+      typeWriter();
+    }, 3200);
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('.newsletter-form-inline') as HTMLFormElement;
   const modal = document.getElementById('success-modal');
