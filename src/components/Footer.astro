@@ -1,9 +1,22 @@
 ---
+import NewsletterCTA from './NewsletterCTA.astro';
 import FontAwesomeIcon from "./FontAwesomeIcon.astro";
 import { faAmazon, faYoutube } from "@fortawesome/free-brands-svg-icons";
+
+interface Props {
+  hideNewsletter?: boolean;
+}
+
+const { hideNewsletter = false } = Astro.props;
 ---
 
 <footer>
+  {!hideNewsletter && (
+    <div class="footer-newsletter">
+      <NewsletterCTA variant="footer" showTestimonials={false} tagline="Never Miss a Story. Subscribe Today" />
+    </div>
+  )}
+
   <div class="social-links">
     <a href="https://www.amazon.com/stores/author/B0FQS3SGZQ" target="_blank" rel="noopener" class="social-link" aria-label="Follow us on Amazon">
       <FontAwesomeIcon iconName={faAmazon} />
@@ -14,22 +27,29 @@ import { faAmazon, faYoutube } from "@fortawesome/free-brands-svg-icons";
       <span>Subscribe on YouTube</span>
     </a>
   </div>
-  <span>
-    &copy; {new Date().getFullYear()} Siblings Write.
-    Powered by <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>.
-    Template by <a href="https://www.twitter.com/Charca" target="_blank" rel="noopener">Maxi Ferreira</a>.
-  </span>
+
+  <div class="footer-credits">
+    <span>
+      &copy; {new Date().getFullYear()} Siblings Write.
+      Powered by <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>.
+      Template by <a href="https://www.twitter.com/Charca" target="_blank" rel="noopener">Maxi Ferreira</a>.
+    </span>
+  </div>
 </footer>
 
 <style>
   footer {
-    color: var(--text-secondary);
-    font-size: .8em;
-    margin: 1em auto;
+    margin: 3em auto 1em;
     max-width: 1400px;
-    padding: 1em 2em;
-    text-align: center;
+    padding: 0 2em;
     width: 100%;
+  }
+
+  .footer-newsletter {
+    max-width: 800px;
+    margin: 0 auto 2em;
+    padding-bottom: 2em;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .social-links {
@@ -61,6 +81,13 @@ import { faAmazon, faYoutube } from "@fortawesome/free-brands-svg-icons";
     width: 20px;
     height: 20px;
     fill: white;
+  }
+
+  .footer-credits {
+    color: var(--text-secondary);
+    font-size: .8em;
+    text-align: center;
+    padding: 1em 0;
   }
 
   @media (prefers-color-scheme: dark) {

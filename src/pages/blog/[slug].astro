@@ -5,6 +5,7 @@ import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import ShareButtons from '../../components/ShareButtons.astro';
 import YouTubeEmbed from '../../components/YouTubeEmbed.astro';
+import NewsletterCTA from '../../components/NewsletterCTA.astro';
 
 export async function getStaticPaths() {
   try {
@@ -92,6 +93,8 @@ const permalink = `${Astro.site.href}blog/${entry.id}`;
           <YouTubeEmbed videoId={entry.data.youtubeId} title={entry.data.title} />
         </div>
       )}
+
+      <NewsletterCTA variant="default" showTestimonials={false} />
 
       <div class="post-navigation">
         {prevPost && (
