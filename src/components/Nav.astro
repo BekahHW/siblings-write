@@ -1,5 +1,4 @@
 ---
-import ThemeToggleButton from './ThemeToggleButton.svelte';
 import MobileNav from './MobileNav.svelte';
 const { current = '' } = Astro.props;
 ---
@@ -51,10 +50,6 @@ const { current = '' } = Astro.props;
     background: var(--primary-color);
   }
 
-  .theme-toggle-container {
-    width: 75px;
-  }
-
   .nav-links {
     display: flex;
     align-items: center;
@@ -64,12 +59,6 @@ const { current = '' } = Astro.props;
   @media screen and (max-width: 768px) {
     .nav-links {
       display: none;
-    }
-  }
-
-  @media screen and (max-width: 520px) {
-    .theme-toggle-container {
-      margin-right: 1em;
     }
   }
 </style>
@@ -82,9 +71,6 @@ const { current = '' } = Astro.props;
   <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
   <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
   <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
-  </div>
-  <div class="theme-toggle-container">
-    <ThemeToggleButton client:load />
   </div>
   <MobileNav client:load current={current} />
 </nav>

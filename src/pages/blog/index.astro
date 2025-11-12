@@ -17,6 +17,15 @@ const getAuthorName = (authorId) => {
   const author = authorEntries.find(a => a.id === authorId);
   return author ? author.data.name : authorId; // Fallback to ID if author not found
 };
+
+// Helper to get multiple author names formatted
+const getAuthorsDisplay = (authorRefs) => {
+  if (!authorRefs || authorRefs.length === 0) return '';
+  const names = authorRefs.map(ref => getAuthorName(ref.id));
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+};
 ---
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink} current="blog">
@@ -35,7 +44,14 @@ const getAuthorName = (authorId) => {
               </h2>
               <p>{post.data.description}</p>
               <span class="post-item-author">
-                By <a href={`/authors/${post.data.author.id}`}>{getAuthorName(post.data.author.id)}</a>
+                By {post.data.authors.map((authorRef, idx) => (
+                  <>
+                    <a href={`/authors/${authorRef.id}`}>{getAuthorName(authorRef.id)}</a>
+                    {idx < post.data.authors.length - 1 && (
+                      idx === post.data.authors.length - 2 ? ' and ' : ', '
+                    )}
+                  </>
+                ))}
               </span>
               <span class="post-item-date">— {post.data.publishDate}</span>
             </div>

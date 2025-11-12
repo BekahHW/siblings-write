@@ -13,44 +13,47 @@
         "publishDate": {
           "type": "string"
         },
-        "author": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string"
-                },
-                "collection": {
-                  "type": "string"
-                }
+        "authors": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
               },
-              "required": [
-                "id",
-                "collection"
-              ],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "slug": {
-                  "type": "string"
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "collection": {
+                    "type": "string"
+                  }
                 },
-                "collection": {
-                  "type": "string"
-                }
+                "required": [
+                  "id",
+                  "collection"
+                ],
+                "additionalProperties": false
               },
-              "required": [
-                "slug",
-                "collection"
-              ],
-              "additionalProperties": false
-            }
-          ]
+              {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string"
+                  },
+                  "collection": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slug",
+                  "collection"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
         },
         "hidden": {
           "type": "boolean"
@@ -63,7 +66,7 @@
         "title",
         "description",
         "publishDate",
-        "author"
+        "authors"
       ],
       "additionalProperties": false
     }

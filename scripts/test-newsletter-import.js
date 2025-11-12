@@ -150,17 +150,22 @@ function testBlogPost(filepath) {
       if (!isValid) allFieldsValid = false;
     }
 
-    // Test 3: Validate author (accept string reference or object with id), case-insensitive
+    // Test 3: Validate authors array (accept array of strings or objects with id), case-insensitive
     const validAuthorSlugs = getValidAuthorSlugs();
-    const authorVal = frontmatter.author;
-    let authorValid = false;
-    if (typeof authorVal === 'string') {
-      authorValid = validAuthorSlugs.has(authorVal.toLowerCase());
-    } else if (authorVal && typeof authorVal === 'object' && authorVal.id) {
-      authorValid = validAuthorSlugs.has(String(authorVal.id).toLowerCase());
+    const authorsVal = frontmatter.authors;
+    let authorsValid = false;
+    if (Array.isArray(authorsVal) && authorsVal.length > 0) {
+      authorsValid = authorsVal.every(author => {
+        if (typeof author === 'string') {
+          return validAuthorSlugs.has(author.toLowerCase());
+        } else if (author && typeof author === 'object' && author.id) {
+          return validAuthorSlugs.has(String(author.id).toLowerCase());
+        }
+        return false;
+      });
     }
-    console.log(`${authorValid ? '✅' : '❌'} author: ${JSON.stringify(authorVal)}`);
-    if (!authorValid) allFieldsValid = false;
+    console.log(`${authorsValid ? '✅' : '❌'} authors: ${JSON.stringify(authorsVal)}`);
+    if (!authorsValid) allFieldsValid = false;
     
     
     // Test 4: Extract and check content

@@ -2,7 +2,7 @@
 title: "Barely Scratching the Surface"
 publishDate: 4 March 2025
 description: When you look underneath, there's always more than meets the eye.
-author: josh
+authors: [josh]
 ---
 ![Illustration of a tunnel in a grassy hill](/assets/blog/tunnel.jpeg)
 

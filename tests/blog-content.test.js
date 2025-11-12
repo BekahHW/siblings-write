@@ -12,7 +12,7 @@ const mockBlogPosts = [
       title: 'Test Post',
       description: 'This is a test post',
       publishDate: new Date('2023-01-01'),
-      author: { id: 'bekah' },
+      authors: [{ id: 'bekah' }],
       image: { src: '/assets/blog/test-image.jpg', alt: 'Test image' }
     }
   }
@@ -74,15 +74,18 @@ describe('Blog Post Structure Tests', () => {
       
       expect(post.data.publishDate).toBeDefined();
       expect(post.data.publishDate instanceof Date || typeof post.data.publishDate === 'string').toBe(true);
-      
-      expect(post.data.author).toBeDefined();
-      expect(post.data.author.id).toBeDefined();
+
+      expect(post.data.authors).toBeDefined();
+      expect(Array.isArray(post.data.authors)).toBe(true);
+      expect(post.data.authors.length).toBeGreaterThan(0);
     });
 
-    it('should have valid author reference', async () => {
+    it('should have valid author references', async () => {
       const authors = await getCollection('authors');
-      const authorExists = authors.some(author => author.id === post.data.author.id);
-      expect(authorExists).toBe(true);
+      post.data.authors.forEach(authorRef => {
+        const authorExists = authors.some(author => author.id === authorRef.id);
+        expect(authorExists).toBe(true);
+      });
     });
 
     it('should have content', () => {
