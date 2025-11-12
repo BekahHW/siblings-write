@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
 const title = 'Siblings Write';
-const description = 'The Hawrot Siblings Writing Blog.';
+const description = 'Young adult fiction, middle grade adventures, and Christmas novels by the Hawrot Siblings. Discover YA stories like Escape from Browns Island, holiday tales like The Battle for Christmas, and family-friendly adventure fiction.';
 const permalink = Astro.site.href;
 // Get all blog posts and sort by date (descending)
 const allPosts = await getCollection('blog', ({ data }) => data.hidden !== true);
@@ -80,7 +80,7 @@ const getAuthorsDisplay = (authorRefs) => {
       <div class="hero-image-container">
         <picture>
           <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
-          <img class="hero-image" alt="the Hawrot Siblings" src="/assets/Hawrot-Siblings.png" width="550" height="466">
+          <img class="hero-image" alt="The Hawrot Siblings - Josh, Bekah, and Zach - authors of young adult fiction, middle grade adventures, and Christmas novels" src="/assets/Hawrot-Siblings.png" width="550" height="466">
         </picture>
       </div>
     </div>

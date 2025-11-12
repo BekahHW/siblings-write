@@ -3,12 +3,124 @@ import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = 'Our Work';
-const description = 'Discover our projects and stories.';
+const description = 'Discover our young adult fiction, middle grade adventures, and Christmas novels. Browse YA fiction like Escape from Browns Island, holiday stories like The Battle for Christmas, and middle grade adventures by the Hawrot siblings.';
 const permalink = `${Astro.site.href}work`;
+
+// Structured data for books
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Book",
+      "@id": "https://www.siblingswrite.com/work#battle-for-christmas",
+      "name": "The Battle for Christmas: Reign of the Nutcrackers",
+      "author": [
+        {
+          "@type": "Person",
+          "name": "Zach Hawrot",
+          "url": "https://www.siblingswrite.com/authors/zach"
+        },
+        {
+          "@type": "Person",
+          "name": "Josh Hawrot",
+          "url": "https://www.siblingswrite.com/authors/josh"
+        }
+      ],
+      "genre": ["Christmas Fiction", "Holiday Fiction", "Fantasy", "Adventure Fiction", "Family Fiction"],
+      "bookFormat": "https://schema.org/Paperback",
+      "description": "Join Tim on a captivating adventure of hope, family, and the enduring magic of Christmas. Perfect for fans of holiday adventures and heartwarming tales, this story reminds us that even in the darkest times, the light of Christmas can shine the brightest.",
+      "image": "https://www.siblingswrite.com/assets/nutcracker.jpg",
+      "url": "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1",
+      "keywords": "Christmas, holiday fiction, Christmas adventure, family story, Christmas magic, nutcracker, holiday reading, Christmas novel, festive fiction",
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Family audience, children and adults"
+      },
+      "inLanguage": "en-US",
+      "review": {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Amazon Reader"
+        },
+        "reviewBody": "I decided to give this book a try over the holiday season and I'm so glad I did! This was a huge break from the normal self-help / non-fiction books I like to read, so I wasn't sure what to expect. The authors do a wonderful job of building a world based on their own lives while pushing into fantasy and adventure in so many creative ways! I couldn't put the book down after the halfway point where the story keeps you guessing while filling you with an undeniable Christmas cheer. I'm a grown adult who felt like a kid again while enjoying this story."
+      }
+    },
+    {
+      "@type": "Book",
+      "@id": "https://www.siblingswrite.com/work#escape-from-browns-island",
+      "name": "Escape from Browns Island",
+      "author": [
+        {
+          "@type": "Person",
+          "name": "Zach Hawrot",
+          "url": "https://www.siblingswrite.com/authors/zach"
+        },
+        {
+          "@type": "Person",
+          "name": "Josh Hawrot",
+          "url": "https://www.siblingswrite.com/authors/josh"
+        }
+      ],
+      "genre": ["Young Adult", "YA Fiction", "Teen Fiction", "Adventure Fiction", "Supernatural Fiction", "Coming of Age"],
+      "bookFormat": "https://schema.org/EBook",
+      "description": "Every small town has legends—but not every kid gets the chance to rewrite them. This novelette starts off with a simple dare: 17-year-old Tommy must spend one summer night alone on Browns Island, an abandoned, 4-mile-long island in the heart of the Ohio River. What he wants is a peaceful night to himself. What he needs is an escape from the chaos he just caused his family. What he finds is an island that isn't abandoned. It is alive and waiting for his arrival.",
+      "image": "https://www.siblingswrite.com/assets/brownsisland.jpg",
+      "url": "https://dub.sh/browns-island",
+      "keywords": "young adult, YA fiction, teen fiction, adventure, supernatural, coming of age, Ohio River, small town, legends, teenage protagonist",
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Young Adult",
+        "suggestedMinAge": 13,
+        "suggestedMaxAge": 18
+      },
+      "inLanguage": "en-US",
+      "numberOfPages": "Novelette length",
+      "review": {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Amazon Reader"
+        },
+        "reviewBody": "Escape from Brown's Island bursts off the page like a star running back on a Saturday-night breakaway—fast, thrilling, and impossible to stop. The Hawrot siblings cut, juke, and power through danger with the perfect mix of grit and finesse, turning every chapter into a game-winning drive."
+      }
+    },
+    {
+      "@type": "Book",
+      "@id": "https://www.siblingswrite.com/work#wild-adventure-mitch",
+      "name": "The Wild Adventure of Mitch and the Sand Bridge",
+      "author": {
+        "@type": "Person",
+        "name": "Zach Hawrot",
+        "url": "https://www.siblingswrite.com/authors/zach"
+      },
+      "genre": ["Middle Grade", "Children's Fiction", "Adventure Fiction", "Summer Reading"],
+      "description": "Welcome to summer vacation! The time for good memories, great beaches, and — invasions?",
+      "url": "https://www.amazon.com/Wild-Adventure-Mitch-Sand-Bridge-ebook/dp/B0CJKVK2ZD",
+      "keywords": "middle grade, children's adventure, summer vacation, beach story, middle grade fiction",
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Middle Grade",
+        "suggestedMinAge": 8,
+        "suggestedMaxAge": 12
+      },
+      "inLanguage": "en-US"
+    }
+  ]
+};
 ---
 
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink} current="work">
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     <div class="container-new">
       <h1>Our Work</h1>
       <!-- <figure class="work-image">
@@ -21,21 +133,29 @@ const permalink = `${Astro.site.href}work`;
 
       <!-- Book Section -->
       <h2>Featured Work</h2>
-      <div class="book-section">
-        <img src="/assets/nutcracker.jpg" alt="The Battle for Christmas: Reign of the Nutcrackers" width="200">
+      <article class="book-section" itemscope itemtype="https://schema.org/Book">
+        <img src="/assets/nutcracker.jpg" alt="Book cover for The Battle for Christmas: Reign of the Nutcrackers - A Christmas adventure novel featuring Tim's magical holiday journey" width="200" itemprop="image">
         <div>
-          <p><strong>The Battle for Christmas: Reign of the Nutcrackers</strong></br>Join Tim on a captivating adventure of hope, family, and the enduring magic of Christmas. Perfect for fans of holiday adventures and heartwarming tales, this story reminds us that even in the darkest times, the light of Christmas can shine the brightest.</p>
-          <a href="https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1/ref=sr_1_2?crid=I5DWDTES3YWX&dib=eyJ2IjoiMSJ9.DmJrhZrdQtB7pGWH9IvAZKZKTx1gMCkYEPuD3R0WX61de458GtTsEU7eVXeBvtgq-ikR04xVMyItbmk5eu2hRwvXcnlkuTGBT1NyUZ0ZiYjxhNrhle14RDmzfNmve3CsJ0KaCLfWQA8qGiy2wjFdAU6Y-SUqDtIbFA6B3i7DVTkGbbHQNdBib5hfzkTbU-XqEhoNi52bsDk4GLZ95oosu4Wmi-HMtR3h5A-MGwG9Esw.j8WZZczBoKaGv4glN4hzV_Iu_NbsDX8-O58knWrr9Qo&dib_tag=se&keywords=battle+for+christmas&qid=1737934190&sprefix=battle+for+christ%2Caps%2C123&sr=8-2" target="_blank" rel="noopener" class="buy-button">Buy Now on Amazon</a>
+          <p><strong itemprop="name">The Battle for Christmas: Reign of the Nutcrackers</strong></br><span itemprop="description">Join Tim on a captivating adventure of hope, family, and the enduring magic of Christmas. Perfect for fans of holiday adventures and heartwarming tales, this story reminds us that even in the darkest times, the light of Christmas can shine the brightest.</span></p>
+          <meta itemprop="genre" content="Christmas Fiction">
+          <meta itemprop="genre" content="Holiday Fiction">
+          <meta itemprop="genre" content="Fantasy">
+          <a href="https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1/ref=sr_1_2?crid=I5DWDTES3YWX&dib=eyJ2IjoiMSJ9.DmJrhZrdQtB7pGWH9IvAZKZKTx1gMCkYEPuD3R0WX61de458GtTsEU7eVXeBvtgq-ikR04xVMyItbmk5eu2hRwvXcnlkuTGBT1NyUZ0ZiYjxhNrhle14RDmzfNmve3CsJ0KaCLfWQA8qGiy2wjFdAU6Y-SUqDtIbFA6B3i7DVTkGbbHQNdBib5hfzkTbU-XqEhoNi52bsDk4GLZ95oosu4Wmi-HMtR3h5A-MGwG9Esw.j8WZZczBoKaGv4glN4hzV_Iu_NbsDX8-O58knWrr9Qo&dib_tag=se&keywords=battle+for+christmas&qid=1737934190&sprefix=battle+for+christ%2Caps%2C123&sr=8-2" target="_blank" rel="noopener" class="buy-button" itemprop="url">Buy Now on Amazon</a>
         </div>
-      </div>
+      </article>
 
-      <div class="book-section">
-        <img src="/assets/brownsisland.jpg" alt="Escape from Browns Island" width="200">
+      <article class="book-section" itemscope itemtype="https://schema.org/Book">
+        <img src="/assets/brownsisland.jpg" alt="Book cover for Escape from Browns Island - A young adult adventure novel featuring 17-year-old Tommy's supernatural encounter on an Ohio River island" width="200" itemprop="image">
         <div>
-          <p><strong>Escape from Browns Island</strong></br>Every small town has legends—but not every kid gets the chance to rewrite them. This novelette starts off with a simple dare: 17-year-old Tommy must spend one summer night alone on Browns Island, an abandoned, 4-mile-long island in the heart of the Ohio River. What he wants is a peaceful night to himself. What he needs is an escape from the chaos he just caused his family. What he finds is an island that isn't abandoned. It is alive and waiting for his arrival.</p>
-          <a href="https://dub.sh/browns-island" target="_blank" rel="noopener" class="buy-button">Find it Now on Amazon</a>
+          <p><strong itemprop="name">Escape from Browns Island</strong></br><span itemprop="description">Every small town has legends—but not every kid gets the chance to rewrite them. This novelette starts off with a simple dare: 17-year-old Tommy must spend one summer night alone on Browns Island, an abandoned, 4-mile-long island in the heart of the Ohio River. What he wants is a peaceful night to himself. What he needs is an escape from the chaos he just caused his family. What he finds is an island that isn't abandoned. It is alive and waiting for his arrival.</span></p>
+          <meta itemprop="genre" content="Young Adult">
+          <meta itemprop="genre" content="YA Fiction">
+          <meta itemprop="genre" content="Teen Fiction">
+          <meta itemprop="genre" content="Adventure">
+          <meta itemprop="genre" content="Supernatural">
+          <a href="https://dub.sh/browns-island" target="_blank" rel="noopener" class="buy-button" itemprop="url">Find it Now on Amazon</a>
         </div>
-      </div>
+      </article>
 
       <h2>Other Projects</h2>
       <ul>

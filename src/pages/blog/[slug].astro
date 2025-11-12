@@ -72,9 +72,39 @@ const nextPost = currentIndex < allBlogPosts.length - 1 ? allBlogPosts[currentIn
 const prevPost = currentIndex > 0 ? allBlogPosts[currentIndex - 1] : null;
 
 const permalink = `${Astro.site.href}blog/${entry.id}`;
+
+// Create Article structured data
+const articleStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": entry.data.title,
+  "description": entry.data.description,
+  "datePublished": entry.data.publishDate,
+  "author": authors.map(author => ({
+    "@type": "Person",
+    "name": author.data.name,
+    "url": `${Astro.site.href}authors/${author.id}`
+  })),
+  "publisher": {
+    "@type": "Organization",
+    "name": "Siblings Write",
+    "url": "https://www.siblingswrite.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.siblingswrite.com/assets/social.png"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": permalink
+  },
+  "url": permalink,
+  "inLanguage": "en-US"
+};
 ---
 <PostHogLayout>
   <BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="blog">
+    <script type="application/ld+json" set:html={JSON.stringify(articleStructuredData)} />
     <header>
       <p>{entry.data.publishDate} ~ {entry.data.readingTime}</p>
       <h1>{entry.data.title}</h1>

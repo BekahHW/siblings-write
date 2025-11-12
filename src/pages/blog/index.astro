@@ -5,7 +5,7 @@ import { getCollection, getEntry } from 'astro:content';
 import NewsletterCTA from '../../components/NewsletterCTA.astro';
 
 const title = 'Stories';
-const description = 'Latest stories.';
+const description = 'Short stories, fiction, and creative writing by the Hawrot Siblings. Explore original stories featuring adventure, family, and wonder from authors of young adult and middle grade fiction.';
 const permalink = `${Astro.site.href}blog`;
 const allPosts = await getCollection('blog', ({ data }) => data.hidden !== true);
 const sortedPosts = allPosts.sort((a, b) => 
