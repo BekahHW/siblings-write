@@ -63,5 +63,21 @@ const pages = defineCollection({
   }),
 });
 
+// Define the schema for the announcements collection
+const announcements = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/announcements" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    image: z.string(),
+    ctaText: z.string().default("Preorder Now!"),
+    ctaLink: z.string(),
+    active: z.boolean().default(true),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    showOnce: z.boolean().default(true),
+  }),
+});
+
 // Export the collections
-export const collections = { authors, blog, cyoa, works, pages };
+export const collections = { authors, blog, cyoa, works, pages, announcements };

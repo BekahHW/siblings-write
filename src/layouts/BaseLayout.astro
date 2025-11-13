@@ -4,6 +4,8 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PostHog from '../components/posthog.astro';
+import AnnouncementPopup from '../components/AnnouncementPopup.svelte';
+import { getCollection } from 'astro:content';
 
 export interface Props {
   title: string;
@@ -13,6 +15,26 @@ export interface Props {
   hideNewsletterFooter?: boolean;
 }
 const { title, description, permalink, current, hideNewsletterFooter = false } = Astro.props;
+
+// Fetch active announcements
+const announcements = await getCollection('announcements');
+const now = new Date();
+
+// Find the first active announcement within date range
+const activeAnnouncement = announcements.find(announcement => {
+  const data = announcement.data;
+
+  // Check if active
+  if (!data.active) return false;
+
+  // Check start date if exists
+  if (data.startDate && new Date(data.startDate) > now) return false;
+
+  // Check end date if exists
+  if (data.endDate && new Date(data.endDate) < now) return false;
+
+  return true;
+});
 
 // Site-wide structured data
 const siteStructuredData = {
@@ -106,6 +128,19 @@ const siteStructuredData = {
 
     <Footer hideNewsletter={hideNewsletterFooter} />
   </div>
+
+  <!-- Render announcement popup if one is active -->
+  {activeAnnouncement && (
+    <AnnouncementPopup
+      client:load
+      title={activeAnnouncement.data.title}
+      description={activeAnnouncement.data.description}
+      image={activeAnnouncement.data.image}
+      ctaText={activeAnnouncement.data.ctaText}
+      ctaLink={activeAnnouncement.data.ctaLink}
+      showOnce={activeAnnouncement.data.showOnce}
+    />
+  )}
 </body>
 </html>
 
