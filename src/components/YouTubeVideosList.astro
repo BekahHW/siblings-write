@@ -26,7 +26,7 @@ const displayVideos = videos.slice(0, limit);
     {displayVideos.map((video) => (
       <a href={`https://www.youtube.com/watch?v=${video.id}`} target="_blank" rel="noopener noreferrer" class="video-card">
         <div class="video-thumbnail">
-          <img src={video.thumbnail} alt={video.title} />
+          <img src={video.thumbnail} alt={video.title} loading="lazy" />
           <div class="play-button">
             <svg viewBox="0 0 24 24" fill="white">
               <path d="M8 5v14l11-7z"/>
