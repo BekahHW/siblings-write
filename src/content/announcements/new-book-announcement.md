@@ -4,7 +4,7 @@ description: "We're thrilled to announce our latest adventure is almost here! Jo
 image: "/assets/social.png"
 ctaText: "Preorder Now!"
 ctaLink: "/works"
-active: true
+active: false
 showOnce: true
 ---
 
