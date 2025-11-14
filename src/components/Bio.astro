@@ -8,7 +8,7 @@ const { name, bio, avatar } = Astro.props;
 ---
 
 <div>
-  <img src={avatar} alt={`Headshot of ${name}`} />
+  <img src={avatar} alt={`Headshot of ${name}`} loading="lazy" />
   <p>
     {bio}
   </p>

@@ -5,8 +5,29 @@ import { getCollection, getEntry } from 'astro:content';
 import NewsletterCTA from '../../components/NewsletterCTA.astro';
 
 const title = 'Stories';
-const description = 'Latest stories.';
+const description = 'Short stories, fiction, and creative writing by the Hawrot Siblings. Explore original stories featuring adventure, family, and wonder from authors of young adult and middle grade fiction.';
 const permalink = `${Astro.site.href}blog`;
+
+// Breadcrumb structured data
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": Astro.site.href
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Stories",
+      "item": permalink
+    }
+  ]
+};
+
 const allPosts = await getCollection('blog', ({ data }) => data.hidden !== true);
 const sortedPosts = allPosts.sort((a, b) => 
   new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
@@ -29,6 +50,7 @@ const getAuthorsDisplay = (authorRefs) => {
 ---
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink} current="blog">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
     <div class="container">
       <h1>Our Short Stories</h1>
 

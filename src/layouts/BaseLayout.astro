@@ -4,6 +4,8 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PostHog from '../components/posthog.astro';
+import AnnouncementPopup from '../components/AnnouncementPopup.svelte';
+import { getCollection } from 'astro:content';
 
 export interface Props {
   title: string;
@@ -13,10 +15,64 @@ export interface Props {
   hideNewsletterFooter?: boolean;
 }
 const { title, description, permalink, current, hideNewsletterFooter = false } = Astro.props;
+
+// Fetch active announcements
+const announcements = await getCollection('announcements');
+const now = new Date();
+
+// Find the first active announcement within date range
+const activeAnnouncement = announcements.find(announcement => {
+  const data = announcement.data;
+
+  // Check if active
+  if (!data.active) return false;
+
+  // Check start date if exists
+  if (data.startDate && new Date(data.startDate) > now) return false;
+
+  // Check end date if exists
+  if (data.endDate && new Date(data.endDate) < now) return false;
+
+  return true;
+});
+
+// Site-wide structured data
+const siteStructuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.siblingswrite.com/#organization",
+      "name": "Siblings Write",
+      "url": "https://www.siblingswrite.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.siblingswrite.com/assets/social.png"
+      },
+      "description": "Brothers writing young adult fiction, middle grade adventures, and Christmas novels together",
+      "sameAs": [
+        "https://www.amazon.com/stores/author/B0FQS3SGZQ",
+        "https://www.youtube.com/@thehawrotsiblings"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.siblingswrite.com/#website",
+      "url": "https://www.siblingswrite.com/",
+      "name": "Siblings Write",
+      "description": "Young adult fiction, middle grade adventures, and Christmas novels by the Hawrot siblings",
+      "publisher": {
+        "@id": "https://www.siblingswrite.com/#organization"
+      },
+      "inLanguage": "en-US"
+    }
+  ]
+};
 ---
 <html lang="en">
 <head>
   <BaseHead title={title} description={description} permalink={permalink} />
+  <script type="application/ld+json" set:html={JSON.stringify(siteStructuredData)} />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script is:inline type="text/javascript" id="posthog-js">
     !(function(t, e) {
@@ -78,6 +134,19 @@ const { title, description, permalink, current, hideNewsletterFooter = false } =
 
     <Footer hideNewsletter={hideNewsletterFooter} />
   </div>
+
+  <!-- Render announcement popup if one is active -->
+  {activeAnnouncement && (
+    <AnnouncementPopup
+      client:load
+      title={activeAnnouncement.data.title}
+      description={activeAnnouncement.data.description}
+      image={activeAnnouncement.data.image}
+      ctaText={activeAnnouncement.data.ctaText}
+      ctaLink={activeAnnouncement.data.ctaLink}
+      showOnce={activeAnnouncement.data.showOnce}
+    />
+  )}
 
   <script is:inline>
     // Reading Progress Bar with Sparkle
