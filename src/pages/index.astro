@@ -788,6 +788,7 @@ const getAuthorsDisplay = (authorRefs) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 6em;
 }
 
 .title-line-1 {
@@ -798,15 +799,25 @@ const getAuthorsDisplay = (authorRefs) => {
   margin: 0;
   text-align: center;
   white-space: nowrap;
-  overflow: hidden;
-  width: 0;
-  display: block;
-  animation: type-line-1 2s steps(40, end) forwards;
-  border-right: 2px solid #667eea;
+  display: inline-block;
+  width: 15ch;
+  position: relative;
+  clip-path: inset(0 100% 0 0);
+  animation: reveal-text 2s steps(40, end) forwards;
+}
+
+.title-line-1::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #667eea;
+  animation: hide-cursor 0s 2s forwards;
 }
 
 .title-line-2 {
-  opacity: 0;
   font-family: var(--font-family-display, 'Cormorant Garamond', serif);
   margin: 0 auto;
   background: linear-gradient(to right, #667eea 0%, #764ba2 50%, #f093fb 100%);
@@ -817,49 +828,50 @@ const getAuthorsDisplay = (authorRefs) => {
   background-clip: text;
   background-size: 200% auto;
   white-space: nowrap;
-  overflow: hidden;
-  width: 0;
-  display: block;
-  animation: type-line-2 2.2s steps(40, end) 2s forwards, gradient-shift 3s ease-in-out 4.2s infinite;
-  border-right: 2px solid #764ba2;
+  display: inline-block;
+  width: 18ch;
+  position: relative;
+  clip-path: inset(0 100% 0 0);
+  animation: reveal-text-gradient 2.2s steps(40, end) 2s forwards, gradient-shift 3s ease-in-out 4.2s infinite;
 }
 
-@keyframes type-line-1 {
-  0% {
-    width: 0;
+.title-line-2::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #764ba2;
+  animation: hide-cursor 0s 4.2s forwards;
+}
+
+@keyframes reveal-text {
+  from {
+    clip-path: inset(0 100% 0 0);
   }
-  99% {
-    border-right: 2px solid #667eea;
-  }
-  100% {
-    width: 15ch;
-    border-right: none;
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
 
-@keyframes type-line-2 {
+@keyframes reveal-text-gradient {
   0% {
+    clip-path: inset(0 100% 0 0);
     background-position: 0% center;
-    opacity: 0;
-    width: 0;
-  }
-  1% {
-    opacity: 1;
-    border-right: 2px solid #764ba2;
   }
   50% {
     background-position: 50% center;
-    border-right: 2px solid #764ba2;
-  }
-  99% {
-    background-position: 100% center;
-    border-right: 2px solid #764ba2;
   }
   100% {
+    clip-path: inset(0 0 0 0);
     background-position: 100% center;
-    opacity: 1;
-    width: 18ch;
-    border-right: none;
+  }
+}
+
+@keyframes hide-cursor {
+  to {
+    opacity: 0;
   }
 }
 
@@ -1111,8 +1123,17 @@ const getAuthorsDisplay = (authorRefs) => {
     min-height: 350px;
   }
 
+  .title-container {
+    min-height: 5em;
+  }
+
+  .title-line-1 {
+    width: 15ch;
+  }
+
   .title-line-2 {
     font-size: 3em;
+    width: 18ch;
   }
 
   .hero-image {
@@ -1146,12 +1167,18 @@ const getAuthorsDisplay = (authorRefs) => {
     text-align: left;
   }
 
+  .title-container {
+    min-height: 4em;
+  }
+
   .title-line-1 {
     font-size: 1.2em;
+    width: 15ch;
   }
 
   .title-line-2 {
     font-size: 2.2em;
+    width: 18ch;
   }
 
   .hero-image-container {
