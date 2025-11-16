@@ -41,11 +41,15 @@ const works = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/works" }),
   schema: z.object({
     title: z.string(),
-    description: z.string(),
-    image: z.string(),
-    link: z.string(),
+    description: z.string(), // Also serves as logline
+    image: z.string(), // Book cover image
+    headerImage: z.string().optional(), // Header/hero image for detail page
+    link: z.string(), // Amazon purchase link
     featured: z.boolean().default(false),
     order: z.number().default(0),
+    inspiredBy: z.string().optional(), // One sentence about inspiration
+    summary: z.string().optional(), // Full book summary
+    inspirationStory: z.string().optional(), // Full paragraphs about what inspired the book
   }),
 });
 
