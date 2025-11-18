@@ -248,13 +248,18 @@ const structuredData = {
     margin: -1em -2em 3em -2em;
     position: relative;
     overflow: hidden;
+    border-radius: 6px;
   }
 
   .hero-image-container {
     position: relative;
     width: 100%;
-    height: 400px;
+    height: 500px;
     overflow: hidden;
+  }
+
+  [data-work-id="battle-for-christmas"] .hero-image-container {
+    height: 600px;
   }
 
   .hero-image {
@@ -555,6 +560,7 @@ const structuredData = {
     max-width: 1000px;
     margin: 0 auto;
     padding: 0 2em;
+    border-radius: 6px;
     --shadow-primary: rgba(124, 58, 237, 0.3);
     --shadow-secondary: rgba(249, 168, 212, 0.4);
     --border-color: rgba(124, 58, 237, 0.15);
@@ -618,8 +624,7 @@ const structuredData = {
     padding: 1.5em;
     background: rgba(255, 255, 255, 0.6);
     border-radius: 12px;
-    border-left: 4px solid transparent;
-    border-image: var(--magic-gradient) 1;
+    border-left: 4px solid var(--border-color);
   }
 
   .inspired-label {
@@ -856,6 +861,11 @@ const structuredData = {
     border-color: rgba(22, 163, 74, 0.5);
   }
 
+  [data-work-id="battle-for-christmas"] .inspired-by {
+    background: rgba(255, 255, 255, 0.9);
+    border-left: 4px solid #dc2626;
+  }
+
   [data-work-id="battle-for-christmas"] .section-title {
     background: linear-gradient(90deg, #dc2626 0%, #16a34a 50%, #dc2626 100%);
     background-size: 200% auto;
@@ -1016,9 +1026,30 @@ const structuredData = {
 
   /* Responsive Design */
   @media (max-width: 1020px) {
+    .hero-image-container {
+      height: 450px;
+    }
+
+    [data-work-id="battle-for-christmas"] .hero-image-container {
+      height: 550px;
+    }
+
     .hero-title {
       font-size: 2.5em;
       padding: 1em 1.5rem 0.5em;
+    }
+
+    .hero-title-cinematic {
+      font-size: 2.8em;
+    }
+
+    .hero-tagline {
+      font-size: 1.5em;
+    }
+
+    .play-trailer-btn {
+      font-size: 1.3em;
+      padding: 1em 2.5em;
     }
 
     .content-container {
@@ -1052,12 +1083,29 @@ const structuredData = {
     }
 
     .hero-image-container {
-      height: 300px;
+      height: 350px;
+    }
+
+    [data-work-id="battle-for-christmas"] .hero-image-container {
+      height: 450px;
     }
 
     .hero-title {
       font-size: 2em;
       padding: 0.8em 1rem 0.4em;
+    }
+
+    .hero-title-cinematic {
+      font-size: 2.2em;
+    }
+
+    .hero-tagline {
+      font-size: 1.3em;
+    }
+
+    .play-trailer-btn {
+      font-size: 1.1em;
+      padding: 0.9em 2em;
     }
 
     .content-container {
@@ -1104,21 +1152,26 @@ const structuredData = {
       height: 250px;
     }
 
+    [data-work-id="battle-for-christmas"] .hero-image-container {
+      height: 400px;
+    }
+
     .hero-title {
       font-size: 1.6em;
     }
 
     .hero-title-cinematic {
-      font-size: 2em;
+      font-size: 1.8em;
     }
 
     .hero-tagline {
-      font-size: 1.2em;
+      font-size: 1.1em;
     }
 
     .play-trailer-btn {
-      font-size: 1.2em;
-      padding: 1em 2em;
+      font-size: 1em;
+      padding: 0.8em 1.5em;
+      gap: 0.5em;
     }
 
     .book-cover-container {
