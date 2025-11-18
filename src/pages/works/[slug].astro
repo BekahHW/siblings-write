@@ -283,6 +283,9 @@ const structuredData = {
     max-width: 1000px;
     margin: 0 auto;
     padding: 0 2em;
+    --shadow-primary: rgba(124, 58, 237, 0.3);
+    --shadow-secondary: rgba(249, 168, 212, 0.4);
+    --border-color: rgba(124, 58, 237, 0.15);
   }
 
   /* Intro Section */
@@ -294,15 +297,15 @@ const structuredData = {
     padding: 3em;
     background: linear-gradient(135deg, rgba(249, 168, 212, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
     border-radius: 24px;
-    border: 2px solid rgba(124, 58, 237, 0.15);
-    box-shadow: 0 10px 40px rgba(124, 58, 237, 0.15);
+    border: 2px solid var(--border-color);
+    box-shadow: 0 10px 40px var(--shadow-primary);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   .intro-section:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 50px rgba(124, 58, 237, 0.25);
-    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 15px 50px var(--shadow-primary);
+    border-color: var(--border-color);
   }
 
   .book-cover-container {
@@ -320,7 +323,7 @@ const structuredData = {
 
   .intro-section:hover .book-cover {
     transform: rotate(-3deg) scale(1.05);
-    box-shadow: 0 20px 50px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 20px 50px var(--shadow-secondary);
   }
 
   .intro-content {
@@ -550,6 +553,16 @@ const structuredData = {
   }
 
   /* Christmas Theme for Battle for Christmas Page */
+  [data-work-id="battle-for-christmas"] {
+    background: white;
+  }
+
+  [data-work-id="battle-for-christmas"] .content-container {
+    --shadow-primary: rgba(220, 38, 38, 0.25);
+    --shadow-secondary: rgba(22, 163, 74, 0.3);
+    --border-color: rgba(220, 38, 38, 0.3);
+  }
+
   [data-work-id="battle-for-christmas"] .hero-overlay {
     background: linear-gradient(
       to bottom,
@@ -563,13 +576,11 @@ const structuredData = {
   }
 
   [data-work-id="battle-for-christmas"] .intro-section {
-    background: linear-gradient(135deg, rgba(254, 242, 242, 0.95) 0%, rgba(240, 253, 244, 0.95) 100%);
+    background: white;
     border: 3px solid rgba(220, 38, 38, 0.3);
-    box-shadow: 0 10px 40px rgba(22, 101, 52, 0.25);
   }
 
   [data-work-id="battle-for-christmas"] .intro-section:hover {
-    box-shadow: 0 15px 50px rgba(220, 38, 38, 0.35);
     border-color: rgba(22, 163, 74, 0.5);
   }
 
@@ -610,21 +621,18 @@ const structuredData = {
   }
 
   [data-work-id="battle-for-christmas"] .summary-section {
-    background: rgba(255, 255, 255, 0.95);
+    background: white;
     border: 3px solid rgba(220, 38, 38, 0.3);
-    box-shadow: 0 8px 30px rgba(22, 163, 74, 0.2);
   }
 
   [data-work-id="battle-for-christmas"] .inspiration-section {
-    background: linear-gradient(135deg, rgba(240, 253, 244, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
+    background: white;
     border: 3px solid rgba(22, 163, 74, 0.3);
-    box-shadow: 0 8px 30px rgba(22, 163, 74, 0.25);
   }
 
   [data-work-id="battle-for-christmas"] .trailer-section {
-    background: linear-gradient(135deg, rgba(254, 242, 242, 0.9) 0%, rgba(240, 253, 244, 0.9) 100%);
+    background: white;
     border: 3px solid rgba(220, 38, 38, 0.3);
-    box-shadow: 0 8px 30px rgba(22, 163, 74, 0.25);
     position: relative;
     overflow: hidden;
   }
@@ -661,7 +669,7 @@ const structuredData = {
   }
 
   [data-work-id="battle-for-christmas"] .cta-card {
-    background: linear-gradient(135deg, rgba(254, 242, 242, 0.9) 0%, rgba(240, 253, 244, 0.9) 100%);
+    background: white;
     border: 3px solid transparent;
   }
 
