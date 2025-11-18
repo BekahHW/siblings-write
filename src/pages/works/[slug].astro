@@ -2,6 +2,7 @@
 import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 
 export async function getStaticPaths() {
   const works = await getCollection('works');
@@ -16,6 +17,13 @@ const { title, description, image, headerImage, link, inspiredBy, summary, inspi
 
 const pageTitle = `${title} | Siblings Write`;
 const permalink = `${Astro.site?.href}works/${work.id}`;
+
+// Breadcrumb items
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Our Work', href: '/works' },
+  { label: title }
+];
 
 // Generate structured data for SEO
 const structuredData = {
@@ -83,6 +91,8 @@ const structuredData = {
 
       <!-- Main Content Container -->
       <div class="content-container">
+        <Breadcrumbs items={breadcrumbItems} />
+
         <!-- Logline, Inspired By, and Buy Button Section -->
         <section class="intro-section">
           <div class="book-cover-container">
