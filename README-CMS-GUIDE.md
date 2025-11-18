@@ -67,10 +67,10 @@ Decap CMS is a user-friendly content management system that lets you edit websit
 **Location:** In the CMS dashboard, click "Works & Books"
 
 **What you can do:**
-- Add new books or projects
-- Update book descriptions
+- Add new books or projects (each gets its own dedicated page!)
+- Update book descriptions, summaries, and inspiration stories
 - Change buy links
-- Upload new book cover images
+- Upload book cover images and hero header images
 - Mark books as "Featured" (appears at top of Works page)
 - Reorder books using the "Order" number
 
@@ -79,12 +79,18 @@ Decap CMS is a user-friendly content management system that lets you edit websit
 2. Click "New Works & Books"
 3. Fill in the form:
    - **Title:** Book or project title
-   - **Description:** What it's about
-   - **Cover Image:** Upload the book cover (click to upload from your computer)
-   - **Buy Link:** Amazon or other purchase link
+   - **Description / Logline:** Short catchy description (appears on Works page and detail page)
+   - **Book Cover Image:** Upload the book cover (click to upload from your computer)
+   - **Header Image:** *(Optional)* Large hero image for the book's detail page. If not provided, the book cover will be used
+   - **Amazon Buy Link:** Amazon or other purchase link
    - **Featured:** Toggle ON to show in the Featured section
    - **Order:** Lower numbers appear first (1, 2, 3, etc.)
+   - **Inspired By:** *(Optional)* One sentence about what inspired this work (shows on the detail page)
+   - **Book Summary:** *(Optional)* Full 1-2 paragraph summary of the book (shows on the detail page)
+   - **Inspiration Story:** *(Optional)* Full 1-3 paragraphs about what inspired the book - the story behind the story. Separate paragraphs with a blank line. (shows on the detail page)
 4. Click "Publish" to save
+
+**Note:** Each work automatically gets its own detail page at `/works/book-title-slug` with all the information you provide!
 
 **Editing existing books:**
 1. Click "Works & Books"
@@ -115,6 +121,7 @@ Edit the Works page headings and intro:
 ### Images
 - **Recommended sizes:**
   - Book covers: 200-400px wide
+  - Book header images: 1200-1600px wide (for hero headers)
   - Author avatars: 200-300px square
 - **Formats:** JPG or PNG work best
 - When you upload an image, it gets saved to `/assets` automatically
@@ -147,14 +154,21 @@ When you click "Publish":
 3. Edit "About Text"
 4. Click "Publish"
 
-### Adding a new book to the Works page
+### Adding a new book to the Works page (with its own detail page!)
 1. Go to CMS > Works & Books
 2. Click "New Works & Books"
-3. Fill in title, description, upload cover image
-4. Add Amazon link
-5. Set "Featured" to ON if it should appear at the top
-6. Set "Order" (use next available number, like 3 or 4)
-7. Click "Publish"
+3. Fill in the required fields:
+   - Title, description/logline, book cover image
+   - Add Amazon link
+   - Set "Featured" to ON if it should appear at the top
+   - Set "Order" (use next available number, like 3 or 4)
+4. Fill in the optional detail page fields:
+   - **Inspired By:** One sentence about the inspiration
+   - **Book Summary:** Full summary (1-2 paragraphs)
+   - **Inspiration Story:** The full story behind the story (1-3 paragraphs, separate with blank lines)
+   - **Header Image:** Upload a hero image for the top of the detail page (or it will use the cover)
+5. Click "Publish"
+6. Your book now appears on the Works page AND has its own dedicated page at `/works/your-book-title`!
 
 ### Publishing a new blog post
 1. Go to CMS > Blog Posts

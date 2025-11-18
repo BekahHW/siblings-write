@@ -67,45 +67,42 @@ const structuredData = {
           <h2>{featuredTitle}</h2>
           {featuredWorks.map((work) => (
             <article class="book-section" itemscope itemtype="https://schema.org/Book">
-              <img
-                src={work.data.image}
-                alt={`Book cover for ${work.data.title}`}
-                width="200"
-                itemprop="image"
-                loading="lazy"
-              >
+              <a href={`/works/${work.id}`} class="book-cover-link">
+                <img
+                  src={work.data.image}
+                  alt={`Book cover for ${work.data.title}`}
+                  width="200"
+                  itemprop="image"
+                  loading="lazy"
+                >
+              </a>
               <div>
                 <p>
-                  <strong itemprop="name">{work.data.title}</strong><br/>
+                  <strong itemprop="name">
+                    <a href={`/works/${work.id}`} class="work-title-link">{work.data.title}</a>
+                  </strong><br/>
                   <span itemprop="description">{work.data.description}</span>
                 </p>
-                <a
-                  href={work.data.link}
-                  target="_blank"
-                  rel="noopener"
-                  class="buy-button"
-                  itemprop="url"
-                >
-                  Buy Now on Amazon
-                </a>
+                <div class="button-group">
+                  <a
+                    href={`/works/${work.id}`}
+                    class="learn-more-button"
+                  >
+                    Learn More
+                  </a>
+                  <a
+                    href={work.data.link}
+                    target="_blank"
+                    rel="noopener"
+                    class="buy-button"
+                    itemprop="url"
+                  >
+                    Buy Now on Amazon
+                  </a>
+                </div>
               </div>
             </article>
           ))}
-        </>
-      )}
-
-      <!-- Other Projects Section -->
-      {otherWorks.length > 0 && (
-        <>
-          <h2>{otherProjectsTitle}</h2>
-          <ul>
-            {otherWorks.map((work) => (
-              <li>
-                <strong><a href={work.data.link} target="_blank" rel="noopener">{work.data.title}</a></strong>
-                <em> {work.data.description}</em>
-              </li>
-            ))}
-          </ul>
         </>
       )}
 
@@ -187,12 +184,37 @@ const structuredData = {
     box-shadow: 0 15px 35px rgba(124, 58, 237, 0.3);
   }
 
-  .buy-button {
-    display: inline-block;
+  .book-cover-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .work-title-link {
+    color: var(--text-main);
+    text-decoration: none;
+    background: linear-gradient(to right, var(--primary-color), #c084fc);
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    transition: background-size 0.3s ease, color 0.3s ease;
+  }
+
+  .work-title-link:hover {
+    background-size: 100% 2px;
+    color: var(--primary-color);
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1em;
     margin-top: 1em;
+    flex-wrap: wrap;
+  }
+
+  .buy-button,
+  .learn-more-button {
+    display: inline-block;
     padding: 1em 2em;
-    background: var(--primary-gradient);
-    color: white;
     text-decoration: none;
     border-radius: 12px;
     font-weight: bold;
@@ -200,9 +222,22 @@ const structuredData = {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    font-family: var(--font-family-sans);
   }
 
-  .buy-button::before {
+  .buy-button {
+    background: var(--primary-gradient);
+    color: white;
+  }
+
+  .learn-more-button {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
+  }
+
+  .buy-button::before,
+  .learn-more-button::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -223,6 +258,16 @@ const structuredData = {
   .buy-button:hover {
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 10px 30px rgba(124, 58, 237, 0.5);
+  }
+
+  .learn-more-button:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .learn-more-button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(79, 172, 254, 0.5);
   }
 
   .testimonials-section {
@@ -329,6 +374,16 @@ const structuredData = {
     .book-section {
       padding: 1em;
       gap: 1em;
+    }
+
+    .button-group {
+      flex-direction: column;
+    }
+
+    .buy-button,
+    .learn-more-button {
+      width: 100%;
+      text-align: center;
     }
 
     .testimonials-section {
