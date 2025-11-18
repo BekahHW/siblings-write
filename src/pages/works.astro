@@ -106,25 +106,6 @@ const structuredData = {
         </>
       )}
 
-      <!-- Other Projects Section -->
-      {otherWorks.length > 0 && (
-        <>
-          <h2>{otherProjectsTitle}</h2>
-          <ul class="other-works-list">
-            {otherWorks.map((work) => (
-              <li>
-                <strong><a href={`/works/${work.id}`}>{work.data.title}</a></strong>
-                <em> {work.data.description}</em>
-                <div class="other-work-links">
-                  <a href={`/works/${work.id}`} class="small-link">Learn More →</a>
-                  <a href={work.data.link} target="_blank" rel="noopener" class="small-link">Buy on Amazon</a>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-
       <!-- Reader Testimonials -->
       <h2>What Readers Are Saying</h2>
       <div class="testimonials-section">
@@ -289,51 +270,6 @@ const structuredData = {
     box-shadow: 0 10px 30px rgba(79, 172, 254, 0.5);
   }
 
-  /* Other Works List */
-  .other-works-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .other-works-list li {
-    padding: 1.5em;
-    margin-bottom: 1em;
-    background: linear-gradient(135deg, rgba(249, 168, 212, 0.08) 0%, rgba(167, 139, 250, 0.08) 100%);
-    border-radius: 12px;
-    border-left: 4px solid transparent;
-    border-image: var(--dream-gradient) 1;
-    transition: all 0.3s ease;
-  }
-
-  .other-works-list li:hover {
-    transform: translateX(5px);
-    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.2);
-  }
-
-  .other-work-links {
-    display: flex;
-    gap: 1em;
-    margin-top: 0.8em;
-    flex-wrap: wrap;
-  }
-
-  .small-link {
-    font-size: 0.9em;
-    font-weight: 600;
-    color: var(--primary-color);
-    text-decoration: none;
-    padding: 0.5em 1em;
-    border-radius: 8px;
-    background: rgba(124, 58, 237, 0.1);
-    transition: all 0.3s ease;
-    font-family: var(--font-family-sans);
-  }
-
-  .small-link:hover {
-    background: rgba(124, 58, 237, 0.2);
-    transform: translateY(-2px);
-  }
-
   .testimonials-section {
     margin-top: 4em;
     padding: 3em 2em;
@@ -452,15 +388,6 @@ const structuredData = {
 
     .testimonials-section {
       padding: 1.5em 1em;
-    }
-
-    .other-work-links {
-      flex-direction: column;
-      gap: 0.5em;
-    }
-
-    .small-link {
-      text-align: center;
     }
   }
 </style>
