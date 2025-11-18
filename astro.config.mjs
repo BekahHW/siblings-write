@@ -5,6 +5,8 @@ import sitemap from '@astrojs/sitemap';
 import remarkGfm from 'remark-gfm';
 import remarkSmartypants from 'remark-smartypants';
 import rehypeExternalLinks from 'rehype-external-links';
+import { defineConfig } from "astro/config";
+import sentry from "@sentry/astro";
 
 
 // https://astro.build/config
@@ -13,6 +15,11 @@ export default defineConfig({
   integrations: [
     mdx(),
     svelte(),
+     sentry({
+      project: "siblings-write",
+      org: "siblings-write",
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
     sitemap({
       filter: (page) => !page.includes('/authors/') || page.endsWith('/authors/zach') || page.endsWith('/authors/josh') || page.endsWith('/authors/bekah'),
       changefreq: 'weekly',
