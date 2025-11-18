@@ -218,9 +218,6 @@
   <!-- Revealed content from previous choices -->
   {#each revealedContent as content, index}
     <div class="story-content revealed" style="animation: fadeSlideIn 0.8s ease-out;">
-      <div class="choice-indicator">
-        <strong>You chose:</strong> {selectedChoices[index]}
-      </div>
       {@html content.replace(/\n/g, '<br>')}
     </div>
   {/each}
@@ -239,7 +236,6 @@
           >
             <div class="card-glow"></div>
             <div class="card-content">
-              <span class="choice-id">{choice.id}</span>
               <span class="choice-title">{choice.title}</span>
               <div class="card-arrow">→</div>
             </div>
@@ -292,17 +288,6 @@
     height: 100%;
     background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), transparent);
     pointer-events: none;
-  }
-
-  .choice-indicator {
-    margin-bottom: 1rem;
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(196, 132, 252, 0.15));
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--primary-color);
-    border-left: 3px solid var(--primary-color);
   }
 
   .choices {
@@ -415,22 +400,11 @@
     padding: 1.5rem 2rem;
     width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .choice-id {
-    font-weight: 800;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    align-items: center;
   }
 
   .choice-title {
+    flex: 1;
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--text-main);
