@@ -71,13 +71,50 @@ const structuredData = {
       <!-- Hero Header with Image and Title -->
       <header class="hero-header">
         <div class="hero-image-container">
-          <img
-            src={headerImage || image}
-            alt={title}
-            class="hero-image"
-          />
-          <div class="hero-overlay"></div>
-          <h1 class="hero-title">{title}</h1>
+          {trailerVideoId && work.id === 'battle-for-christmas' ? (
+            <>
+              <div class="hero-video-background">
+                <iframe
+                  src={`https://www.youtube.com/embed/${trailerVideoId}?autoplay=1&mute=1&loop=1&playlist=${trailerVideoId}&controls=0&showinfo=0&rel=0&modestbranding=1`}
+                  title={`${title} - Background Trailer`}
+                  frameborder="0"
+                  allow="autoplay; encrypted-media"
+                  allowfullscreen
+                ></iframe>
+              </div>
+              <div class="hero-overlay hero-frosted"></div>
+              <div class="snowfall-container">
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+              </div>
+              <div class="hero-content">
+                <h1 class="hero-title hero-title-cinematic">{title}</h1>
+                <p class="hero-tagline">Watch for the Magic</p>
+                <button class="play-trailer-btn" data-trailer-id={trailerVideoId}>
+                  <span class="play-icon">▶</span>
+                  <span class="play-text">Play Trailer</span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <img
+                src={headerImage || image}
+                alt={title}
+                class="hero-image"
+              />
+              <div class="hero-overlay"></div>
+              <h1 class="hero-title">{title}</h1>
+            </>
+          )}
         </div>
       </header>
 
@@ -275,6 +312,241 @@ const structuredData = {
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  /* Cinematic Hero for Battle for Christmas */
+  .hero-video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .hero-video-background iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 177.78%;
+    height: 177.78%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-frosted {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.25) 100%
+    );
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    z-index: 1;
+  }
+
+  .hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 3;
+    width: 90%;
+    max-width: 800px;
+  }
+
+  .hero-title-cinematic {
+    position: static;
+    padding: 0;
+    margin: 0 0 0.3em 0;
+    background: none;
+    font-size: 3.5em;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8),
+                 0 0 60px rgba(220, 38, 38, 0.8),
+                 0 0 80px rgba(22, 163, 74, 0.6);
+    animation: titleGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes titleGlow {
+    0%, 100% {
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8),
+                   0 0 60px rgba(220, 38, 38, 0.8),
+                   0 0 80px rgba(22, 163, 74, 0.6);
+    }
+    50% {
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8),
+                   0 0 80px rgba(220, 38, 38, 1),
+                   0 0 100px rgba(22, 163, 74, 0.8);
+    }
+  }
+
+  .hero-tagline {
+    font-size: 1.8em;
+    color: white;
+    font-family: var(--font-family-serif);
+    font-style: italic;
+    margin: 0 0 1.5em 0;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    animation: fadeInUp 1s ease-out 0.5s forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .play-trailer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8em;
+    padding: 1.2em 3em;
+    font-size: 1.5em;
+    font-weight: 700;
+    font-family: var(--font-family-sans);
+    background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%);
+    color: white;
+    border: 3px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 40px rgba(220, 38, 38, 0.6),
+                0 0 60px rgba(22, 163, 74, 0.4);
+    animation: btnPulse 2s ease-in-out infinite, fadeInUp 1s ease-out 1s forwards;
+    opacity: 0;
+  }
+
+  .play-trailer-btn:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 15px 60px rgba(220, 38, 38, 0.9),
+                0 0 100px rgba(22, 163, 74, 0.7);
+    border-color: rgba(255, 215, 0, 1);
+  }
+
+  @keyframes btnPulse {
+    0%, 100% {
+      box-shadow: 0 10px 40px rgba(220, 38, 38, 0.6),
+                  0 0 60px rgba(22, 163, 74, 0.4);
+    }
+    50% {
+      box-shadow: 0 10px 50px rgba(220, 38, 38, 0.8),
+                  0 0 80px rgba(22, 163, 74, 0.6);
+    }
+  }
+
+  .play-icon {
+    font-size: 1.2em;
+    animation: iconBounce 2s ease-in-out infinite;
+  }
+
+  @keyframes iconBounce {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(5px);
+    }
+  }
+
+  /* Snowfall Animation */
+  .snowfall-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  .snowflake {
+    position: absolute;
+    top: -10%;
+    color: white;
+    font-size: 1.5em;
+    opacity: 0.8;
+    animation: snowfall-anim linear infinite;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+
+  .snowflake:nth-child(1) {
+    left: 10%;
+    animation-duration: 8s;
+    animation-delay: 0s;
+  }
+
+  .snowflake:nth-child(2) {
+    left: 20%;
+    animation-duration: 10s;
+    animation-delay: 1s;
+  }
+
+  .snowflake:nth-child(3) {
+    left: 30%;
+    animation-duration: 7s;
+    animation-delay: 2s;
+  }
+
+  .snowflake:nth-child(4) {
+    left: 40%;
+    animation-duration: 9s;
+    animation-delay: 0.5s;
+  }
+
+  .snowflake:nth-child(5) {
+    left: 50%;
+    animation-duration: 11s;
+    animation-delay: 1.5s;
+  }
+
+  .snowflake:nth-child(6) {
+    left: 60%;
+    animation-duration: 8.5s;
+    animation-delay: 2.5s;
+  }
+
+  .snowflake:nth-child(7) {
+    left: 70%;
+    animation-duration: 9.5s;
+    animation-delay: 3s;
+  }
+
+  .snowflake:nth-child(8) {
+    left: 80%;
+    animation-duration: 7.5s;
+    animation-delay: 0.8s;
+  }
+
+  .snowflake:nth-child(9) {
+    left: 90%;
+    animation-duration: 10.5s;
+    animation-delay: 1.8s;
+  }
+
+  .snowflake:nth-child(10) {
+    left: 15%;
+    animation-duration: 8.8s;
+    animation-delay: 2.8s;
+  }
+
+  @keyframes snowfall-anim {
+    0% {
+      top: -10%;
+      opacity: 0.8;
+    }
+    100% {
+      top: 110%;
+      opacity: 0;
     }
   }
 
@@ -836,6 +1108,19 @@ const structuredData = {
       font-size: 1.6em;
     }
 
+    .hero-title-cinematic {
+      font-size: 2em;
+    }
+
+    .hero-tagline {
+      font-size: 1.2em;
+    }
+
+    .play-trailer-btn {
+      font-size: 1.2em;
+      padding: 1em 2em;
+    }
+
     .book-cover-container {
       width: 180px;
     }
@@ -848,4 +1133,140 @@ const structuredData = {
       font-size: 0.8em;
     }
   }
+
+  /* Trailer Modal */
+  .trailer-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    animation: modalFadeIn 0.3s ease;
+  }
+
+  .trailer-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .trailer-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    aspect-ratio: 16 / 9;
+    animation: modalSlideUp 0.4s ease;
+  }
+
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .trailer-modal-close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    font-size: 2em;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .trailer-modal-close:hover {
+    background: white;
+    color: black;
+    transform: rotate(90deg);
+  }
+
+  .trailer-modal iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 8px;
+  }
 </style>
+
+<div id="trailerModal" class="trailer-modal">
+  <div class="trailer-modal-content">
+    <button class="trailer-modal-close" id="closeModal">×</button>
+    <div id="trailerVideoContainer"></div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const playBtn = document.querySelector('.play-trailer-btn');
+    const modal = document.getElementById('trailerModal');
+    const closeBtn = document.getElementById('closeModal');
+    const videoContainer = document.getElementById('trailerVideoContainer');
+
+    if (playBtn) {
+      playBtn.addEventListener('click', () => {
+        const trailerId = playBtn.getAttribute('data-trailer-id');
+        if (trailerId) {
+          const iframe = document.createElement('iframe');
+          iframe.src = `https://www.youtube.com/embed/${trailerId}?autoplay=1`;
+          iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+          iframe.allowFullscreen = true;
+          iframe.className = 'trailer-modal';
+
+          videoContainer.innerHTML = '';
+          videoContainer.appendChild(iframe);
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+    }
+
+    const closeModal = () => {
+      modal.classList.remove('active');
+      videoContainer.innerHTML = '';
+      document.body.style.overflow = 'auto';
+    };
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeModal);
+    }
+
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+  });
+</script>
