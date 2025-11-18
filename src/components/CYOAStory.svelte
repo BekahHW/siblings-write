@@ -87,17 +87,119 @@
   let currentStep = $state(0);
   let selectedChoices = $state<string[]>([]);
   let revealedContent = $state<string[]>([]);
+  let isAnimating = $state(false);
+  let showingConfetti = $state(false);
 
-  function makeChoice(choiceId: string, content: string) {
+  // Confetti effect
+  function createConfetti(event: MouseEvent) {
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100vw';
+    canvas.style.height = '100vh';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '9999';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const particles: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      color: string;
+      size: number;
+      rotation: number;
+      rotationSpeed: number;
+    }> = [];
+
+    const colors = ['#7c3aed', '#c084fc', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#fa709a', '#fee140'];
+
+    // Create particles
+    for (let i = 0; i < 80; i++) {
+      const angle = (Math.PI * 2 * i) / 80;
+      const velocity = 3 + Math.random() * 8;
+      particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * velocity,
+        vy: Math.sin(angle) * velocity - 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 4 + Math.random() * 8,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.3
+      });
+    }
+
+    let frameCount = 0;
+    const gravity = 0.3;
+
+    function animate() {
+      if (!ctx || !canvas) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      frameCount++;
+
+      particles.forEach(p => {
+        p.vy += gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotationSpeed;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+      });
+
+      if (frameCount < 180) {
+        requestAnimationFrame(animate);
+      } else {
+        document.body.removeChild(canvas);
+      }
+    }
+
+    animate();
+  }
+
+  async function makeChoice(choiceId: string, content: string, event: MouseEvent) {
+    if (isAnimating) return;
+
+    isAnimating = true;
+    showingConfetti = true;
+
+    // Create confetti effect
+    createConfetti(event);
+
+    // Wait for confetti animation
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     selectedChoices.push(choiceId);
     revealedContent.push(content);
     currentStep++;
+
+    showingConfetti = false;
+    isAnimating = false;
   }
 
   function reset() {
     currentStep = 0;
     selectedChoices = [];
     revealedContent = [];
+    isAnimating = false;
+    showingConfetti = false;
   }
 
   // Get the current choice section to display
@@ -115,7 +217,7 @@
 
   <!-- Revealed content from previous choices -->
   {#each revealedContent as content, index}
-    <div class="story-content revealed">
+    <div class="story-content revealed" style="animation: fadeSlideIn 0.8s ease-out;">
       <div class="choice-indicator">
         <strong>You chose:</strong> {selectedChoices[index]}
       </div>
@@ -127,14 +229,20 @@
   {#if currentStep < choiceSections.length}
     <div class="choices">
       <h3 class="choice-prompt">What do you do?</h3>
-      <div class="choice-buttons">
-        {#each choiceSections[currentStep].choices as choice}
+      <div class="choice-cards">
+        {#each choiceSections[currentStep].choices as choice, index}
           <button
-            class="choice-button"
-            onclick={() => makeChoice(choice.id, choice.content)}
+            class="choice-card"
+            class:disabled={isAnimating}
+            onclick={(e) => makeChoice(choice.id, choice.content, e)}
+            style="animation: cardEntrance 0.6s ease-out {index * 0.1}s backwards;"
           >
-            <span class="choice-id">{choice.id}</span>
-            <span class="choice-title">{choice.title}</span>
+            <div class="card-glow"></div>
+            <div class="card-content">
+              <span class="choice-id">{choice.id}</span>
+              <span class="choice-title">{choice.title}</span>
+              <div class="card-arrow">→</div>
+            </div>
           </button>
         {/each}
       </div>
@@ -162,125 +270,348 @@
     line-height: 1.8;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: rgba(84, 142, 155, 0.05);
-    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(249, 168, 212, 0.08), rgba(139, 92, 246, 0.08));
+    border-radius: 12px;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    backdrop-filter: blur(10px);
   }
 
   .story-content.revealed {
-    border-left: 4px solid var(--primary-color);
+    border-left: 4px solid transparent;
+    border-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .story-content.revealed::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), transparent);
+    pointer-events: none;
   }
 
   .choice-indicator {
     margin-bottom: 1rem;
-    padding: 0.5rem;
-    background: rgba(84, 142, 155, 0.15);
-    border-radius: 4px;
-    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(196, 132, 252, 0.15));
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    border-left: 3px solid var(--primary-color);
   }
 
   .choices {
-    margin: 2rem 0;
+    margin: 3rem 0;
   }
 
   .choice-prompt {
     text-align: center;
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
     color: var(--text-main);
+    font-family: var(--font-family-display);
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .choice-buttons {
+  .choice-cards {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 
-  .choice-button {
+  .choice-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 1.25rem 1.5rem;
-    background: rgba(84, 142, 155, 0.05);
-    border: 2px solid rgba(107, 111, 114, 0.3);
-    border-radius: 8px;
+    padding: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(249, 168, 212, 0.1));
+    border: 2px solid rgba(124, 58, 237, 0.2);
+    border-radius: 16px;
     cursor: pointer;
-    transition: all 0.2s ease;
     text-align: left;
     width: 100%;
     color: var(--text-main);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(124, 58, 237, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
   }
 
-  .choice-button:hover {
+  .choice-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .card-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .choice-card:hover .card-glow {
+    opacity: 1;
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.1);
+    }
+  }
+
+  .choice-card:hover {
+    transform: translateY(-8px) scale(1.02);
     border-color: var(--primary-color);
-    background: rgba(84, 142, 155, 0.1);
-    transform: translateX(4px);
+    box-shadow:
+      0 20px 40px rgba(124, 58, 237, 0.25),
+      0 10px 20px rgba(124, 58, 237, 0.15),
+      0 0 0 1px rgba(124, 58, 237, 0.1);
+  }
+
+  .choice-card:hover::before {
+    opacity: 1;
+  }
+
+  .choice-card:active {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .choice-card.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem 2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   .choice-id {
-    font-weight: bold;
-    color: var(--primary-color);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .choice-title {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
     color: var(--text-main);
+    line-height: 1.4;
+    font-family: var(--font-family-sans);
+  }
+
+  .card-arrow {
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+  }
+
+  .choice-card:hover .card-arrow {
+    transform: translateY(-50%) translateX(5px);
   }
 
   .completion {
     text-align: center;
-    padding: 2rem;
-    background: rgba(84, 142, 155, 0.05);
-    border-radius: 8px;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, rgba(249, 168, 212, 0.1), rgba(103, 232, 249, 0.1));
+    border-radius: 16px;
     margin: 2rem 0;
+    border: 2px solid rgba(124, 58, 237, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .completion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.1), transparent 70%);
+    animation: glowPulse 3s ease-in-out infinite;
   }
 
   .completion h3 {
-    font-size: 2rem;
+    font-size: 2.5rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    font-family: var(--font-family-display);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
   }
 
   .completion p {
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.15rem;
+    margin-bottom: 2rem;
     color: var(--text-main);
+    position: relative;
+    z-index: 1;
   }
 
   .reset-button {
-    padding: 0.75rem 2rem;
-    background: var(--primary-color);
+    position: relative;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: var(--font-family-sans);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .reset-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .reset-button:hover::before {
+    opacity: 1;
   }
 
   .reset-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
   }
 
+  .reset-button:active {
+    transform: translateY(-1px);
+  }
+
+  /* Animations */
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes cardEntrance {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Responsive adjustments */
   @media (max-width: 768px) {
     .cyoa-container {
       padding: 1rem 0.5rem;
     }
 
     .story-content {
-      padding: 1rem;
+      padding: 1.25rem;
       font-size: 1rem;
     }
 
-    .choice-button {
-      padding: 1rem;
+    .choice-prompt {
+      font-size: 1.3rem;
+    }
+
+    .card-content {
+      padding: 1.25rem 1.5rem;
     }
 
     .choice-title {
+      font-size: 1.05rem;
+    }
+
+    .card-arrow {
+      right: 1.5rem;
+      font-size: 1.25rem;
+    }
+
+    .completion h3 {
+      font-size: 2rem;
+    }
+
+    .completion p {
       font-size: 1rem;
+    }
+
+    .reset-button {
+      padding: 0.875rem 2rem;
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .choice-cards {
+      gap: 1rem;
+    }
+
+    .card-content {
+      padding: 1rem 1.25rem;
+    }
+
+    .choice-card:hover {
+      transform: translateY(-4px) scale(1.01);
     }
   }
 </style>
