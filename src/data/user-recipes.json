@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Sarah's Hot Cocoa",
+    "submittedBy": "Sarah M.",
+    "recipe": "My favorite reading treat is a rich hot cocoa made with:\n\n• 2 cups whole milk\n• 3 tbsp cocoa powder\n• 2 tbsp sugar\n• 1/4 tsp vanilla extract\n• Pinch of salt\n• Whipped cream on top\n\nHeat milk in a saucepan, whisk in cocoa and sugar until smooth. Add vanilla and salt. Top with whipped cream and enjoy with your favorite chapter!"
+  },
+  {
+    "id": 2,
+    "name": "Classic Gingerbread Cookies",
+    "submittedBy": "Mike R.",
+    "recipe": "These gingerbread cookies are perfect for reading on a cozy afternoon:\n\nIngredients:\n• 3 cups flour\n• 1 tsp baking soda\n• 2 tsp ground ginger\n• 1 tsp cinnamon\n• 1/2 tsp cloves\n• 1/4 tsp salt\n• 3/4 cup butter, softened\n• 3/4 cup brown sugar\n• 1/2 cup molasses\n• 1 egg\n\nInstructions:\n1. Mix dry ingredients\n2. Cream butter and sugar, add molasses and egg\n3. Combine wet and dry ingredients\n4. Chill dough for 1 hour\n5. Roll out and cut shapes\n6. Bake at 350°F for 8-10 minutes"
+  },
+  {
+    "id": 3,
+    "name": "Spiced Chai Latte",
+    "submittedBy": "Emily K.",
+    "recipe": "My go-to drink while reading:\n\n• 2 cups water\n• 4 black tea bags\n• 2 cinnamon sticks\n• 4 cardamom pods\n• 4 whole cloves\n• 1-inch fresh ginger, sliced\n• 2 cups milk\n• Honey to taste\n\nBoil water with spices for 5 minutes. Add tea bags, steep for 3 minutes. Add milk and heat (don't boil). Strain and sweeten with honey. Perfect for curling up with a good book!"
+  }
+]
