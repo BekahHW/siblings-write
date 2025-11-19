@@ -118,7 +118,33 @@ const getAuthorsDisplay = (authorRefs) => {
       </div>
     </div>
 
-
+    <!-- Battle for Christmas Trailer Section -->
+    <section class="christmas-trailer-section">
+      <div class="christmas-trailer-container">
+        <h2 class="christmas-trailer-title">
+          Watch The Battle for Christmas: Reign of the Nutcrackers Trailer
+        </h2>
+        <div class="trailer-video-container">
+          <div class="video-wrapper">
+            <iframe
+              src="https://www.youtube.com/embed/QNtP_LRRNTM"
+              title="The Battle for Christmas: Reign of the Nutcrackers - Book Trailer"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+        <div class="christmas-cta">
+          <p class="christmas-tagline">Experience the magic of Christmas like never before!</p>
+          <a href="/works/battle-for-christmas" class="christmas-button">
+            <span class="button-text">Discover the Story</span>
+            <span class="button-icon">🎅</span>
+          </a>
+        </div>
+      </div>
+    </section>
 
     <section class="latest-section-wrapper">
       <h2 class="section-title">Latest Works</h2>
@@ -411,6 +437,249 @@ const getAuthorsDisplay = (authorRefs) => {
   .newsletter-intro {
     font-size: 1em !important;
     text-align: center;
+  }
+}
+
+/* Christmas Trailer Section */
+.christmas-trailer-section {
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.85) 0%, rgba(240, 253, 244, 0.85) 50%, rgba(254, 242, 242, 0.85) 100%);
+  padding: 4em 2em;
+  margin: 3em auto;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+.christmas-trailer-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 3px;
+  background: linear-gradient(135deg, #dc2626 0%, #16a34a 50%, #dc2626 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: christmasBorder 5s ease-in-out infinite;
+}
+
+@keyframes christmasBorder {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+.christmas-trailer-section::after {
+  content: '❄️ 🎄 ⭐ 🎁 ❄️ 🎄 ⭐ 🎁 ❄️ 🎄 ⭐ 🎁';
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.5em;
+  opacity: 0.3;
+  animation: slowFloat 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes slowFloat {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(-20px) translateY(-10px);
+  }
+}
+
+.christmas-trailer-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.christmas-trailer-title {
+  font-family: var(--font-family-display, 'Cormorant Garamond', serif);
+  font-size: 2.5em;
+  font-weight: 800;
+  text-align: center;
+  margin: 0 0 1.5em 0;
+  background: linear-gradient(90deg, #dc2626 0%, #16a34a 50%, #dc2626 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: christmasGradient 4s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+@keyframes christmasGradient {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+.christmas-icon {
+  display: inline-block;
+  font-size: 1.2em;
+}
+
+.trailer-video-container {
+  max-width: 900px;
+  margin: 0 auto 2em;
+}
+
+.christmas-trailer-section .video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 15px 50px rgba(220, 38, 38, 0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.christmas-trailer-section .video-wrapper:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 70px rgba(22, 163, 74, 0.5);
+}
+
+.christmas-trailer-section .video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+}
+
+.christmas-cta {
+  text-align: center;
+  margin-top: 2em;
+}
+
+.christmas-tagline {
+  font-size: 1.4em;
+  font-family: var(--font-family-serif, serif);
+  font-style: italic;
+  color: #15803d;
+  margin-bottom: 1.5em;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+.christmas-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 1.2em 2.5em;
+  font-size: 1.3em;
+  font-weight: 700;
+  font-family: var(--font-family-sans);
+  text-decoration: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%);
+  color: white;
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+}
+
+.christmas-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.christmas-button:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.christmas-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(22, 163, 74, 0.7);
+}
+
+.christmas-button .button-text {
+  position: relative;
+  z-index: 1;
+}
+
+.christmas-button .button-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 1.2em;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .christmas-trailer-section {
+    padding: 3em 1.5em;
+    margin: 2em 1em;
+  }
+
+  .christmas-trailer-title {
+    font-size: 2em;
+  }
+
+  .christmas-tagline {
+    font-size: 1.2em;
+  }
+
+  .christmas-button {
+    padding: 1em 2em;
+    font-size: 1.1em;
+    width: 100%;
+  }
+
+  .christmas-trailer-section .video-wrapper {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .christmas-trailer-title {
+    font-size: 1.6em;
+  }
+
+  .christmas-icon {
+    font-size: 1em;
   }
 }
 
