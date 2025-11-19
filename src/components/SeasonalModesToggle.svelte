@@ -119,7 +119,7 @@
       snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
       snowflake.style.animationDelay = Math.random() * 5 + 's';
       snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
-      snowflake.style.opacity = Math.random() * 0.6 + 0.4;
+      snowflake.style.opacity = Math.random() * 0.3 + 0.2;
       container.appendChild(snowflake);
     }
   }

@@ -1,5 +1,6 @@
 ---
 import MobileNav from './MobileNav.svelte';
+import SeasonalModesToggle from './SeasonalModesToggle.svelte';
 import { getCollection } from 'astro:content';
 
 const { current = '' } = Astro.props;
@@ -59,6 +60,11 @@ const showCyoa = cyoaStories.length > 0;
   .nav-links {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
+  }
+
+  .theme-toggle-wrapper {
+    margin-left: 0.5rem;
   }
 
   /* Hide only the links on mobile, not the entire nav */
@@ -78,6 +84,9 @@ const showCyoa = cyoaStories.length > 0;
   <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
   <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
   <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
+  <div class="theme-toggle-wrapper">
+    <SeasonalModesToggle client:load />
+  </div>
   </div>
   <MobileNav client:load current={current} showCyoa={showCyoa} />
 </nav>
