@@ -83,5 +83,19 @@ const announcements = defineCollection({
   }),
 });
 
+// Define the schema for the author console secrets collection
+const secrets = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/secrets" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    type: z.enum(['lore', 'chapter', 'deleted-scene', 'behind-the-scenes']),
+    publishDate: z.string(),
+    author: reference("authors").optional(),
+    order: z.number().default(0),
+    featured: z.boolean().default(false),
+  }),
+});
+
 // Export the collections
-export const collections = { authors, blog, cyoa, works, pages, announcements };
+export const collections = { authors, blog, cyoa, works, pages, announcements, secrets };
