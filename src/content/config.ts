@@ -83,5 +83,26 @@ const announcements = defineCollection({
   }),
 });
 
+// Define the schema for the Behind the Story collection
+const behindTheStory = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/behind-the-story" }),
+  schema: z.object({
+    work: reference("works"), // Reference to the work this belongs to
+    title: z.string(), // Title of the Behind the Story series
+    description: z.string().optional(), // Optional description
+    slides: z.array(z.object({
+      type: z.enum(['before-after', 'plot', 'character', 'insight', 'media']), // Slide type
+      title: z.string(), // Slide title
+      content: z.string(), // Main content (markdown supported)
+      before: z.string().optional(), // For before-after: the "before" text
+      after: z.string().optional(), // For before-after: the "after" text
+      videoUrl: z.string().optional(), // Optional video URL (YouTube, Vimeo, etc.)
+      audioUrl: z.string().optional(), // Optional audio file URL
+      image: z.string().optional(), // Optional image for the slide
+      duration: z.number().optional(), // Auto-advance duration in seconds (optional)
+    })),
+  }),
+});
+
 // Export the collections
-export const collections = { authors, blog, cyoa, works, pages, announcements };
+export const collections = { authors, blog, cyoa, works, pages, announcements, behindTheStory };

@@ -1,0 +1,287 @@
+---
+import PostHogLayout from '../../../layouts/PostHogLayout.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import BehindTheStory from '../../../components/BehindTheStory.svelte';
+
+export async function getStaticPaths() {
+  const allBehindTheStory = await getCollection('behindTheStory');
+  const works = await getCollection('works');
+
+  return allBehindTheStory.map((bts) => {
+    const work = works.find(w => w.id === bts.data.work.id);
+    return {
+      params: { slug: bts.data.work.id },
+      props: {
+        behindTheStory: bts,
+        work: work
+      },
+    };
+  });
+}
+
+const { behindTheStory, work } = Astro.props;
+const { title, slides } = behindTheStory.data;
+
+const pageTitle = `Behind the Story: ${work?.data.title || title} | Siblings Write`;
+const permalink = `${Astro.site?.href}works/${work?.id}/behind-the-story`;
+
+// Breadcrumb items
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Our Work', href: '/works' },
+  { label: work?.data.title || 'Work', href: `/works/${work?.id}` },
+  { label: 'Behind the Story' }
+];
+
+// Generate structured data for SEO
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${permalink}#breadcrumb`,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.siblingswrite.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Our Work",
+          "item": "https://www.siblingswrite.com/works"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": work?.data.title || 'Work',
+          "item": `https://www.siblingswrite.com/works/${work?.id}`
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Behind the Story",
+          "item": permalink
+        }
+      ]
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": `${permalink}#creative-work`,
+      "name": title,
+      "description": `An interactive look behind the creation of ${work?.data.title}`,
+      "url": permalink,
+      "inLanguage": "en-US",
+      "author": {
+        "@type": "Organization",
+        "name": "Siblings Write",
+        "url": "https://www.siblingswrite.com/"
+      }
+    }
+  ]
+};
+---
+
+<PostHogLayout>
+  <BaseLayout title={pageTitle} description={`Go behind the scenes of ${work?.data.title}`} permalink={permalink} current="works">
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+    <article class="behind-story-page">
+      <!-- Header -->
+      <header class="page-header">
+        <div class="header-content">
+          <h1 class="page-title">Behind the Story</h1>
+          <p class="page-subtitle">{work?.data.title}</p>
+        </div>
+      </header>
+
+      <!-- Main Content Container -->
+      <div class="content-container">
+        <Breadcrumbs items={breadcrumbItems} />
+
+        <!-- Instructions -->
+        <section class="instructions">
+          <p class="instruction-text">
+            📱 Tap or click to navigate through the story • Hold to pause • Swipe on mobile
+          </p>
+        </section>
+
+        <!-- Behind the Story Component -->
+        <div class="story-wrapper">
+          <BehindTheStory slides={slides} title={title} client:load />
+        </div>
+
+        <!-- Back Link -->
+        <div class="back-link-container">
+          <a href={`/works/${work?.id}`} class="back-link">
+            ← Back to {work?.data.title}
+          </a>
+        </div>
+      </div>
+    </article>
+  </BaseLayout>
+</PostHogLayout>
+
+<style>
+  .behind-story-page {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Header */
+  .page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 4em 2em 3em;
+    margin: -1em -2em 3em -2em;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1), transparent 70%);
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.1);
+    }
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-title {
+    font-family: var(--font-family-display);
+    font-size: 3.5em;
+    color: white;
+    margin: 0 0 0.3em 0;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .page-subtitle {
+    font-family: var(--font-family-serif);
+    font-size: 1.5em;
+    color: rgba(255, 255, 255, 0.95);
+    font-style: italic;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Content Container */
+  .content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2em;
+  }
+
+  /* Instructions */
+  .instructions {
+    text-align: center;
+    margin-bottom: 3em;
+  }
+
+  .instruction-text {
+    font-size: 1.1em;
+    color: var(--text-secondary);
+    background: linear-gradient(135deg, rgba(249, 168, 212, 0.1), rgba(139, 92, 246, 0.1));
+    padding: 1em 2em;
+    border-radius: 12px;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    display: inline-block;
+    margin: 0;
+  }
+
+  /* Story Wrapper */
+  .story-wrapper {
+    margin: 0 auto 4em;
+    max-width: 600px;
+  }
+
+  /* Back Link */
+  .back-link-container {
+    text-align: center;
+    padding: 2em 0 4em;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-family-sans);
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.8em 1.5em;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: rgba(124, 58, 237, 0.1);
+  }
+
+  .back-link:hover {
+    background: rgba(124, 58, 237, 0.2);
+    transform: translateX(-5px);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .page-header {
+      margin: -1em -1em 2em -1em;
+      padding: 3em 1.5em 2em;
+    }
+
+    .page-title {
+      font-size: 2.5em;
+    }
+
+    .page-subtitle {
+      font-size: 1.2em;
+    }
+
+    .content-container {
+      padding: 0 1em;
+    }
+
+    .instruction-text {
+      font-size: 0.95em;
+      padding: 0.875em 1.5em;
+    }
+
+    .story-wrapper {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-title {
+      font-size: 2em;
+    }
+
+    .page-subtitle {
+      font-size: 1em;
+    }
+
+    .instruction-text {
+      font-size: 0.85em;
+      padding: 0.75em 1em;
+    }
+  }
+</style>
