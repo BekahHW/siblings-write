@@ -4,6 +4,16 @@
   const rootEl = typeof document !== 'undefined' ? document.documentElement : null;
   let season = null; // null means no seasonal theme active
   let mounted = false;
+  let dropdownOpen = false;
+  let hoveredTheme = null;
+
+  const themes = [
+    { id: null, name: 'Default', description: 'Original site theme', icon: '⭐' },
+    { id: 'winter', name: 'Winter', description: 'Snowy wonderland with falling snowflakes', icon: '❄️' },
+    { id: 'halloween', name: 'Halloween', description: 'Spooky atmosphere with flickering lights', icon: '🎃' },
+    { id: 'summer', name: 'Summer', description: 'Warm beach vibes with fireflies', icon: '☀️' },
+    { id: 'spring', name: 'Spring', description: 'Blooming flowers and fresh colors', icon: '🌸' }
+  ];
 
   onMount(() => {
     mounted = true;
@@ -18,8 +28,17 @@
     season = newSeason;
     localStorage.setItem('seasonal-mode', season === null ? 'null' : season);
     applySeasonalMode(newSeason);
-    const message = newSeason === null ? 'Default theme' : `${newSeason} theme activated`;
-    announceToScreenReader(message);
+    const themeName = themes.find(t => t.id === newSeason)?.name || 'Default';
+    announceToScreenReader(`${themeName} theme activated`);
+    dropdownOpen = false;
+  }
+
+  function toggleDropdown() {
+    dropdownOpen = !dropdownOpen;
+  }
+
+  function closeDropdown() {
+    dropdownOpen = false;
   }
 
   function announceToScreenReader(message) {
@@ -142,175 +161,262 @@
       container.appendChild(light);
     }
   }
+
+  $: currentTheme = themes.find(t => t.id === season) || themes[0];
 </script>
 
-<div class="seasonal-toggle-bar">
-  <!-- Default/Star -->
+<svelte:window on:click={(e) => {
+  if (!e.target.closest('.seasonal-toggle')) {
+    closeDropdown();
+  }
+}} />
+
+<div class="seasonal-toggle">
   <button
-    class="theme-btn {season === null ? 'active' : ''}"
-    on:click={() => handleChange(null)}
-    title="Default theme"
-    aria-label="Default theme"
-    aria-pressed={season === null}
+    class="toggle-button"
+    on:click={toggleDropdown}
+    aria-label="Select seasonal theme"
+    aria-haspopup="true"
+    aria-expanded={dropdownOpen}
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7.4-6.3-4.6-6.3 4.6 2.3-7.4-6-4.6h7.6z"/>
+    <span class="theme-icon">{currentTheme.icon}</span>
+    <span class="theme-name">{currentTheme.name}</span>
+    <svg class="chevron" class:open={dropdownOpen} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
     </svg>
   </button>
 
-  <!-- Winter/Snowflake -->
-  <button
-    class="theme-btn {season === 'winter' ? 'active' : ''}"
-    on:click={() => handleChange('winter')}
-    title="Winter theme"
-    aria-label="Winter theme"
-    aria-pressed={season === 'winter'}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 3L11 4v7H4L2 12l2 1h7v7l1 1 1-1v-7h7l2-1-2-1h-7V4l-1-1z"/>
-      <circle cx="12" cy="12" r="2" fill="currentColor"/>
-    </svg>
-  </button>
-
-  <!-- Halloween/Pumpkin -->
-  <button
-    class="theme-btn {season === 'halloween' ? 'active' : ''}"
-    on:click={() => handleChange('halloween')}
-    title="Halloween theme"
-    aria-label="Halloween theme"
-    aria-pressed={season === 'halloween'}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 3c-4 0-7 3-8 5-1 3-1 5 0 8 0 1 1 3 3 4l1 1c2 2 3 3 4 3s2-1 4-3l1-1c2-1 3-3 3-4 1-3 1-5 0-8-1-2-4-5-8-5zm-3 10a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm6 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
-    </svg>
-  </button>
-
-  <!-- Summer/Sun -->
-  <button
-    class="theme-btn {season === 'summer' ? 'active' : ''}"
-    on:click={() => handleChange('summer')}
-    title="Summer theme"
-    aria-label="Summer theme"
-    aria-pressed={season === 'summer'}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41m9.9 9.9l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41m9.9-9.9l1.41-1.41M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-    </svg>
-  </button>
-
-  <!-- Spring/Flower -->
-  <button
-    class="theme-btn {season === 'spring' ? 'active' : ''}"
-    on:click={() => handleChange('spring')}
-    title="Spring theme"
-    aria-label="Spring theme"
-    aria-pressed={season === 'spring'}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 4c-2 0-4 2-4 4 0 1 0 3 2 4-2 0-3 1-3 3s1 3 3 3c0 2 2 4 4 4s4-2 4-4c2 0 3-1 3-3s-1-3-3-3c2-1 2-3 2-4 0-2-2-4-4-4z"/>
-      <circle cx="9" cy="10" r="1.5"/>
-      <circle cx="15" cy="10" r="1.5"/>
-      <circle cx="12" cy="16" r="1.5"/>
-    </svg>
-  </button>
+  {#if dropdownOpen}
+    <div class="dropdown-menu" role="menu">
+      {#each themes as theme}
+        <button
+          class="theme-option"
+          class:active={season === theme.id}
+          on:click={() => handleChange(theme.id)}
+          on:mouseenter={() => hoveredTheme = theme.id}
+          on:mouseleave={() => hoveredTheme = null}
+          role="menuitem"
+          aria-label={`Switch to ${theme.name} theme`}
+        >
+          <span class="option-icon">{theme.icon}</span>
+          <span class="option-name">{theme.name}</span>
+          {#if season === theme.id}
+            <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          {/if}
+        </button>
+        {#if hoveredTheme === theme.id}
+          <div class="tooltip" role="tooltip">
+            {theme.description}
+          </div>
+        {/if}
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
-  .seasonal-toggle-bar {
+  .seasonal-toggle {
+    position: relative;
+    display: inline-block;
+  }
+
+  .toggle-button {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.5rem 1rem;
     background: rgba(255, 255, 255, 0.95);
-    padding: 0.5rem;
-    border-radius: 2rem;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    color: #374151;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
   }
 
-  .theme-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0;
-    background: transparent;
-    color: #6b7280;
-    border: 2px solid transparent;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  .toggle-button:hover {
+    border-color: #7c3aed;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
   }
 
-  .theme-btn:hover {
-    background: rgba(124, 58, 237, 0.1);
-    color: #7c3aed;
-    transform: scale(1.1);
-  }
-
-  .theme-btn:focus-visible {
+  .toggle-button:focus-visible {
     outline: 2px solid #7c3aed;
     outline-offset: 2px;
-  }
-
-  .theme-btn.active {
-    background: var(--primary-color, #7c3aed);
-    color: white;
-    border-color: var(--primary-color, #7c3aed);
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
-  }
-
-  .theme-btn.active:hover {
-    transform: scale(1.05);
-  }
-
-  /* Seasonal color variations for active states */
-  .theme-btn.active[aria-label="Winter theme"] {
-    background: #2563eb;
-    border-color: #2563eb;
-  }
-
-  .theme-btn.active[aria-label="Halloween theme"] {
-    background: #ff6b35;
-    border-color: #ff6b35;
-  }
-
-  .theme-btn.active[aria-label="Summer theme"] {
-    background: #dc2626;
-    border-color: #dc2626;
-  }
-
-  .theme-btn.active[aria-label="Spring theme"] {
-    background: #059669;
-    border-color: #059669;
-  }
-
-  .theme-btn.active[aria-label="Default theme"] {
-    background: #7c3aed;
     border-color: #7c3aed;
   }
 
+  .theme-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .theme-name {
+    color: #1f2937;
+    font-weight: 600;
+  }
+
+  .chevron {
+    transition: transform 0.2s ease;
+    color: #6b7280;
+  }
+
+  .chevron.open {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 220px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    z-index: 1000;
+    animation: dropdown-appear 0.2s ease-out;
+  }
+
+  @keyframes dropdown-appear {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .theme-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #374151;
+    transition: all 0.15s ease;
+    text-align: left;
+  }
+
+  .theme-option:hover {
+    background: #f3f4f6;
+  }
+
+  .theme-option:focus-visible {
+    outline: 2px solid #7c3aed;
+    outline-offset: -2px;
+  }
+
+  .theme-option.active {
+    background: #ede9fe;
+    color: #7c3aed;
+  }
+
+  .option-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .option-name {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .check-icon {
+    color: #7c3aed;
+    flex-shrink: 0;
+  }
+
+  .tooltip {
+    position: absolute;
+    left: calc(100% + 0.75rem);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    animation: tooltip-appear 0.15s ease-out;
+    pointer-events: none;
+  }
+
+  .tooltip::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: #1f2937;
+  }
+
+  @keyframes tooltip-appear {
+    from {
+      opacity: 0;
+      transform: translateY(-50%) translateX(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+
   @media (max-width: 768px) {
-    .seasonal-toggle-bar {
-      gap: 0.375rem;
-      padding: 0.375rem;
+    .toggle-button {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
     }
 
-    .theme-btn {
-      width: 2.25rem;
-      height: 2.25rem;
+    .theme-name {
+      display: none;
+    }
+
+    .dropdown-menu {
+      min-width: 180px;
+      right: -0.5rem;
+    }
+
+    .tooltip {
+      display: none;
     }
   }
 
   @media (max-width: 480px) {
-    .seasonal-toggle-bar {
-      gap: 0.25rem;
-      padding: 0.25rem;
+    .toggle-button {
+      padding: 0.4rem 0.6rem;
     }
 
-    .theme-btn {
-      width: 2rem;
-      height: 2rem;
+    .theme-icon {
+      font-size: 1.1rem;
+    }
+
+    .dropdown-menu {
+      min-width: 160px;
+    }
+
+    .theme-option {
+      padding: 0.6rem 0.75rem;
+    }
+
+    .option-icon {
+      font-size: 1.25rem;
     }
   }
 </style>
