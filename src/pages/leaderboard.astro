@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Leaderboard from '../components/Leaderboard.svelte';
+
+export const prerender = false;
+---
+
+<BaseLayout 
+  title="Leaderboard | Siblings Write"
+  description="See the top contributors to our collaborative stories"
+  current="leaderboard"
+>
+  <Leaderboard client:load />
+</BaseLayout>

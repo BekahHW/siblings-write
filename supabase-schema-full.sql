@@ -387,3 +387,27 @@ COMMENT ON TABLE badges IS 'User achievements and awards';
 COMMENT ON TABLE story_votes IS 'User votes for published stories';
 COMMENT ON TABLE notifications IS 'In-app notifications for users';
 COMMENT ON TABLE user_upgrades IS 'Purchased upgrades and memberships';
+
+-- ============================================================================
+-- HELPER FUNCTIONS FOR VOTING
+-- ============================================================================
+
+-- Increment story votes
+CREATE OR REPLACE FUNCTION increment_story_votes(story_uuid UUID)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE stories
+  SET votes = votes + 1
+  WHERE story_id = story_uuid;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Decrement story votes
+CREATE OR REPLACE FUNCTION decrement_story_votes(story_uuid UUID)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE stories
+  SET votes = GREATEST(votes - 1, 0)
+  WHERE story_id = story_uuid;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
