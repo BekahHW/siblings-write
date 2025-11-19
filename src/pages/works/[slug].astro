@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 }
 
 const { work } = Astro.props;
-const { title, description, image, headerImage, link, inspiredBy, summary, inspirationStory, trailerVideoId } = work.data;
+const { title, description, image, headerImage, link, inspiredBy, summary, inspirationStory, spotifyPlaylist, trailerVideoId } = work.data;
 
 const pageTitle = `${title} | Siblings Write`;
 const permalink = `${Astro.site?.href}works/${work.id}`;
@@ -192,6 +192,41 @@ const structuredData = {
               {inspirationStory.split('\n\n').map((paragraph: string) => (
                 <p>{paragraph}</p>
               ))}
+            </div>
+          </section>
+        )}
+
+        <!-- Spotify Playlist Section -->
+        {spotifyPlaylist && (
+          <section class="spotify-section">
+            <h2 class="section-title">
+              <span class="title-decoration">🎵</span>
+              Listen to the Soundtrack
+              <span class="title-decoration">🎵</span>
+            </h2>
+            <div class="spotify-content">
+              <p class="spotify-intro">Immerse yourself in the magical atmosphere of the story with our curated Spotify playlist!</p>
+              <div class="spotify-embed-container">
+                <iframe
+                  style="border-radius:12px"
+                  src={spotifyPlaylist.replace('open.spotify.com', 'open.spotify.com/embed')}
+                  width="100%"
+                  height="352"
+                  frameBorder="0"
+                  allowfullscreen=""
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                ></iframe>
+              </div>
+              <a
+                href={spotifyPlaylist}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="spotify-link"
+              >
+                <span class="spotify-icon">🎧</span>
+                <span>Open in Spotify</span>
+              </a>
             </div>
           </section>
         )}
@@ -816,6 +851,82 @@ const structuredData = {
     margin-bottom: 0;
   }
 
+  /* Spotify Playlist Section */
+  .spotify-section {
+    margin-bottom: 4em;
+    padding: 3em;
+    background: linear-gradient(135deg, rgba(30, 215, 96, 0.1) 0%, rgba(29, 185, 84, 0.1) 100%);
+    border-radius: 20px;
+    border: 2px solid rgba(30, 215, 96, 0.2);
+    box-shadow: 0 8px 30px rgba(30, 215, 96, 0.15);
+  }
+
+  .spotify-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2em;
+  }
+
+  .spotify-intro {
+    font-size: 1.2em;
+    line-height: 1.6;
+    color: var(--text-main);
+    text-align: center;
+    margin: 0;
+    max-width: 600px;
+  }
+
+  .spotify-embed-container {
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .spotify-embed-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(30, 215, 96, 0.3);
+  }
+
+  .spotify-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 1em 2em;
+    font-size: 1.1em;
+    font-weight: 600;
+    font-family: var(--font-family-sans);
+    color: white;
+    background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+    text-decoration: none;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 215, 96, 0.3);
+  }
+
+  .spotify-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(30, 215, 96, 0.5);
+    background: linear-gradient(135deg, #1ed760 0%, #1DB954 100%);
+  }
+
+  .spotify-icon {
+    font-size: 1.3em;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+
   /* Quiz CTA Section */
   .quiz-cta-section {
     margin-bottom: 4em;
@@ -910,45 +1021,6 @@ const structuredData = {
     box-shadow: 0 12px 35px rgba(46, 74, 54, 0.6);
   }
 
-  /* Trailer Section */
-  .trailer-section {
-    margin-bottom: 4em;
-    padding: 3em;
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
-    border-radius: 20px;
-    border: 2px solid rgba(255, 107, 107, 0.2);
-    box-shadow: 0 8px 30px rgba(255, 107, 107, 0.15);
-  }
-
-  .trailer-container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .video-wrapper {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
-    height: 0;
-    overflow: hidden;
-    border-radius: 16px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-    transition: all 0.4s ease;
-  }
-
-  .video-wrapper:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 50px rgba(255, 107, 107, 0.4);
-  }
-
-  .video-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 16px;
-  }
-
   /* Christmas Theme for Battle for Christmas Page */
   [data-work-id="battle-for-christmas"] {
     background: white;
@@ -1032,42 +1104,9 @@ const structuredData = {
     border: 3px solid rgba(22, 163, 74, 0.3);
   }
 
-  [data-work-id="battle-for-christmas"] .trailer-section {
+  [data-work-id="battle-for-christmas"] .spotify-section {
     background: white;
-    border: 3px solid rgba(220, 38, 38, 0.3);
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Christmas snow effect */
-  [data-work-id="battle-for-christmas"] .trailer-section::before {
-    content: '❄️ ❄️ ❄️ ❄️ ❄️ ❄️ ❄️ ❄️';
-    position: absolute;
-    top: 10px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-size: 1.5em;
-    opacity: 0.4;
-    animation: snowfall 10s linear infinite;
-    pointer-events: none;
-  }
-
-  @keyframes snowfall {
-    0% {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    10% {
-      opacity: 0.4;
-    }
-    90% {
-      opacity: 0.4;
-    }
-    100% {
-      transform: translateY(calc(100% + 40px));
-      opacity: 0;
-    }
+    border: 3px solid rgba(30, 215, 96, 0.3);
   }
 
   [data-work-id="battle-for-christmas"] .cta-card {
@@ -1192,7 +1231,8 @@ const structuredData = {
     }
 
     .summary-section,
-    .inspiration-section {
+    .inspiration-section,
+    .spotify-section {
       padding: 2em;
     }
 
@@ -1264,6 +1304,7 @@ const structuredData = {
 
     .summary-section,
     .inspiration-section,
+    .spotify-section,
     .cta-card {
       padding: 1.5em;
     }
