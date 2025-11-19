@@ -1,70 +1,171 @@
-<script>
-  import { onMount } from 'svelte';
+<script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
+  import { user, profile } from '../stores/authStore';
+  import { supabase, getTodaysTheme, getThemeDisplayName } from '../utils/supabase';
 
   let story = '';
   let wordCount = 0;
   let storyId = '';
+  let storyStatus: 'active' | 'wrap_up' | 'published' = 'active';
+  let theme = '';
   let wordInput = '';
-  let contributorId = '';
-  let contributorName = '';
-  let contributorUrl = '';
-  let showContributorFields = false;
   let isSubmitting = false;
   let errorMessage = '';
   let successMessage = '';
   let isLoading = true;
+  let showAuthPrompt = false;
+  let realtimeChannel: any;
 
-  // Generate or retrieve contributor ID and info
-  onMount(() => {
-    if (typeof localStorage !== 'undefined') {
-      let id = localStorage.getItem('oneWordStoryContributorId');
-      if (!id) {
-        // Generate a simple unique ID
-        id = `contributor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('oneWordStoryContributorId', id);
-      }
-      contributorId = id;
+  // Get today's theme
+  $: themeDisplay = theme ? getThemeDisplayName(theme) : '';
+  $: isWrapUp = storyStatus === 'wrap_up';
+  $: maxWords = 900;
 
-      // Load saved contributor info
-      const savedName = localStorage.getItem('oneWordStoryContributorName');
-      const savedUrl = localStorage.getItem('oneWordStoryContributorUrl');
-      if (savedName) {
-        contributorName = savedName;
-        showContributorFields = true;
-      }
-      if (savedUrl) {
-        contributorUrl = savedUrl;
-        showContributorFields = true;
-      }
+  onMount(async () => {
+    await fetchStory();
+    setupRealtimeSubscription();
+
+    // Check if user is authenticated
+    if (!$user) {
+      showAuthPrompt = true;
     }
-    fetchStory();
   });
+
+  onDestroy(() => {
+    if (realtimeChannel) {
+      supabase.removeChannel(realtimeChannel);
+    }
+  });
+
+  function setupRealtimeSubscription() {
+    // Subscribe to story changes
+    realtimeChannel = supabase
+      .channel('story-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'stories',
+          filter: 'status=eq.active'
+        },
+        (payload) => {
+          console.log('Story changed:', payload);
+          fetchStory();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'contributions'
+        },
+        (payload) => {
+          console.log('New contribution:', payload);
+          // Refresh story when a new contribution is added
+          fetchStory();
+        }
+      )
+      .subscribe();
+  }
 
   async function fetchStory() {
     isLoading = true;
     errorMessage = '';
     try {
-      const response = await fetch('/api/one-word-story');
-      const data = await response.json();
+      // Get current active story
+      const { data: storyData, error: storyError } = await supabase
+        .from('stories')
+        .select('*')
+        .in('status', ['active', 'wrap_up'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
 
-      if (data.success) {
-        story = data.story.words || '';
-        wordCount = data.story.wordCount || 0;
-        storyId = data.story.storyId;
-      } else {
-        errorMessage = data.error || 'Failed to load story';
+      if (storyError && storyError.code !== 'PGRST116') {
+        console.error('Error fetching story:', storyError);
+        errorMessage = 'Failed to load story';
+        isLoading = false;
+        return;
       }
+
+      if (!storyData) {
+        // No active story, create one
+        const todayTheme = getTodaysTheme();
+        const { data: newStory, error: createError } = await supabase
+          .from('stories')
+          .insert({
+            theme: todayTheme,
+            status: 'active',
+            word_count: 0,
+            max_words: 900
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating story:', createError);
+          errorMessage = 'Failed to create story';
+          isLoading = false;
+          return;
+        }
+
+        storyId = newStory.story_id;
+        storyStatus = newStory.status;
+        theme = newStory.theme || '';
+        wordCount = newStory.word_count;
+        story = '';
+        isLoading = false;
+        return;
+      }
+
+      // Fetch all contributions for this story
+      const { data: contributions, error: contribError } = await supabase
+        .from('contributions')
+        .select('word, word_position')
+        .eq('story_id', storyData.story_id)
+        .order('word_position', { ascending: true });
+
+      if (contribError) {
+        console.error('Error fetching contributions:', contribError);
+      }
+
+      storyId = storyData.story_id;
+      storyStatus = storyData.status;
+      theme = storyData.theme || '';
+      wordCount = storyData.word_count;
+      maxWords = storyData.max_words || 900;
+
+      // Reconstruct story from contributions
+      if (contributions && contributions.length > 0) {
+        story = contributions.map(c => c.word).join(' ');
+      } else {
+        story = '';
+      }
+
     } catch (error) {
       errorMessage = 'Failed to load story. Please try again.';
-      console.error('Error fetching story:', error);
+      console.error('Error in fetchStory:', error);
     } finally {
       isLoading = false;
     }
   }
 
   async function submitWord() {
+    if (!$user || !$profile) {
+      errorMessage = 'Please sign in to contribute';
+      showAuthPrompt = true;
+      return;
+    }
+
     if (!wordInput.trim()) {
       errorMessage = 'Please enter a word';
+      return;
+    }
+
+    if (wordInput.trim().split(/\s+/).length > 1) {
+      errorMessage = 'Please enter only one word';
       return;
     }
 
@@ -72,17 +173,8 @@
     errorMessage = '';
     successMessage = '';
 
-    // Save contributor info to localStorage
-    if (typeof localStorage !== 'undefined') {
-      if (contributorName.trim()) {
-        localStorage.setItem('oneWordStoryContributorName', contributorName.trim());
-      }
-      if (contributorUrl.trim()) {
-        localStorage.setItem('oneWordStoryContributorUrl', contributorUrl.trim());
-      }
-    }
-
     try {
+      // Call API endpoint for validation and submission
       const response = await fetch('/api/one-word-story', {
         method: 'POST',
         headers: {
@@ -90,24 +182,25 @@
         },
         body: JSON.stringify({
           word: wordInput.trim(),
-          contributorId: contributorId,
-          contributorName: contributorName.trim() || undefined,
-          contributorUrl: contributorUrl.trim() || undefined
+          userId: $user.id,
+          storyId: storyId
         })
       });
 
       const data = await response.json();
 
       if (data.success) {
-        story = data.story.words || '';
-        wordCount = data.story.wordCount || 0;
-        storyId = data.story.storyId;
         wordInput = '';
         successMessage = 'Word added successfully!';
 
         if (data.storyCompleted) {
-          successMessage = `🎉 Story completed with ${data.completedStory.wordCount} words! A pull request has been created. Starting a new story...`;
+          successMessage = `🎉 Story completed! Starting a new story...`;
+        } else if (data.wrapUpMode) {
+          successMessage = `Word added! Story is in wrap-up mode (${wordCount + 1}/900 words).`;
         }
+
+        // Story will auto-refresh via realtime subscription
+        await fetchStory();
 
         // Clear success message after 3 seconds
         setTimeout(() => {
@@ -124,27 +217,34 @@
     }
   }
 
-  function handleKeyPress(event) {
+  function handleKeyPress(event: KeyboardEvent) {
     if (event.key === 'Enter' && !isSubmitting) {
       submitWord();
     }
   }
 
   function getWordsRemaining() {
-    return Math.max(0, 900 - wordCount);
+    return Math.max(0, maxWords - wordCount);
   }
 
   function getProgressPercentage() {
-    return Math.min(100, (wordCount / 900) * 100);
+    return Math.min(100, (wordCount / maxWords) * 100);
   }
 </script>
 
 <div class="one-word-story">
   <div class="story-header">
     <h2>One Word Story</h2>
+    {#if themeDisplay}
+      <div class="theme-badge">{themeDisplay}</div>
+    {/if}
     <p class="story-description">
       A collaborative story written one word at a time by the Siblings Write community.
-      Contribute your word to help tell the tale!
+      {#if isWrapUp}
+        <strong>⚠️ Wrap-up mode! Story is almost complete.</strong>
+      {:else}
+        Contribute your word to help tell the tale!
+      {/if}
     </p>
   </div>
 
@@ -163,9 +263,12 @@
     <div class="progress-fill" style="width: {getProgressPercentage()}%"></div>
   </div>
 
-  <div class="story-container">
+  <div class="story-container" class:wrap-up={isWrapUp}>
     {#if isLoading}
-      <div class="loading">Loading story...</div>
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading story...</p>
+      </div>
     {:else if story}
       <div class="story-text">{story}</div>
     {:else}
@@ -173,66 +276,41 @@
     {/if}
   </div>
 
-  <div class="word-input-container">
-    <input
-      type="text"
-      bind:value={wordInput}
-      on:keypress={handleKeyPress}
-      placeholder="Enter one word..."
-      disabled={isSubmitting}
-      maxlength="30"
-      class="word-input"
-    />
-    <button
-      on:click={submitWord}
-      disabled={isSubmitting || !wordInput.trim()}
-      class="submit-button"
-    >
-      {isSubmitting ? 'Submitting...' : 'Add Word'}
-    </button>
-  </div>
+  {#if !$user || !$profile}
+    <div class="auth-prompt">
+      <p>🔒 Sign in to contribute to the story</p>
+      <p class="auth-prompt-hint">Once signed in, you can add words and track your streak!</p>
+    </div>
+  {:else}
+    <div class="word-input-container">
+      <input
+        type="text"
+        bind:value={wordInput}
+        on:keypress={handleKeyPress}
+        placeholder="Enter one word..."
+        disabled={isSubmitting}
+        maxlength="30"
+        class="word-input"
+      />
+      <button
+        on:click={submitWord}
+        disabled={isSubmitting || !wordInput.trim()}
+        class="submit-button"
+      >
+        {isSubmitting ? 'Submitting...' : 'Add Word'}
+      </button>
+    </div>
 
-  <div class="contributor-section">
-    <button
-      class="toggle-contributor-button"
-      on:click={() => showContributorFields = !showContributorFields}
-      type="button"
-    >
-      {showContributorFields ? '▼' : '►'} {contributorName ? `Contributing as ${contributorName}` : 'Add your name (optional)'}
-    </button>
-
-    {#if showContributorFields}
-      <div class="contributor-fields">
-        <div class="field-group">
-          <label for="contributor-name">Your Name</label>
-          <input
-            id="contributor-name"
-            type="text"
-            bind:value={contributorName}
-            placeholder="e.g., Jane Doe"
-            disabled={isSubmitting}
-            maxlength="50"
-            class="contributor-input"
-          />
-          <span class="field-hint">Your name will appear in the credits when the story is complete</span>
-        </div>
-
-        <div class="field-group">
-          <label for="contributor-url">Your Website or Social Link</label>
-          <input
-            id="contributor-url"
-            type="url"
-            bind:value={contributorUrl}
-            placeholder="https://example.com or https://twitter.com/username"
-            disabled={isSubmitting}
-            maxlength="200"
-            class="contributor-input"
-          />
-          <span class="field-hint">Optional: Link to your website, Twitter, LinkedIn, etc.</span>
-        </div>
+    {#if $profile}
+      <div class="user-info">
+        Contributing as <strong>{$profile.username}</strong>
+        • {$profile.total_words} word{$profile.total_words !== 1 ? 's' : ''} contributed
+        {#if $profile.current_streak > 0}
+          • 🔥 {$profile.current_streak} day streak
+        {/if}
       </div>
     {/if}
-  </div>
+  {/if}
 
   {#if errorMessage}
     <div class="message error-message">{errorMessage}</div>
@@ -249,6 +327,7 @@
       <li>You cannot submit two consecutive words</li>
       <li>Words must be in English</li>
       <li>No inappropriate language</li>
+      <li>At 850 words, the story enters "wrap-up mode"</li>
       <li>When the story reaches 900 words, it will be published and a new story begins!</li>
     </ul>
   </div>
@@ -268,8 +347,21 @@
 
   .story-header h2 {
     font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+  }
+
+  .theme-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, var(--primary-color), #7b2cbf);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .story-description {
@@ -294,7 +386,7 @@
   .stat-value {
     font-size: 2rem;
     font-weight: bold;
-    color: var(--accent-color, #4a9eff);
+    color: var(--primary-color);
   }
 
   .stat-label {
@@ -307,7 +399,7 @@
   .progress-bar {
     width: 100%;
     height: 8px;
-    background-color: var(--bg-secondary, #f0f0f0);
+    background-color: rgba(128, 128, 128, 0.2);
     border-radius: 4px;
     margin-bottom: 2rem;
     overflow: hidden;
@@ -315,32 +407,80 @@
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(to right, #4a9eff, #7b2cbf);
+    background: linear-gradient(to right, var(--primary-color), #7b2cbf);
     border-radius: 4px;
     transition: width 0.3s ease;
   }
 
   .story-container {
-    background-color: var(--bg-secondary, #f9f9f9);
+    background-color: rgba(128, 128, 128, 0.05);
     border-radius: 8px;
     padding: 2rem;
     margin-bottom: 2rem;
     min-height: 200px;
-    border: 2px solid var(--border-color, #e0e0e0);
+    border: 2px solid rgba(128, 128, 128, 0.2);
+    transition: border-color 0.3s;
+  }
+
+  .story-container.wrap-up {
+    border-color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.05);
   }
 
   .story-text {
     font-size: 1.2rem;
     line-height: 1.8;
-    color: var(--text-color);
+    color: var(--text-main);
     text-align: justify;
   }
 
-  .loading, .empty-story {
+  .loading {
     text-align: center;
+    padding: 3rem 0;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(128, 128, 128, 0.2);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .loading p,
+  .empty-story {
     color: var(--text-secondary);
     font-style: italic;
-    padding: 3rem 0;
+  }
+
+  .auth-prompt {
+    background: linear-gradient(135deg, rgba(74, 158, 255, 0.1), rgba(123, 44, 191, 0.1));
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .auth-prompt p {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .auth-prompt-hint {
+    font-size: 0.9rem !important;
+    font-weight: 400 !important;
+    color: var(--text-secondary) !important;
   }
 
   .word-input-container {
@@ -353,16 +493,16 @@
     flex: 1;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 2px solid var(--border-color, #e0e0e0);
-    border-radius: 4px;
-    background-color: var(--bg-primary, #ffffff);
-    color: var(--text-color);
+    border: 2px solid rgba(128, 128, 128, 0.3);
+    border-radius: 8px;
+    background-color: var(--background-body);
+    color: var(--text-main);
     transition: border-color 0.2s;
   }
 
   .word-input:focus {
     outline: none;
-    border-color: var(--accent-color, #4a9eff);
+    border-color: var(--primary-color);
   }
 
   .word-input:disabled {
@@ -375,15 +515,15 @@
     font-size: 1rem;
     font-weight: 600;
     color: white;
-    background-color: var(--accent-color, #4a9eff);
+    background-color: var(--primary-color);
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+    transition: opacity 0.2s, transform 0.1s;
   }
 
   .submit-button:hover:not(:disabled) {
-    background-color: var(--accent-color-hover, #3a8eef);
+    opacity: 0.9;
     transform: translateY(-1px);
   }
 
@@ -396,112 +536,48 @@
     cursor: not-allowed;
   }
 
-  .contributor-section {
-    margin-bottom: 1.5rem;
-  }
-
-  .toggle-contributor-button {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
+  .user-info {
     font-size: 0.9rem;
-    cursor: pointer;
-    padding: 0.5rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: color 0.2s;
-  }
-
-  .toggle-contributor-button:hover {
-    color: var(--text-color);
-  }
-
-  .contributor-fields {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: var(--bg-secondary, #f9f9f9);
-    border-radius: 4px;
-    border: 1px solid var(--border-color, #e0e0e0);
-  }
-
-  .field-group {
+    color: var(--text-secondary);
+    text-align: center;
     margin-bottom: 1rem;
-  }
-
-  .field-group:last-child {
-    margin-bottom: 0;
-  }
-
-  .field-group label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
-  }
-
-  .contributor-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: 1px solid var(--border-color, #e0e0e0);
-    border-radius: 4px;
-    background-color: var(--bg-primary, #ffffff);
-    color: var(--text-color);
-    transition: border-color 0.2s;
-    box-sizing: border-box;
-  }
-
-  .contributor-input:focus {
-    outline: none;
-    border-color: var(--accent-color, #4a9eff);
-  }
-
-  .contributor-input:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .field-hint {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-top: 0.25rem;
-    font-style: italic;
+    padding: 0.75rem;
+    background: rgba(128, 128, 128, 0.05);
+    border-radius: 8px;
   }
 
   .message {
     padding: 1rem;
-    border-radius: 4px;
+    border-radius: 8px;
     margin-bottom: 1rem;
     font-weight: 500;
+    text-align: center;
   }
 
   .error-message {
-    background-color: #fee;
-    color: #c33;
-    border: 1px solid #fcc;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
   }
 
   .success-message {
-    background-color: #efe;
-    color: #3a3;
-    border: 1px solid #cfc;
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
   }
 
   .story-rules {
-    background-color: var(--bg-secondary, #f9f9f9);
+    background-color: rgba(128, 128, 128, 0.05);
     border-radius: 8px;
     padding: 1.5rem;
     margin-top: 2rem;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid rgba(128, 128, 128, 0.2);
   }
 
   .story-rules h3 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: var(--text-color);
+    color: var(--text-main);
   }
 
   .story-rules ul {

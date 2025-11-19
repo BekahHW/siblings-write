@@ -1,10 +1,9 @@
 import type { APIRoute } from 'astro';
-import StoryDatabase from '../../utils/storyDb';
+import { supabase } from '../../utils/supabase';
 import { validateWord, sanitizeWord } from '../../utils/wordFilter';
-import fs from 'fs';
-import path from 'path';
 
-const WORD_THRESHOLD = 900;
+const WRAP_UP_THRESHOLD = 850;
+const MAX_WORDS = 900;
 
 export const prerender = false;
 
@@ -14,20 +13,21 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ request }) => {
   try {
-    const story = await StoryDatabase.getCurrentStory();
+    const { data: story, error } = await supabase
+      .from('stories')
+      .select('*')
+      .in('status', ['active', 'wrap_up'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
 
-    if (!story) {
-      // Create a new story if none exists
-      const newStory = await StoryDatabase.createNewStory();
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching story:', error);
       return new Response(JSON.stringify({
-        success: true,
-        story: {
-          words: newStory.words,
-          wordCount: newStory.word_count,
-          storyId: newStory.story_id
-        }
+        success: false,
+        error: 'Failed to fetch story'
       }), {
-        status: 200,
+        status: 500,
         headers: {
           'Content-Type': 'application/json'
         }
@@ -36,11 +36,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     return new Response(JSON.stringify({
       success: true,
-      story: {
-        words: story.words,
-        wordCount: story.word_count,
-        storyId: story.story_id
-      }
+      story: story || null
     }), {
       status: 200,
       headers: {
@@ -48,7 +44,7 @@ export const GET: APIRoute = async ({ request }) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching story:', error);
+    console.error('Error in GET /api/one-word-story:', error);
     return new Response(JSON.stringify({
       success: false,
       error: 'Failed to fetch story'
@@ -68,13 +64,13 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { word, contributorId, contributorName, contributorUrl } = body;
+    const { word, userId, storyId } = body;
 
     // Validate required fields
-    if (!word || !contributorId) {
+    if (!word || !userId || !storyId) {
       return new Response(JSON.stringify({
         success: false,
-        error: 'Word and contributor ID are required'
+        error: 'Word, user ID, and story ID are required'
       }), {
         status: 400,
         headers: {
@@ -97,19 +93,14 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Sanitize and add the word
+    // Sanitize the word
     const sanitizedWord = sanitizeWord(word);
-    const result = await StoryDatabase.addWord(
-      contributorId,
-      sanitizedWord,
-      contributorName,
-      contributorUrl
-    );
 
-    if (!result.success) {
+    // Check if word contains only one word
+    if (sanitizedWord.split(/\s+/).length > 1) {
       return new Response(JSON.stringify({
         success: false,
-        error: result.error
+        error: 'Please submit only one word'
       }), {
         status: 400,
         headers: {
@@ -118,33 +109,151 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Check if we've reached the threshold
-    if (result.story && result.story.word_count >= WORD_THRESHOLD) {
-      // Archive the current story
-      const archivedStory = await StoryDatabase.archiveCurrentStory();
+    // Get the current story
+    const { data: story, error: storyError } = await supabase
+      .from('stories')
+      .select('*')
+      .eq('story_id', storyId)
+      .single();
 
-      if (archivedStory) {
-        // Create the PR asynchronously (don't wait for it)
-        createStoryPullRequest(archivedStory).catch(err => {
+    if (storyError || !story) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Story not found'
+      }), {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
+    // Check if story is already published
+    if (story.status === 'published') {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'This story has been completed. Please refresh to see the new story.'
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
+    // Check if story is at max capacity
+    if (story.word_count >= MAX_WORDS) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Story has reached maximum word count'
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
+    // Server-side turn enforcement: Check if user was the last contributor
+    if (story.last_contributor_id === userId) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'You cannot submit two consecutive words. Wait for another user to contribute.'
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
+    const newWordCount = story.word_count + 1;
+    const newStatus = newWordCount >= WRAP_UP_THRESHOLD ? 'wrap_up' : 'active';
+    const isCompleted = newWordCount >= MAX_WORDS;
+
+    // Update the story
+    const { error: updateError } = await supabase
+      .from('stories')
+      .update({
+        word_count: newWordCount,
+        last_contributor_id: userId,
+        status: isCompleted ? 'published' : newStatus,
+        completed_at: isCompleted ? new Date().toISOString() : null
+      })
+      .eq('story_id', storyId);
+
+    if (updateError) {
+      console.error('Error updating story:', updateError);
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Failed to update story'
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
+    // Add the contribution
+    const { error: contributionError } = await supabase
+      .from('contributions')
+      .insert({
+        story_id: storyId,
+        user_id: userId,
+        word: sanitizedWord,
+        word_position: newWordCount
+      });
+
+    if (contributionError) {
+      console.error('Error adding contribution:', contributionError);
+      // Rollback story update
+      await supabase
+        .from('stories')
+        .update({
+          word_count: story.word_count,
+          last_contributor_id: story.last_contributor_id,
+          status: story.status
+        })
+        .eq('story_id', storyId);
+
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Failed to add contribution'
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
+    // If story is completed, create a pull request
+    if (isCompleted) {
+      // Get all contributions for the completed story
+      const { data: contributions } = await supabase
+        .from('contributions')
+        .select(`
+          word,
+          word_position,
+          user_id,
+          profiles (username)
+        `)
+        .eq('story_id', storyId)
+        .order('word_position', { ascending: true });
+
+      if (contributions) {
+        // Create PR asynchronously (don't wait)
+        createStoryPullRequest(story, contributions).catch(err => {
           console.error('Failed to create PR:', err);
         });
       }
 
-      // Create a new story
-      const newStory = await StoryDatabase.createNewStory();
-
       return new Response(JSON.stringify({
         success: true,
         storyCompleted: true,
-        completedStory: {
-          words: archivedStory?.words,
-          wordCount: archivedStory?.word_count
-        },
-        story: {
-          words: newStory.words,
-          wordCount: newStory.word_count,
-          storyId: newStory.story_id
-        }
+        wrapUpMode: false,
+        message: 'Story completed! A new story will begin.'
       }), {
         status: 200,
         headers: {
@@ -156,11 +265,8 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(JSON.stringify({
       success: true,
       storyCompleted: false,
-      story: {
-        words: result.story.words,
-        wordCount: result.story.word_count,
-        storyId: result.story.story_id
-      }
+      wrapUpMode: newStatus === 'wrap_up',
+      message: newStatus === 'wrap_up' ? 'Story is in wrap-up mode!' : 'Word added successfully'
     }), {
       status: 200,
       headers: {
@@ -168,7 +274,7 @@ export const POST: APIRoute = async ({ request }) => {
       }
     });
   } catch (error) {
-    console.error('Error submitting word:', error);
+    console.error('Error in POST /api/one-word-story:', error);
     return new Response(JSON.stringify({
       success: false,
       error: 'Failed to submit word'
@@ -184,8 +290,11 @@ export const POST: APIRoute = async ({ request }) => {
 /**
  * Create a pull request for a completed story
  */
-async function createStoryPullRequest(story: any): Promise<void> {
+async function createStoryPullRequest(story: any, contributions: any[]): Promise<void> {
   try {
+    const fs = await import('fs');
+    const path = await import('path');
+
     const timestamp = new Date().toISOString().split('T')[0];
     const storyFileName = `one-word-story-${timestamp}-${story.story_id.substring(0, 8)}.md`;
     const collabsDir = path.join(process.cwd(), 'src', 'content', 'collabs');
@@ -196,35 +305,50 @@ async function createStoryPullRequest(story: any): Promise<void> {
       fs.mkdirSync(collabsDir, { recursive: true });
     }
 
-    // Get contributors
-    const contributors = await StoryDatabase.getStoryContributors(story.story_id);
-    const contributorCount = await StoryDatabase.getStoryContributorCount(story.story_id);
+    // Build the story text
+    const storyText = contributions.map(c => c.word).join(' ');
+
+    // Get unique contributors
+    const contributorMap = new Map();
+    contributions.forEach((c: any) => {
+      if (c.profiles && c.profiles.username) {
+        contributorMap.set(c.user_id, c.profiles.username);
+      }
+    });
+
+    const contributors = Array.from(contributorMap.values());
+    const contributorCount = contributorMap.size;
 
     // Build contributor list
     let contributorList = '';
     if (contributors.length > 0) {
-      const namedContributors = contributors.filter(c => c.name);
-      if (namedContributors.length > 0) {
-        contributorList = '\n\n### Contributors\n\n';
-        namedContributors.forEach(contributor => {
-          if (contributor.url) {
-            contributorList += `- [${contributor.name}](${contributor.url})\n`;
-          } else {
-            contributorList += `- ${contributor.name}\n`;
-          }
-        });
-      }
+      contributorList = '\n\n### Contributors\n\n';
+      contributors.forEach(username => {
+        contributorList += `- ${username}\n`;
+      });
     }
+
+    // Get theme display name
+    const themeNames: Record<string, string> = {
+      mystery: 'Mystery',
+      time_travel: 'Time Travel',
+      whimsical: 'Whimsical',
+      thriller: 'Thriller',
+      fantasy: 'Fantasy',
+      sci_fi: 'Sci-Fi',
+      slice_of_life: 'Slice of Life',
+    };
+    const themeDisplay = story.theme ? themeNames[story.theme] || story.theme : '';
 
     // Create the story markdown file
     const storyContent = `---
-title: "One Word Story - ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}"
-description: "A collaborative story created one word at a time by the Siblings Write community"
+title: "${story.title || `One Word Story - ${themeDisplay} - ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}"
+description: "A collaborative ${themeDisplay.toLowerCase()} story created one word at a time by the Siblings Write community"
 publishDate: "${new Date().toISOString()}"
 hidden: false
 ---
 
-${story.words}
+${storyText}
 
 ---
 
@@ -241,23 +365,28 @@ ${story.words}
 
     const branchName = `collab-story-${timestamp}-${story.story_id.substring(0, 8)}`;
 
-    // Create branch and commit
-    await execPromise(`git checkout -b ${branchName}`);
-    await execPromise(`git add ${storyFilePath}`);
-    await execPromise(`git commit -m "Add completed One Word Story from ${timestamp}"`);
-    await execPromise(`git push -u origin ${branchName}`);
-
-    // Create PR using gh CLI (if available)
     try {
-      await execPromise(`gh pr create --title "One Word Story - ${timestamp}" --body "Automated PR for completed collaborative story with ${story.word_count} words." --label "collab-story"`);
-    } catch (err) {
-      console.error('gh CLI not available or failed, PR must be created manually:', err);
-    }
+      // Create branch and commit
+      await execPromise(`git checkout -b ${branchName}`);
+      await execPromise(`git add ${storyFilePath}`);
+      await execPromise(`git commit -m "Add completed One Word Story from ${timestamp}"`);
+      await execPromise(`git push -u origin ${branchName}`);
 
-    // Switch back to original branch
-    await execPromise('git checkout -');
+      // Create PR using gh CLI (if available)
+      try {
+        await execPromise(`gh pr create --title "One Word Story - ${themeDisplay} - ${timestamp}" --body "Automated PR for completed collaborative story with ${story.word_count} words.\\n\\nTheme: ${themeDisplay}\\nContributors: ${contributorCount}" --label "collab-story"`);
+      } catch (err) {
+        console.error('gh CLI not available or failed, PR must be created manually:', err);
+      }
+
+      // Switch back to original branch
+      await execPromise('git checkout -');
+    } catch (gitError) {
+      console.error('Git operations failed:', gitError);
+      // Don't throw - the story file was created successfully
+    }
   } catch (error) {
     console.error('Failed to create story PR:', error);
-    throw error;
+    // Don't throw - this is a background operation
   }
 }
