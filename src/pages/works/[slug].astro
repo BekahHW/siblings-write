@@ -210,6 +210,76 @@ const structuredData = {
         </div>
       </div>
     </article>
+
+    <!-- Trailer Modal -->
+    <div id="trailerModal" class="trailer-modal">
+      <div class="trailer-modal-content">
+        <button class="trailer-modal-close" id="closeModal">×</button>
+        <div id="trailerVideoContainer"></div>
+      </div>
+    </div>
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        const playBtn = document.querySelector('.play-trailer-btn');
+        const modal = document.getElementById('trailerModal');
+        const closeBtn = document.getElementById('closeModal');
+        const videoContainer = document.getElementById('trailerVideoContainer');
+
+        console.log('Script loaded. Elements found:', { playBtn: !!playBtn, modal: !!modal, videoContainer: !!videoContainer });
+
+        if (playBtn && modal && videoContainer) {
+          playBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const trailerId = playBtn.getAttribute('data-trailer-id');
+            console.log('Play button clicked, trailer ID:', trailerId);
+            if (trailerId) {
+              const iframe = document.createElement('iframe');
+              iframe.src = `https://www.youtube.com/embed/${trailerId}?autoplay=1`;
+              iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+              iframe.allowFullscreen = true;
+              iframe.style.width = '100%';
+              iframe.style.height = '100%';
+              iframe.style.border = 'none';
+              iframe.style.borderRadius = '8px';
+
+              videoContainer.innerHTML = '';
+              videoContainer.appendChild(iframe);
+              modal.classList.add('active');
+              document.body.style.overflow = 'hidden';
+            }
+          });
+        } else {
+          console.error('Missing elements for trailer modal');
+        }
+
+        const closeModal = () => {
+          if (modal && videoContainer) {
+            modal.classList.remove('active');
+            videoContainer.innerHTML = '';
+            document.body.style.overflow = 'auto';
+          }
+        };
+
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeModal);
+        }
+
+        if (modal) {
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+              closeModal();
+            }
+          });
+        }
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+            closeModal();
+          }
+        });
+      });
+    </script>
   </BaseLayout>
 </PostHogLayout>
 
@@ -1259,68 +1329,3 @@ const structuredData = {
     border-radius: 8px;
   }
 </style>
-
-<div id="trailerModal" class="trailer-modal">
-  <div class="trailer-modal-content">
-    <button class="trailer-modal-close" id="closeModal">×</button>
-    <div id="trailerVideoContainer"></div>
-  </div>
-</div>
-
-<script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    const playBtn = document.querySelector('.play-trailer-btn');
-    const modal = document.getElementById('trailerModal');
-    const closeBtn = document.getElementById('closeModal');
-    const videoContainer = document.getElementById('trailerVideoContainer');
-
-    if (playBtn && modal && videoContainer) {
-      playBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const trailerId = playBtn.getAttribute('data-trailer-id');
-        console.log('Play button clicked, trailer ID:', trailerId);
-        if (trailerId) {
-          const iframe = document.createElement('iframe');
-          iframe.src = `https://www.youtube.com/embed/${trailerId}?autoplay=1`;
-          iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-          iframe.allowFullscreen = true;
-          iframe.style.width = '100%';
-          iframe.style.height = '100%';
-          iframe.style.border = 'none';
-          iframe.style.borderRadius = '8px';
-
-          videoContainer.innerHTML = '';
-          videoContainer.appendChild(iframe);
-          modal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        }
-      });
-    }
-
-    const closeModal = () => {
-      if (modal && videoContainer) {
-        modal.classList.remove('active');
-        videoContainer.innerHTML = '';
-        document.body.style.overflow = 'auto';
-      }
-    };
-
-    if (closeBtn) {
-      closeBtn.addEventListener('click', closeModal);
-    }
-
-    if (modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          closeModal();
-        }
-      });
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
-        closeModal();
-      }
-    });
-  });
-</script>
