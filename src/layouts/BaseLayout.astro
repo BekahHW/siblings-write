@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PostHog from '../components/posthog.astro';
 import AnnouncementPopup from '../components/AnnouncementPopup.svelte';
+import SeasonalModesToggle from '../components/SeasonalModesToggle.svelte';
 import { getCollection } from 'astro:content';
 
 export interface Props {
@@ -135,6 +136,11 @@ const siteStructuredData = {
     <Footer hideNewsletter={hideNewsletterFooter} />
   </div>
 
+  <!-- Seasonal Modes Toggle -->
+  <div class="seasonal-toggle-container">
+    <SeasonalModesToggle client:load />
+  </div>
+
   <!-- Render announcement popup if one is active -->
   {activeAnnouncement && (
     <AnnouncementPopup
@@ -261,6 +267,33 @@ const siteStructuredData = {
     .progress-sparkle {
       font-size: 1em;
       top: -6px;
+    }
+  }
+
+  /* Seasonal Modes Toggle Container */
+  .seasonal-toggle-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9998;
+    animation: float-in 0.6s ease-out;
+  }
+
+  @keyframes float-in {
+    0% {
+      transform: translateY(100px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .seasonal-toggle-container {
+      bottom: 1rem;
+      right: 1rem;
     }
   }
 </style>
