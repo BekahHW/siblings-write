@@ -389,14 +389,30 @@ const structuredData = {
   }
 
   .hero-tagline {
-    font-size: 1.8em;
+    font-size: 2.2em;
     color: white;
     font-family: var(--font-family-serif);
     font-style: italic;
+    font-weight: 600;
     margin: 0 0 1.5em 0;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9);
-    opacity: 0;
-    animation: fadeInUp 1s ease-out 0.5s forwards;
+    padding: 0.3em 0.8em;
+    background: rgba(220, 38, 38, 0.7);
+    border-radius: 8px;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.8);
+    box-shadow: 0 4px 30px rgba(220, 38, 38, 0.6), 0 0 60px rgba(22, 163, 74, 0.4);
+    opacity: 1;
+    animation: taglineGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes taglineGlow {
+    0%, 100% {
+      box-shadow: 0 4px 30px rgba(220, 38, 38, 0.6), 0 0 60px rgba(22, 163, 74, 0.4);
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.8);
+    }
+    50% {
+      box-shadow: 0 4px 40px rgba(220, 38, 38, 0.9), 0 0 80px rgba(22, 163, 74, 0.7);
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9), 0 0 50px rgba(255, 215, 0, 1);
+    }
   }
 
   @keyframes fadeInUp {
@@ -1044,7 +1060,7 @@ const structuredData = {
     }
 
     .hero-tagline {
-      font-size: 1.5em;
+      font-size: 1.8em;
     }
 
     .play-trailer-btn {
@@ -1100,7 +1116,7 @@ const structuredData = {
     }
 
     .hero-tagline {
-      font-size: 1.3em;
+      font-size: 1.5em;
     }
 
     .play-trailer-btn {
@@ -1165,7 +1181,8 @@ const structuredData = {
     }
 
     .hero-tagline {
-      font-size: 1.1em;
+      font-size: 1.2em;
+      padding: 0.2em 0.6em;
     }
 
     .play-trailer-btn {
