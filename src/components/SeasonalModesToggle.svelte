@@ -226,7 +226,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.75rem;
     background: rgba(255, 255, 255, 0.95);
     color: #374151;
     border: 2px solid #e5e7eb;
@@ -256,8 +256,7 @@
   }
 
   .theme-name {
-    color: #1f2937;
-    font-weight: 600;
+    display: none;
   }
 
   .chevron {
@@ -382,10 +381,6 @@
     .toggle-button {
       padding: 0.5rem 0.75rem;
       font-size: 0.8rem;
-    }
-
-    .theme-name {
-      display: none;
     }
 
     .dropdown-menu {
