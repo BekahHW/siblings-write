@@ -3,7 +3,7 @@ title: "The Mysterious Forest"
 description: "A thrilling adventure through an enchanted forest where every choice matters."
 publishDate: "2025-11-10"
 author: "zach"
-hidden: true
+hidden: false
 ---
 
 You stand at the edge of an ancient forest, the kind that appears in fairy tales. The trees tower above you, their branches creating a canopy that filters the afternoon sunlight into dancing patches on the forest floor. You've heard stories about this place—tales of hidden treasures, magical creatures, and travelers who never returned.

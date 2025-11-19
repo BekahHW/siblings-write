@@ -1,6 +1,6 @@
 ---
 title: 100 Puppies
-description: '📚  100 Puppies:  A Hawrot Siblings Micro-Monthly Story'
+description: 'A mischievous girl, a magical fountain, and one wild wish. A heartwarming, chaotic family story that ends with the arrival of 100 puppies.'
 publishDate: '2025-10-04'
 authors: [zach]
 ---
@@ -216,12 +216,3 @@ The old man, now with a stone-cold face, bent over to Lola. “Sweetheart, what 
 
 Lola, with a menacing grin, turned to him and said, “One hundred puppies!”
 
-
-
----
-
-*📖** If you missed last month’s story about the Last Show at The Luna, it’s now live on our **website**.*
-
-*P.S. Sharing is caring—forward this story to a friend so they can **subscribe** and be rad like you!*
-
-https://www.siblingswrite.com/Unsubscribe · Preferences

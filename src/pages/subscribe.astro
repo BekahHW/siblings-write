@@ -228,10 +228,10 @@ const permalink = `${Astro.site.href}subscribe`;
 
   .formkit-submit {
     padding: 14px 32px;
-    background: var(--primary-color, #548e9b);
+    background: var(--primary-gradient);
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
@@ -239,12 +239,30 @@ const permalink = `${Astro.site.href}subscribe`;
     position: relative;
     overflow: hidden;
     white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .formkit-submit::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .formkit-submit:hover::before {
+    width: 300px;
+    height: 300px;
   }
 
   .formkit-submit:hover {
-    background: #4a7d88;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(84, 142, 155, 0.3);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.5);
   }
 
   .formkit-spinner {
@@ -335,3 +353,82 @@ const permalink = `${Astro.site.href}subscribe`;
     }
   }
 </style>
+
+<script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.subscribe-form');
+
+  if (!form) return;
+
+  // Function to create confetti explosion
+  function createConfettiExplosion(container) {
+    const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f093fb', '#667eea'];
+    const rect = container.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    for (let i = 0; i < 50; i++) {
+      setTimeout(() => {
+        const confetti = document.createElement('div');
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const angle = (Math.random() * 360) * (Math.PI / 180);
+        const velocity = 3 + Math.random() * 6;
+        const size = 6 + Math.random() * 6;
+
+        confetti.style.cssText = `
+          position: fixed;
+          width: ${size}px;
+          height: ${size}px;
+          background: ${color};
+          left: ${centerX}px;
+          top: ${centerY}px;
+          opacity: 1;
+          pointer-events: none;
+          z-index: 9999;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+        `;
+
+        document.body.appendChild(confetti);
+
+        const velocityX = Math.cos(angle) * velocity;
+        const velocityY = Math.sin(angle) * velocity;
+        let posX = 0;
+        let posY = 0;
+        let opacity = 1;
+        let rotation = 0;
+
+        const animate = () => {
+          posX += velocityX;
+          posY += velocityY + (posY * 0.1);
+          opacity -= 0.015;
+          rotation += 5;
+
+          confetti.style.transform = `translate(${posX}px, ${posY}px) rotate(${rotation}deg)`;
+          confetti.style.opacity = opacity;
+
+          if (opacity > 0) {
+            requestAnimationFrame(animate);
+          } else {
+            confetti.remove();
+          }
+        };
+
+        requestAnimationFrame(animate);
+      }, i * 10);
+    }
+  }
+
+  // Watch for successful submission
+  form.addEventListener('submit', function() {
+    // Delay slightly to allow form validation
+    setTimeout(() => {
+      const formSection = document.querySelector('.form-section');
+      if (formSection) {
+        createConfettiExplosion(formSection);
+      }
+    }, 500);
+  });
+});
+</script>

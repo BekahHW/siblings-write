@@ -1,10 +1,30 @@
 <style>
-  img {
+  .logo-link {
+    text-decoration: none;
+    color: inherit;
     display: block;
-    width: 75px;
+  }
+
+  .logo-text {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+    color: var(--text-main);
+    transition: color 0.3s ease;
+  }
+
+  .logo-link:hover .logo-text {
+    color: var(--primary-color);
+  }
+
+  @media screen and (max-width: 520px) {
+    .logo-text {
+      font-size: 1.2rem;
+    }
   }
 </style>
 
-<a href="/">
-  <img alt="Blog Logo" src="/assets/logo.png" width="75" height="50" />
+<a href="/" class="logo-link">
+  <span class="logo-text">The Hawrot Siblings</span>
 </a>

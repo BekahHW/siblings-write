@@ -1,5 +1,4 @@
 ---
-import ThemeToggleButton from './ThemeToggleButton.svelte';
 import MobileNav from './MobileNav.svelte';
 import AuthControls from './AuthControls.svelte';
 import { getCollection } from 'astro:content';
@@ -63,10 +62,6 @@ const showCyoa = cyoaStories.length > 0;
     align-items: center;
   }
 
-  .theme-toggle-container {
-    width: 75px;
-  }
-
   .auth-controls-container {
     margin-left: 12px;
   }
@@ -75,12 +70,6 @@ const showCyoa = cyoaStories.length > 0;
   @media screen and (max-width: 768px) {
     .nav-links {
       display: none;
-    }
-  }
-
-  @media screen and (max-width: 520px) {
-    .theme-toggle-container {
-      margin-right: 1em;
     }
   }
 </style>
@@ -98,9 +87,6 @@ const showCyoa = cyoaStories.length > 0;
   </div>
   <div class="auth-controls-container">
     <AuthControls client:load />
-  </div>
-  <div class="theme-toggle-container">
-    <ThemeToggleButton client:load />
   </div>
   <MobileNav client:load current={current} showCyoa={showCyoa} />
 </nav>

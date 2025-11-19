@@ -67,44 +67,42 @@ const structuredData = {
           <h2>{featuredTitle}</h2>
           {featuredWorks.map((work) => (
             <article class="book-section" itemscope itemtype="https://schema.org/Book">
-              <img
-                src={work.data.image}
-                alt={`Book cover for ${work.data.title}`}
-                width="200"
-                itemprop="image"
-              >
+              <a href={`/works/${work.id}`} class="book-cover-link">
+                <img
+                  src={work.data.image}
+                  alt={`Book cover for ${work.data.title}`}
+                  width="200"
+                  itemprop="image"
+                  loading="lazy"
+                >
+              </a>
               <div>
                 <p>
-                  <strong itemprop="name">{work.data.title}</strong><br/>
+                  <strong itemprop="name">
+                    <a href={`/works/${work.id}`} class="work-title-link">{work.data.title}</a>
+                  </strong><br/>
                   <span itemprop="description">{work.data.description}</span>
                 </p>
-                <a
-                  href={work.data.link}
-                  target="_blank"
-                  rel="noopener"
-                  class="buy-button"
-                  itemprop="url"
-                >
-                  Buy Now on Amazon
-                </a>
+                <div class="button-group">
+                  <a
+                    href={`/works/${work.id}`}
+                    class="learn-more-button"
+                  >
+                    Learn More
+                  </a>
+                  <a
+                    href={work.data.link}
+                    target="_blank"
+                    rel="noopener"
+                    class="buy-button"
+                    itemprop="url"
+                  >
+                    Buy Now on Amazon
+                  </a>
+                </div>
               </div>
             </article>
           ))}
-        </>
-      )}
-
-      <!-- Other Projects Section -->
-      {otherWorks.length > 0 && (
-        <>
-          <h2>{otherProjectsTitle}</h2>
-          <ul>
-            {otherWorks.map((work) => (
-              <li>
-                <strong><a href={work.data.link} target="_blank" rel="noopener">{work.data.title}</a></strong>
-                <em> {work.data.description}</em>
-              </li>
-            ))}
-          </ul>
         </>
       )}
 
@@ -132,7 +130,7 @@ const structuredData = {
 
 <style>
   .container-new {
-    max-width: 80%;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 2em;
   }
@@ -151,29 +149,125 @@ const structuredData = {
   .book-section {
     display: flex;
     align-items: center;
-    gap: 1em;
-    margin: 2em 0;
+    gap: 2em;
+    margin: 3em 0;
+    padding: 2em;
+    background: linear-gradient(135deg, rgba(249, 168, 212, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
+    border-radius: 20px;
+    transition: all 0.4s ease;
+    border: 2px solid rgba(124, 58, 237, 0.1);
+  }
+
+  .book-section > div {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .book-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(124, 58, 237, 0.2);
+    border-color: rgba(124, 58, 237, 0.3);
   }
 
   .book-section img {
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 12px
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    width: 200px;
+    height: auto;
+  }
+
+  .book-section:hover img {
+    transform: scale(1.05) rotate(-2deg);
+    box-shadow: 0 15px 35px rgba(124, 58, 237, 0.3);
+  }
+
+  .book-cover-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .work-title-link {
+    color: var(--text-main);
+    text-decoration: none;
+    background: linear-gradient(to right, var(--primary-color), #c084fc);
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    transition: background-size 0.3s ease, color 0.3s ease;
+  }
+
+  .work-title-link:hover {
+    background-size: 100% 2px;
+    color: var(--primary-color);
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1em;
+    margin-top: 1em;
+    flex-wrap: wrap;
+  }
+
+  .buy-button,
+  .learn-more-button {
+    display: inline-block;
+    padding: 1em 2em;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: bold;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-family-sans);
   }
 
   .buy-button {
-    display: inline-block;
-    margin-top: 1em;
-    padding: 0.8em 1.5em;
-    background-color: #007acc;
+    background: var(--primary-gradient);
     color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: bold;
+  }
+
+  .learn-more-button {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
+  }
+
+  .buy-button::before,
+  .learn-more-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .buy-button:hover::before {
+    width: 300px;
+    height: 300px;
   }
 
   .buy-button:hover {
-    background-color: #005fa3;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.5);
+  }
+
+  .learn-more-button:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .learn-more-button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(79, 172, 254, 0.5);
   }
 
   .testimonials-section {
@@ -189,18 +283,32 @@ const structuredData = {
   }
 
   .testimonial {
-    background: linear-gradient(135deg, rgba(84, 142, 155, 0.08) 0%, rgba(190, 214, 221, 0.2) 100%);
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.08) 0%, rgba(249, 168, 212, 0.08) 100%);
     padding: 2em;
-    border-radius: 12px;
-    border-left: 5px solid var(--primary-color, #548e9b);
+    border-radius: 16px;
+    border-left: 5px solid transparent;
+    border-image: var(--magic-gradient) 1;
     margin: 0;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .testimonial::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 6em;
+    color: rgba(124, 58, 237, 0.1);
+    font-family: Georgia, serif;
+    line-height: 1;
   }
 
   .testimonial:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(124, 58, 237, 0.2);
   }
 
   .testimonial p {
@@ -220,6 +328,11 @@ const structuredData = {
   }
 
   @media (max-width: 1020px) {
+    .container-new {
+      padding: 1.5em;
+      max-width: 100%;
+    }
+
     .work-image {
       float: none;
       margin: 0 auto 2em;
@@ -227,17 +340,54 @@ const structuredData = {
 
     .book-section {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
+      text-align: center;
+      padding: 1.5em;
+      margin: 2em 0;
     }
 
     .book-section img {
       width: 100%;
-      max-width: 250px;
+      max-width: 200px;
+      margin: 0 0 1.5em 0;
     }
 
     .testimonials-section {
       padding: 2em 1.5em;
       margin-top: 3em;
+    }
+
+    .testimonial {
+      padding: 1.5em;
+    }
+
+    .testimonial::before {
+      font-size: 4em;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .container-new {
+      padding: 1em;
+    }
+
+    .book-section {
+      padding: 1em;
+      gap: 1em;
+    }
+
+    .button-group {
+      flex-direction: column;
+    }
+
+    .buy-button,
+    .learn-more-button {
+      width: 100%;
+      text-align: center;
+    }
+
+    .testimonials-section {
+      padding: 1.5em 1em;
     }
   }
 </style>

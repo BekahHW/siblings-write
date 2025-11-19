@@ -1,0 +1,1401 @@
+---
+import PostHogLayout from '../../layouts/PostHogLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+
+export async function getStaticPaths() {
+  const works = await getCollection('works');
+  return works.map((work) => ({
+    params: { slug: work.id },
+    props: { work },
+  }));
+}
+
+const { work } = Astro.props;
+const { title, description, image, headerImage, link, inspiredBy, summary, inspirationStory, trailerVideoId } = work.data;
+
+const pageTitle = `${title} | Siblings Write`;
+const permalink = `${Astro.site?.href}works/${work.id}`;
+
+// Breadcrumb items
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Our Work', href: '/works' },
+  { label: title }
+];
+
+// Generate structured data for SEO
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${permalink}#breadcrumb`,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.siblingswrite.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Our Work",
+          "item": "https://www.siblingswrite.com/works"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": title,
+          "item": permalink
+        }
+      ]
+    },
+    {
+      "@type": "Book",
+      "@id": `${permalink}#book`,
+      "name": title,
+      "description": description,
+      "image": `https://www.siblingswrite.com${image}`,
+      "url": link,
+      "inLanguage": "en-US",
+      "author": {
+        "@type": "Organization",
+        "name": "Siblings Write",
+        "url": "https://www.siblingswrite.com/"
+      }
+    }
+  ]
+};
+---
+
+<PostHogLayout>
+  <BaseLayout title={pageTitle} description={description} permalink={permalink} current="works">
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+    <article class="work-detail" data-work-id={work.id}>
+      <!-- Hero Header with Image and Title -->
+      <header class="hero-header">
+        <div class="hero-image-container">
+          {trailerVideoId && work.id === 'battle-for-christmas' ? (
+            <>
+              <div class="hero-video-background" id="heroVideoBackground">
+                <iframe
+                  id="heroVideoIframe"
+                  src={`https://www.youtube.com/embed/${trailerVideoId}?autoplay=1&mute=1&loop=1&playlist=${trailerVideoId}&controls=0&showinfo=0&rel=0&modestbranding=1`}
+                  title={`${title} - Background Trailer`}
+                  frameborder="0"
+                  allow="autoplay; encrypted-media"
+                  allowfullscreen
+                ></iframe>
+              </div>
+              <div class="hero-overlay hero-frosted" id="heroOverlay"></div>
+              <div class="snowfall-container" id="snowfallContainer">
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+                <div class="snowflake">❄</div>
+              </div>
+              <div class="hero-content" id="heroContent">
+                <h1 class="hero-title hero-title-cinematic">{title}</h1>
+                <p class="hero-tagline">Watch for the Magic</p>
+                <button class="play-trailer-btn" id="playTrailerBtn" data-trailer-id={trailerVideoId}>
+                  <span class="play-icon">▶</span>
+                  <span class="play-text">Play Trailer</span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <img
+                src={headerImage || image}
+                alt={title}
+                class="hero-image"
+              />
+              <div class="hero-overlay"></div>
+              <h1 class="hero-title">{title}</h1>
+            </>
+          )}
+        </div>
+      </header>
+
+      <!-- Main Content Container -->
+      <div class="content-container">
+        <Breadcrumbs items={breadcrumbItems} />
+
+        <!-- Logline, Inspired By, and Buy Button Section -->
+        <section class="intro-section">
+          <div class="book-cover-container">
+            <img
+              src={image}
+              alt={`${title} book cover`}
+              class="book-cover"
+              loading="eager"
+            />
+          </div>
+
+          <div class="intro-content">
+            <div class="logline">
+              <p>{description}</p>
+            </div>
+
+            {inspiredBy && (
+              <div class="inspired-by">
+                <p class="inspired-label">What Inspired This Story</p>
+                <p class="inspired-text">{inspiredBy}</p>
+              </div>
+            )}
+
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="cta-button cta-primary"
+            >
+              <span class="button-text">Buy Now on Amazon</span>
+              <span class="button-icon">📚</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Book Summary Section -->
+        {summary && (
+          <section class="summary-section">
+            <h2 class="section-title">
+              <span class="title-decoration">✨</span>
+              About the Book
+              <span class="title-decoration">✨</span>
+            </h2>
+            <div class="summary-content">
+              <p>{summary}</p>
+            </div>
+          </section>
+        )}
+
+        <!-- Inspiration Story Section -->
+        {inspirationStory && (
+          <section class="inspiration-section">
+            <h2 class="section-title">
+              <span class="title-decoration">💫</span>
+              The Story Behind the Story
+              <span class="title-decoration">💫</span>
+            </h2>
+            <div class="inspiration-content">
+              {inspirationStory.split('\n\n').map((paragraph: string) => (
+                <p>{paragraph}</p>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- Quiz CTA Section (Battle for Christmas only) -->
+        {work.id === 'battle-for-christmas' && (
+          <section class="quiz-cta-section">
+            <div class="quiz-cta-card">
+              <div class="quiz-cta-content">
+                <div class="quiz-icon">🎄</div>
+                <h3 class="quiz-cta-title">Which Nutcracker Village Character Are You?</h3>
+                <p class="quiz-cta-description">
+                  Take our interactive personality quiz to discover which character from <em>The Battle for Christmas</em> matches your personality!
+                </p>
+                <a
+                  href="/works/battle-for-christmas/which-character-are-you"
+                  class="cta-button quiz-button"
+                >
+                  <span class="button-text">Take the Quiz</span>
+                  <span class="button-icon">✨</span>
+                </a>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <!-- Final CTA Section -->
+        <section class="final-cta-section">
+          <div class="cta-card">
+            <h3>Ready to Start Your Adventure?</h3>
+            <p>Get your copy today and discover the magic for yourself!</p>
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="cta-button cta-secondary"
+            >
+              <span class="button-text">Order Your Copy Now</span>
+              <span class="button-icon">🚀</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Back to Works Link -->
+        <div class="back-link-container">
+          <a href="/works" class="back-link">
+            ← Back to All Works
+          </a>
+        </div>
+      </div>
+    </article>
+  </BaseLayout>
+</PostHogLayout>
+
+<style>
+  .work-detail {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hero Header */
+  .hero-header {
+    margin: -1em -2em 3em -2em;
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  .hero-image-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+  }
+
+  [data-work-id="battle-for-christmas"] .hero-image-container {
+    height: 600px;
+  }
+
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(0.7);
+    transition: transform 0.3s ease;
+  }
+
+  .hero-image-container:hover .hero-image {
+    transform: scale(1.05);
+  }
+
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(124, 58, 237, 0.3) 0%,
+      rgba(124, 58, 237, 0.6) 100%
+    );
+    pointer-events: none;
+  }
+
+  .hero-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: white;
+    font-size: 3.5em;
+    font-family: var(--font-family-display);
+    text-align: center;
+    padding: 1em 2rem 0.5em;
+    margin: 0;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(124, 58, 237, 0.8);
+    animation: titleFadeIn 1s ease-out;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      transparent 100%
+    );
+  }
+
+  @keyframes titleFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Cinematic Hero for Battle for Christmas */
+  .hero-video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .hero-video-background iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 177.78%;
+    height: 177.78%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-frosted {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.25) 100%
+    );
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    z-index: 1;
+  }
+
+  .hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 3;
+    width: 90%;
+    max-width: 800px;
+  }
+
+  .hero-title-cinematic {
+    position: static;
+    padding: 0;
+    margin: 0 0 0.3em 0;
+    background: none;
+    font-size: 3.5em;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8),
+                 0 0 60px rgba(220, 38, 38, 0.8),
+                 0 0 80px rgba(22, 163, 74, 0.6);
+    animation: titleGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes titleGlow {
+    0%, 100% {
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8),
+                   0 0 60px rgba(220, 38, 38, 0.8),
+                   0 0 80px rgba(22, 163, 74, 0.6);
+    }
+    50% {
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8),
+                   0 0 80px rgba(220, 38, 38, 1),
+                   0 0 100px rgba(22, 163, 74, 0.8);
+    }
+  }
+
+  .hero-tagline {
+    font-size: 2.2em;
+    color: white;
+    font-family: var(--font-family-serif);
+    font-style: italic;
+    font-weight: 600;
+    margin: 0 0 1.5em 0;
+    padding: 0.3em 0.8em;
+    background: rgba(220, 38, 38, 0.7);
+    border-radius: 8px;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.8);
+    box-shadow: 0 4px 30px rgba(220, 38, 38, 0.6), 0 0 60px rgba(22, 163, 74, 0.4);
+    opacity: 1;
+    animation: taglineGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes taglineGlow {
+    0%, 100% {
+      box-shadow: 0 4px 30px rgba(220, 38, 38, 0.6), 0 0 60px rgba(22, 163, 74, 0.4);
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.8);
+    }
+    50% {
+      box-shadow: 0 4px 40px rgba(220, 38, 38, 0.9), 0 0 80px rgba(22, 163, 74, 0.7);
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9), 0 0 50px rgba(255, 215, 0, 1);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .play-trailer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8em;
+    padding: 1.2em 3em;
+    font-size: 1.5em;
+    font-weight: 700;
+    font-family: var(--font-family-sans);
+    background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%);
+    color: white;
+    border: 3px solid white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 40px rgba(220, 38, 38, 0.6),
+                0 0 60px rgba(22, 163, 74, 0.4);
+    animation: btnPulse 2s ease-in-out infinite;
+    opacity: 1;
+  }
+
+  .play-trailer-btn:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 15px 60px rgba(220, 38, 38, 0.9),
+                0 0 100px rgba(22, 163, 74, 0.7);
+    border-color: rgba(255, 215, 0, 1);
+  }
+
+  @keyframes btnPulse {
+    0%, 100% {
+      box-shadow: 0 10px 40px rgba(220, 38, 38, 0.6),
+                  0 0 60px rgba(22, 163, 74, 0.4);
+    }
+    50% {
+      box-shadow: 0 10px 50px rgba(220, 38, 38, 0.8),
+                  0 0 80px rgba(22, 163, 74, 0.6);
+    }
+  }
+
+  .play-icon {
+    font-size: 1.2em;
+    animation: iconBounce 2s ease-in-out infinite;
+  }
+
+  @keyframes iconBounce {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(5px);
+    }
+  }
+
+  /* Snowfall Animation */
+  .snowfall-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  .snowflake {
+    position: absolute;
+    top: -10%;
+    color: white;
+    font-size: 1.5em;
+    opacity: 0.8;
+    animation: snowfall-anim linear infinite;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+
+  .snowflake:nth-child(1) {
+    left: 10%;
+    animation-duration: 8s;
+    animation-delay: 0s;
+  }
+
+  .snowflake:nth-child(2) {
+    left: 20%;
+    animation-duration: 10s;
+    animation-delay: 1s;
+  }
+
+  .snowflake:nth-child(3) {
+    left: 30%;
+    animation-duration: 7s;
+    animation-delay: 2s;
+  }
+
+  .snowflake:nth-child(4) {
+    left: 40%;
+    animation-duration: 9s;
+    animation-delay: 0.5s;
+  }
+
+  .snowflake:nth-child(5) {
+    left: 50%;
+    animation-duration: 11s;
+    animation-delay: 1.5s;
+  }
+
+  .snowflake:nth-child(6) {
+    left: 60%;
+    animation-duration: 8.5s;
+    animation-delay: 2.5s;
+  }
+
+  .snowflake:nth-child(7) {
+    left: 70%;
+    animation-duration: 9.5s;
+    animation-delay: 3s;
+  }
+
+  .snowflake:nth-child(8) {
+    left: 80%;
+    animation-duration: 7.5s;
+    animation-delay: 0.8s;
+  }
+
+  .snowflake:nth-child(9) {
+    left: 90%;
+    animation-duration: 10.5s;
+    animation-delay: 1.8s;
+  }
+
+  .snowflake:nth-child(10) {
+    left: 15%;
+    animation-duration: 8.8s;
+    animation-delay: 2.8s;
+  }
+
+  @keyframes snowfall-anim {
+    0% {
+      top: -10%;
+      opacity: 0.8;
+    }
+    100% {
+      top: 110%;
+      opacity: 0;
+    }
+  }
+
+  /* Content Container */
+  .content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2em;
+    border-radius: 6px;
+    --shadow-primary: rgba(124, 58, 237, 0.3);
+    --shadow-secondary: rgba(249, 168, 212, 0.4);
+    --border-color: rgba(124, 58, 237, 0.15);
+  }
+
+  /* Intro Section */
+  .intro-section {
+    display: flex;
+    gap: 3em;
+    align-items: flex-start;
+    margin-bottom: 4em;
+    padding: 3em;
+    background: linear-gradient(135deg, rgba(249, 168, 212, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
+    border-radius: 24px;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 10px 40px var(--shadow-primary);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .intro-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px var(--shadow-primary);
+    border-color: var(--border-color);
+  }
+
+  .book-cover-container {
+    flex-shrink: 0;
+    width: 280px;
+  }
+
+  .book-cover {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+  }
+
+  .intro-section:hover .book-cover {
+    transform: rotate(-3deg) scale(1.05);
+    box-shadow: 0 20px 50px var(--shadow-secondary);
+  }
+
+  .intro-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+  }
+
+  .logline p {
+    font-size: 1.4em;
+    line-height: 1.6;
+    font-family: var(--font-family-serif);
+    font-style: italic;
+    color: var(--text-main);
+    margin: 0;
+  }
+
+  .inspired-by {
+    padding: 1.5em;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    border-left: 4px solid var(--border-color);
+  }
+
+  .inspired-label {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary-color);
+    margin: 0 0 0.5em 0;
+  }
+
+  .inspired-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin: 0;
+    color: var(--text-main);
+  }
+
+  /* CTA Buttons */
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    padding: 1.2em 2.5em;
+    font-size: 1.2em;
+    font-weight: 700;
+    font-family: var(--font-family-sans);
+    text-decoration: none;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+  }
+
+  .cta-primary {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+  }
+
+  .cta-secondary {
+    background: var(--sunset-gradient);
+    color: white;
+    box-shadow: 0 8px 25px rgba(250, 112, 154, 0.4);
+  }
+
+  .cta-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .cta-button:hover::before {
+    width: 400px;
+    height: 400px;
+  }
+
+  .cta-button:hover {
+    transform: translateY(-3px) scale(1.05);
+  }
+
+  .cta-primary:hover {
+    box-shadow: 0 12px 35px rgba(124, 58, 237, 0.6);
+  }
+
+  .cta-secondary:hover {
+    box-shadow: 0 12px 35px rgba(250, 112, 154, 0.6);
+  }
+
+  .button-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .button-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 1.2em;
+    animation: float 2s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  /* Section Titles */
+  .section-title {
+    font-family: var(--font-family-display);
+    font-size: 2.5em;
+    text-align: center;
+    margin: 0 0 1.5em 0;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+  }
+
+  .title-decoration {
+    display: inline-block;
+    animation: sparkleRotate 3s ease-in-out infinite;
+  }
+
+  @keyframes sparkleRotate {
+    0%, 100% {
+      transform: rotate(0deg) scale(1);
+    }
+    50% {
+      transform: rotate(180deg) scale(1.2);
+    }
+  }
+
+  /* Summary Section */
+  .summary-section {
+    margin-bottom: 4em;
+    padding: 3em;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    border: 2px solid rgba(167, 139, 250, 0.2);
+    box-shadow: 0 8px 30px rgba(167, 139, 250, 0.15);
+  }
+
+  .summary-content p {
+    font-size: 1.3em;
+    line-height: 1.8;
+    color: var(--text-main);
+  }
+
+  /* Inspiration Section */
+  .inspiration-section {
+    margin-bottom: 4em;
+    padding: 3em;
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+    border-radius: 20px;
+    border: 2px solid rgba(79, 172, 254, 0.2);
+    box-shadow: 0 8px 30px rgba(79, 172, 254, 0.15);
+  }
+
+  .inspiration-content p {
+    font-size: 1.2em;
+    line-height: 1.8;
+    color: var(--text-main);
+    margin-bottom: 1.5em;
+  }
+
+  .inspiration-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Quiz CTA Section */
+  .quiz-cta-section {
+    margin-bottom: 4em;
+  }
+
+  .quiz-cta-card {
+    background:
+      linear-gradient(135deg, rgba(139, 35, 35, 0.15) 0%, rgba(46, 74, 54, 0.15) 100%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23F7F3EC"/><circle cx="20" cy="20" r="15" fill="%238B2323" opacity="0.05"/></svg>');
+    border-radius: 24px;
+    padding: 3em;
+    border: 3px solid rgba(217, 176, 90, 0.4);
+    box-shadow: 0 15px 50px rgba(139, 35, 35, 0.15);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .quiz-cta-card::before {
+    content: '❄️';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 4em;
+    opacity: 0.1;
+    animation: snowRotate 10s linear infinite;
+  }
+
+  @keyframes snowRotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .quiz-cta-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 60px rgba(139, 35, 35, 0.25);
+    border-color: rgba(217, 176, 90, 0.6);
+  }
+
+  .quiz-cta-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .quiz-icon {
+    font-size: 4em;
+    margin-bottom: 0.5em;
+    animation: iconBounce 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(139, 35, 35, 0.3));
+  }
+
+  @keyframes iconBounce {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-10px) scale(1.1);
+    }
+  }
+
+  .quiz-cta-title {
+    font-family: var(--font-family-display);
+    font-size: 2.5em;
+    color: #8B2323;
+    margin-bottom: 0.5em;
+  }
+
+  .quiz-cta-description {
+    font-size: 1.3em;
+    color: #2E4A36;
+    margin-bottom: 1.5em;
+    line-height: 1.6;
+  }
+
+  .quiz-cta-description em {
+    color: #8B2323;
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  .quiz-button {
+    background: linear-gradient(135deg, #2E4A36 0%, #3D6249 100%);
+    box-shadow: 0 8px 25px rgba(46, 74, 54, 0.4);
+  }
+
+  .quiz-button:hover {
+    box-shadow: 0 12px 35px rgba(46, 74, 54, 0.6);
+  }
+
+  /* Trailer Section */
+  .trailer-section {
+    margin-bottom: 4em;
+    padding: 3em;
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
+    border-radius: 20px;
+    border: 2px solid rgba(255, 107, 107, 0.2);
+    box-shadow: 0 8px 30px rgba(255, 107, 107, 0.15);
+  }
+
+  .trailer-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+  }
+
+  .video-wrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(255, 107, 107, 0.4);
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+  }
+
+  /* Christmas Theme for Battle for Christmas Page */
+  [data-work-id="battle-for-christmas"] {
+    background: white;
+  }
+
+  [data-work-id="battle-for-christmas"] .content-container {
+    --shadow-primary: rgba(220, 38, 38, 0.25);
+    --shadow-secondary: rgba(22, 163, 74, 0.3);
+    --border-color: rgba(220, 38, 38, 0.3);
+  }
+
+  [data-work-id="battle-for-christmas"] .hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(220, 38, 38, 0.35) 0%,
+      rgba(22, 101, 52, 0.65) 100%
+    );
+  }
+
+  [data-work-id="battle-for-christmas"] .hero-title {
+    text-shadow: 0 4px 20px rgba(220, 38, 38, 0.9), 0 0 40px rgba(255, 215, 0, 0.7);
+  }
+
+  [data-work-id="battle-for-christmas"] .intro-section {
+    background: white;
+    border: 3px solid rgba(220, 38, 38, 0.3);
+  }
+
+  [data-work-id="battle-for-christmas"] .intro-section:hover {
+    border-color: rgba(22, 163, 74, 0.5);
+  }
+
+  [data-work-id="battle-for-christmas"] .inspired-by {
+    background: rgba(255, 255, 255, 0.9);
+    border-left: 4px solid #dc2626;
+  }
+
+  [data-work-id="battle-for-christmas"] .section-title {
+    background: linear-gradient(90deg, #dc2626 0%, #16a34a 50%, #dc2626 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: christmasGradient 4s ease-in-out infinite;
+  }
+
+  @keyframes christmasGradient {
+    0%, 100% {
+      background-position: 0% center;
+    }
+    50% {
+      background-position: 100% center;
+    }
+  }
+
+  [data-work-id="battle-for-christmas"] .cta-primary {
+    background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%);
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+  }
+
+  [data-work-id="battle-for-christmas"] .cta-primary:hover {
+    box-shadow: 0 12px 35px rgba(220, 38, 38, 0.7);
+  }
+
+  [data-work-id="battle-for-christmas"] .cta-secondary {
+    background: linear-gradient(135deg, #16a34a 0%, #dc2626 100%);
+    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.5);
+  }
+
+  [data-work-id="battle-for-christmas"] .cta-secondary:hover {
+    box-shadow: 0 12px 35px rgba(22, 163, 74, 0.7);
+  }
+
+  [data-work-id="battle-for-christmas"] .summary-section {
+    background: white;
+    border: 3px solid rgba(220, 38, 38, 0.3);
+  }
+
+  [data-work-id="battle-for-christmas"] .inspiration-section {
+    background: white;
+    border: 3px solid rgba(22, 163, 74, 0.3);
+  }
+
+  [data-work-id="battle-for-christmas"] .trailer-section {
+    background: white;
+    border: 3px solid rgba(220, 38, 38, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Christmas snow effect */
+  [data-work-id="battle-for-christmas"] .trailer-section::before {
+    content: '❄️ ❄️ ❄️ ❄️ ❄️ ❄️ ❄️ ❄️';
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 1.5em;
+    opacity: 0.4;
+    animation: snowfall 10s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes snowfall {
+    0% {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.4;
+    }
+    90% {
+      opacity: 0.4;
+    }
+    100% {
+      transform: translateY(calc(100% + 40px));
+      opacity: 0;
+    }
+  }
+
+  [data-work-id="battle-for-christmas"] .cta-card {
+    background: white;
+    border: 3px solid transparent;
+  }
+
+  [data-work-id="battle-for-christmas"] .cta-card::before {
+    background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%);
+  }
+
+  /* Final CTA Section */
+  .final-cta-section {
+    margin-bottom: 3em;
+  }
+
+  .cta-card {
+    text-align: center;
+    padding: 3em;
+    background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
+    border-radius: 24px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .cta-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 3px;
+    background: var(--sunset-gradient);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .cta-card h3 {
+    font-family: var(--font-family-display);
+    font-size: 2.2em;
+    margin-bottom: 0.5em;
+    color: var(--primary-color);
+  }
+
+  .cta-card p {
+    font-size: 1.3em;
+    margin-bottom: 1.5em;
+    color: var(--text-secondary);
+  }
+
+  /* Back Link */
+  .back-link-container {
+    text-align: center;
+    padding: 2em 0;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-family-sans);
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.8em 1.5em;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: rgba(124, 58, 237, 0.1);
+  }
+
+  .back-link:hover {
+    background: rgba(124, 58, 237, 0.2);
+    transform: translateX(-5px);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1020px) {
+    .hero-image-container {
+      height: 450px;
+    }
+
+    [data-work-id="battle-for-christmas"] .hero-image-container {
+      height: 550px;
+    }
+
+    .hero-title {
+      font-size: 2.5em;
+      padding: 1em 1.5rem 0.5em;
+    }
+
+    .hero-title-cinematic {
+      font-size: 2.8em;
+    }
+
+    .hero-tagline {
+      font-size: 1.8em;
+    }
+
+    .play-trailer-btn {
+      font-size: 1.3em;
+      padding: 1em 2.5em;
+    }
+
+    .content-container {
+      padding: 0 1.5em;
+    }
+
+    .intro-section {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2em;
+    }
+
+    .book-cover-container {
+      width: 240px;
+    }
+
+    .section-title {
+      font-size: 2em;
+    }
+
+    .summary-section,
+    .inspiration-section {
+      padding: 2em;
+    }
+
+    .quiz-cta-card {
+      padding: 2em;
+    }
+
+    .quiz-cta-title {
+      font-size: 2em;
+    }
+
+    .quiz-cta-description {
+      font-size: 1.2em;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-header {
+      margin: -1em -1em 2em -1em;
+    }
+
+    .hero-image-container {
+      height: 350px;
+    }
+
+    [data-work-id="battle-for-christmas"] .hero-image-container {
+      height: 450px;
+    }
+
+    .hero-title {
+      font-size: 2em;
+      padding: 0.8em 1rem 0.4em;
+    }
+
+    .hero-title-cinematic {
+      font-size: 2.2em;
+    }
+
+    .hero-tagline {
+      font-size: 1.5em;
+    }
+
+    .play-trailer-btn {
+      font-size: 1.1em;
+      padding: 0.9em 2em;
+    }
+
+    .content-container {
+      padding: 0 1em;
+    }
+
+    .intro-section {
+      padding: 1.5em;
+      gap: 2em;
+    }
+
+    .book-cover-container {
+      width: 200px;
+    }
+
+    .logline p {
+      font-size: 1.2em;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      flex-wrap: wrap;
+    }
+
+    .summary-section,
+    .inspiration-section,
+    .cta-card {
+      padding: 1.5em;
+    }
+
+    .cta-button {
+      padding: 1em 2em;
+      font-size: 1.1em;
+      width: 100%;
+    }
+
+    .cta-card h3 {
+      font-size: 1.8em;
+    }
+
+    .quiz-cta-card {
+      padding: 1.5em;
+    }
+
+    .quiz-icon {
+      font-size: 3em;
+    }
+
+    .quiz-cta-title {
+      font-size: 1.8em;
+    }
+
+    .quiz-cta-description {
+      font-size: 1.1em;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-image-container {
+      height: 250px;
+    }
+
+    [data-work-id="battle-for-christmas"] .hero-image-container {
+      height: 400px;
+    }
+
+    .hero-title {
+      font-size: 1.6em;
+    }
+
+    .hero-title-cinematic {
+      font-size: 1.8em;
+    }
+
+    .hero-tagline {
+      font-size: 1.2em;
+      padding: 0.2em 0.6em;
+    }
+
+    .play-trailer-btn {
+      font-size: 1em;
+      padding: 0.8em 1.5em;
+      gap: 0.5em;
+    }
+
+    .book-cover-container {
+      width: 180px;
+    }
+
+    .section-title {
+      font-size: 1.5em;
+    }
+
+    .title-decoration {
+      font-size: 0.8em;
+    }
+
+    .quiz-icon {
+      font-size: 2.5em;
+    }
+
+    .quiz-cta-title {
+      font-size: 1.5em;
+    }
+
+    .quiz-cta-description {
+      font-size: 1em;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    function initTrailerPlayer() {
+      const playBtn = document.getElementById('playTrailerBtn');
+      const heroVideoIframe = document.getElementById('heroVideoIframe');
+      const heroOverlay = document.getElementById('heroOverlay');
+      const snowfallContainer = document.getElementById('snowfallContainer');
+      const heroContent = document.getElementById('heroContent');
+
+      console.log('Trailer player script running');
+      console.log('Elements found:', {
+        playBtn: !!playBtn,
+        heroVideoIframe: !!heroVideoIframe,
+        heroOverlay: !!heroOverlay,
+        snowfallContainer: !!snowfallContainer,
+        heroContent: !!heroContent
+      });
+
+      if (!playBtn || !heroVideoIframe) {
+        console.log('Missing required elements for trailer player');
+        return;
+      }
+
+      playBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const trailerId = playBtn.getAttribute('data-trailer-id');
+        console.log('Play button clicked! Trailer ID:', trailerId);
+
+        if (trailerId) {
+          // Hide overlay, snowfall, and hero content
+          if (heroOverlay) heroOverlay.style.display = 'none';
+          if (snowfallContainer) snowfallContainer.style.display = 'none';
+          if (heroContent) heroContent.style.display = 'none';
+
+          // Replace the background video with the full trailer with controls
+          heroVideoIframe.src = 'https://www.youtube.com/embed/' + trailerId + '?autoplay=1&controls=1&rel=0&modestbranding=1';
+
+          console.log('Trailer now playing in header');
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTrailerPlayer);
+    } else {
+      initTrailerPlayer();
+    }
+  })();
+</script>

@@ -52,11 +52,16 @@ const works = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/works" }),
   schema: z.object({
     title: z.string(),
-    description: z.string(),
-    image: z.string(),
-    link: z.string(),
+    description: z.string(), // Also serves as logline
+    image: z.string(), // Book cover image
+    headerImage: z.string().optional(), // Header/hero image for detail page
+    link: z.string(), // Amazon purchase link
     featured: z.boolean().default(false),
     order: z.number().default(0),
+    inspiredBy: z.string().optional(), // One sentence about inspiration
+    summary: z.string().optional(), // Full book summary
+    inspirationStory: z.string().optional(), // Full paragraphs about what inspired the book
+    trailerVideoId: z.string().optional(), // YouTube video ID for book trailer
   }),
 });
 
@@ -74,5 +79,21 @@ const pages = defineCollection({
   }),
 });
 
+// Define the schema for the announcements collection
+const announcements = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/announcements" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    image: z.string(),
+    ctaText: z.string().default("Preorder Now!"),
+    ctaLink: z.string(),
+    active: z.boolean().default(true),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    showOnce: z.boolean().default(true),
+  }),
+});
+
 // Export the collections
-export const collections = { authors, blog, cyoa, collabs, works, pages };
+export const collections = { authors, blog, cyoa, collabs, works, pages, announcements };

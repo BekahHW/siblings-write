@@ -43,48 +43,32 @@ const getAuthorsDisplay = (authorRefs) => {
 
 <PostHogLayout>
   <BaseLayout title={title} description={description} permalink={permalink}>
+    <!-- Background Animation Container -->
+    <div class="bg-animation">
+      <div id="stars"></div>
+    </div>
+
+    <!-- Fireflies Container -->
+    <div class="fireflies-container">
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+    </div>
+
     <div class="home-container">
       <div class="home-copy">
-        <h1>{mainTitle}</h1>
+        <div class="title-container">
+          <h1 class="title-line-1">Hi, we're the</h1>
+          <h1 class="title-line-2">Hawrot Siblings.</h1>
+        </div>
         <div class="about-content">
-          <h2>{subtitle}</h2>
-          <p>{aboutText}</p>
-
-          <!-- Newsletter Form Integrated -->
-          <div class="newsletter-callout">
-            <p class="newsletter-intro">{newsletterIntro}</p>
-            <form 
-              action="https://app.kit.com/forms/7612128/subscriptions" 
-              class="seva-form formkit-form newsletter-form-inline" 
-              method="post" 
-              data-sv-form="7612128" 
-              data-uid="775bb3f6cc" 
-              data-format="inline"
-              data-version="5"
-              data-options='{"settings":{"after_subscribe":{"action":"message","success_message":"Success! Now check your email to confirm your subscription.","redirect_url":""},"analytics":{"google":null,"fathom":null,"facebook":null,"segment":null,"pinterest":null,"sparkloop":null,"googletagmanager":null},"powered_by":{"show":false},"recaptcha":{"enabled":true}},"version":"5"}'
-            >
-              <ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul>
-              <div data-element="fields" class="seva-fields formkit-fields newsletter-fields-inline">
-                <div class="formkit-field">
-                  <input 
-                    class="formkit-input newsletter-input-inline" 
-                    name="email_address" 
-                    placeholder="your@email.com" 
-                    required 
-                    type="email"
-                    aria-label="Email Address"
-                  >
-                </div>
-                <button 
-                  data-element="submit"
-                  class="formkit-submit newsletter-submit-inline"
-                  type="submit"
-                >
-                  <div class="formkit-spinner"><div></div><div></div><div></div></div>
-                  <span>Join Us</span>
-                </button>
-              </div>
-            </form>
+          <div class="typewriter-text">
+            <p>Once upon a time, in a small town called Steubenville, Ohio, there lived three siblings named Josh, Bekah, and Zach who spent their childhood chasing fireflies through summer twilights and building snow forts that felt like castles in the winter. The years turned, as they always do, and those three children grew up and became parents to thirteen little ones of their own. But here's the secret: they never quite stopped being children in the ways that matter most. So they began writing down the wonder they remembered, creating stories that tasted like childhood, because some people never outgrow wonder. They just learn to share it.</p>
           </div>
         </div>
       </div>
@@ -94,10 +78,73 @@ const getAuthorsDisplay = (authorRefs) => {
           <source srcset="/assets/Hawrot-Siblings.png" media="(min-width: 600px)">
           <img class="hero-image" alt="The Hawrot Siblings - Josh, Bekah, and Zach - authors of young adult fiction, middle grade adventures, and Christmas novels" src="/assets/Hawrot-Siblings.png" width="550" height="466">
         </picture>
+
+        <!-- Newsletter Form Below Picture -->
+        <div class="newsletter-callout">
+            <p class="newsletter-intro">Stories that make you believe in magic - delivered first to subscribers</p>
+            <form
+              action="https://app.kit.com/forms/7612128/subscriptions"
+              class="seva-form formkit-form newsletter-form-inline"
+              method="post"
+              data-sv-form="7612128"
+              data-uid="775bb3f6cc"
+              data-format="inline"
+              data-version="5"
+              data-options='{"settings":{"after_subscribe":{"action":"message","success_message":"Success! Now check your email to confirm your subscription.","redirect_url":""},"analytics":{"google":null,"fathom":null,"facebook":null,"segment":null,"pinterest":null,"sparkloop":null,"googletagmanager":null},"powered_by":{"show":false},"recaptcha":{"enabled":true}},"version":"5"}'
+            >
+              <ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul>
+              <div data-element="fields" class="seva-fields formkit-fields newsletter-fields-inline">
+                <div class="formkit-field">
+                  <input
+                    class="formkit-input newsletter-input-inline"
+                    name="email_address"
+                    placeholder="your@email.com"
+                    required
+                    type="email"
+                    aria-label="Email Address"
+                  >
+                </div>
+                <button
+                  data-element="submit"
+                  class="formkit-submit newsletter-submit-inline"
+                  type="submit"
+                >
+                  <div class="formkit-spinner"><div></div><div></div><div></div></div>
+                  <span>Join Us</span>
+                </button>
+              </div>
+            </form>
+        </div>
       </div>
     </div>
 
-
+    <!-- Battle for Christmas Trailer Section -->
+    <section class="christmas-trailer-section">
+      <div class="christmas-trailer-container">
+        <h2 class="christmas-trailer-title">
+          Watch The Battle for Christmas: Reign of the Nutcrackers Trailer
+        </h2>
+        <div class="trailer-video-container">
+          <div class="video-wrapper">
+            <iframe
+              src="https://www.youtube.com/embed/QNtP_LRRNTM"
+              title="The Battle for Christmas: Reign of the Nutcrackers - Book Trailer"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+        <div class="christmas-cta">
+          <p class="christmas-tagline">Experience the magic of Christmas like never before!</p>
+          <a href="/works/battle-for-christmas" class="christmas-button">
+            <span class="button-text">Discover the Story</span>
+            <span class="button-icon">🎅</span>
+          </a>
+        </div>
+      </div>
+    </section>
 
     <section class="latest-section-wrapper">
       <h2 class="section-title">Latest Works</h2>
@@ -158,6 +205,44 @@ const getAuthorsDisplay = (authorRefs) => {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Limelight&family=Playwrite+HU:wght@100..400&display=swap');
 
+/* Background Stars Animation */
+.bg-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#stars {
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: 1780px 1349px #FFF, 1487px 732px #FFF, 1994px 1305px #FFF, 1237px 1594px #FFF, 840px 623px #FFF, 1075px 638px #FFF, 1531px 1902px #FFF, 1058px 1119px #FFF, 1849px 1411px #FFF, 1327px 870px #FFF, 1164px 1671px #FFF, 1572px 1499px #FFF, 670px 1672px #FFF, 1039px 1354px #FFF, 1388px 1768px #FFF, 765px 1857px #FFF, 1889px 1415px #FFF, 1698px 1923px #FFF, 371px 1331px #FFF, 1491px 956px #FFF, 1997px 1751px #FFF, 1945px 559px #FFF, 686px 1065px #FFF, 1622px 841px #FFF, 1158px 1203px #FFF, 1869px 1395px #FFF, 1469px 1196px #FFF, 1455px 1253px #FFF, 897px 630px #FFF, 989px 1733px #FFF, 1531px 1304px #FFF, 1980px 1569px #FFF, 1104px 830px #FFF, 1529px 1729px #FFF, 1647px 1543px #FFF, 1304px 988px #FFF, 1367px 1040px #FFF, 1941px 1371px #FFF, 528px 1539px #FFF, 1980px 1586px #FFF;
+  animation: animStar 100s linear infinite;
+}
+
+#stars:after {
+  content: " ";
+  position: absolute;
+  top: 2000px;
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: 1780px 1349px #FFF, 1487px 732px #FFF, 1994px 1305px #FFF, 1237px 1594px #FFF, 840px 623px #FFF, 1075px 638px #FFF, 1531px 1902px #FFF, 1058px 1119px #FFF, 1849px 1411px #FFF, 1327px 870px #FFF, 1164px 1671px #FFF, 1572px 1499px #FFF, 670px 1672px #FFF, 1039px 1354px #FFF, 1388px 1768px #FFF, 765px 1857px #FFF, 1889px 1415px #FFF, 1698px 1923px #FFF, 371px 1331px #FFF, 1491px 956px #FFF, 1997px 1751px #FFF, 1945px 559px #FFF, 686px 1065px #FFF, 1622px 841px #FFF, 1158px 1203px #FFF, 1869px 1395px #FFF, 1469px 1196px #FFF, 1455px 1253px #FFF, 897px 630px #FFF, 989px 1733px #FFF, 1531px 1304px #FFF, 1980px 1569px #FFF, 1104px 830px #FFF, 1529px 1729px #FFF, 1647px 1543px #FFF, 1304px 988px #FFF, 1367px 1040px #FFF, 1941px 1371px #FFF, 528px 1539px #FFF, 1980px 1586px #FFF;
+}
+
+@keyframes animStar {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-2000px);
+  }
+}
+
 /* ConvertKit Form Overrides */
 .newsletter-callout .formkit-form {
   box-sizing: border-box;
@@ -173,14 +258,16 @@ const getAuthorsDisplay = (authorRefs) => {
   min-width: 0;
 }
 
-/* Newsletter Callout - Integrated into home container */
+/* Newsletter Callout - Below picture */
 .newsletter-callout {
-  margin-top: 2em;
+  margin-top: 1.5em;
   padding: 1.5em;
   background: rgba(255, 255, 255, 0.7);
   border-radius: 12px;
   border: 2px solid rgba(84, 142, 155, 0.2);
   backdrop-filter: blur(10px);
+  width: 100%;
+  max-width: 550px;
 }
 
 .newsletter-intro {
@@ -224,11 +311,11 @@ const getAuthorsDisplay = (authorRefs) => {
 }
 
 .newsletter-submit-inline {
-  padding: 10px 20px;
-  background: var(--primary-color, #548e9b);
+  padding: 12px 24px;
+  background: var(--primary-gradient);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -237,12 +324,35 @@ const getAuthorsDisplay = (authorRefs) => {
   overflow: hidden;
   min-width: 90px;
   flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+.newsletter-submit-inline::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.newsletter-submit-inline:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .newsletter-submit-inline:hover {
-  background: #4a7d88;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(84, 142, 155, 0.3);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.5);
+}
+
+.newsletter-submit-inline span {
+  position: relative;
+  z-index: 1;
 }
 
 .newsletter-submit-inline:focus {
@@ -330,6 +440,249 @@ const getAuthorsDisplay = (authorRefs) => {
   }
 }
 
+/* Christmas Trailer Section */
+.christmas-trailer-section {
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.85) 0%, rgba(240, 253, 244, 0.85) 50%, rgba(254, 242, 242, 0.85) 100%);
+  padding: 4em 2em;
+  margin: 3em auto;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+.christmas-trailer-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 3px;
+  background: linear-gradient(135deg, #dc2626 0%, #16a34a 50%, #dc2626 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: christmasBorder 5s ease-in-out infinite;
+}
+
+@keyframes christmasBorder {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+.christmas-trailer-section::after {
+  content: '❄️ 🎄 ⭐ 🎁 ❄️ 🎄 ⭐ 🎁 ❄️ 🎄 ⭐ 🎁';
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.5em;
+  opacity: 0.3;
+  animation: slowFloat 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes slowFloat {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(-20px) translateY(-10px);
+  }
+}
+
+.christmas-trailer-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.christmas-trailer-title {
+  font-family: var(--font-family-display, 'Cormorant Garamond', serif);
+  font-size: 2.5em;
+  font-weight: 800;
+  text-align: center;
+  margin: 0 0 1.5em 0;
+  background: linear-gradient(90deg, #dc2626 0%, #16a34a 50%, #dc2626 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: christmasGradient 4s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+@keyframes christmasGradient {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+.christmas-icon {
+  display: inline-block;
+  font-size: 1.2em;
+}
+
+.trailer-video-container {
+  max-width: 900px;
+  margin: 0 auto 2em;
+}
+
+.christmas-trailer-section .video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 15px 50px rgba(220, 38, 38, 0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.christmas-trailer-section .video-wrapper:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 70px rgba(22, 163, 74, 0.5);
+}
+
+.christmas-trailer-section .video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+}
+
+.christmas-cta {
+  text-align: center;
+  margin-top: 2em;
+}
+
+.christmas-tagline {
+  font-size: 1.4em;
+  font-family: var(--font-family-serif, serif);
+  font-style: italic;
+  color: #15803d;
+  margin-bottom: 1.5em;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+.christmas-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 1.2em 2.5em;
+  font-size: 1.3em;
+  font-weight: 700;
+  font-family: var(--font-family-sans);
+  text-decoration: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%);
+  color: white;
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+}
+
+.christmas-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.christmas-button:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.christmas-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(22, 163, 74, 0.7);
+}
+
+.christmas-button .button-text {
+  position: relative;
+  z-index: 1;
+}
+
+.christmas-button .button-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 1.2em;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .christmas-trailer-section {
+    padding: 3em 1.5em;
+    margin: 2em 1em;
+  }
+
+  .christmas-trailer-title {
+    font-size: 2em;
+  }
+
+  .christmas-tagline {
+    font-size: 1.2em;
+  }
+
+  .christmas-button {
+    padding: 1em 2em;
+    font-size: 1.1em;
+    width: 100%;
+  }
+
+  .christmas-trailer-section .video-wrapper {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .christmas-trailer-title {
+    font-size: 1.6em;
+  }
+
+  .christmas-icon {
+    font-size: 1em;
+  }
+}
+
 /* Success Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -407,20 +760,41 @@ const getAuthorsDisplay = (authorRefs) => {
 }
 
 .modal-button {
-  background: var(--primary-color, #548e9b);
+  background: var(--primary-gradient);
   color: white;
   border: none;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+.modal-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.modal-button:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .modal-button:hover {
-  background: #4a7d88;
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.5);
 }
 
 @keyframes fadeIn {
@@ -459,10 +833,43 @@ const getAuthorsDisplay = (authorRefs) => {
 }
 
 .section-title {
-  font-family: "Playwrite HU", cursive;
-  font-size: 2.2em;
-  margin-bottom: 0.8em;
+  font-family: 'Fira Code', monospace;
+  font-size: 2.8em;
+  font-weight: 700;
+  margin-bottom: 0;
+  text-align: center;
+  position: relative;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  background: linear-gradient(90deg, #10b981 0%, #10b981 10%, #3b82f6 50%, #8b5cf6 90%, #8b5cf6 100%);
+  background-size: 200% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
+
+.section-title.typing {
+  width: 0;
+  border-right: 2px solid #10b981;
+  animation: type-section 2s steps(40, end) forwards, gradient-fade-colorful 7s ease-out forwards;
+}
+
+@keyframes type-section {
+  0% {
+    width: 0;
+  }
+  99% {
+    border-right: 2px solid #667eea;
+  }
+  100% {
+    width: 100%;
+    border-right: none;
+  }
+}
+
 
 .post-list {
   list-style: none;
@@ -474,30 +881,47 @@ const getAuthorsDisplay = (authorRefs) => {
 }
 
 .post-item {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.1);
   padding: 1.5em;
   animation: fadeUp 0.6s ease forwards;
   opacity: 0;
   transform: translateY(20px);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  border: 2px solid transparent;
+  overflow: hidden;
+}
+
+.post-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-gradient);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: 16px;
+  z-index: 0;
+}
+
+.post-item:hover::before {
+  opacity: 0.05;
 }
 
 .post-item:hover,
 .post-item:focus-within {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  transform: translateY(-8px) rotate(-1deg);
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+  border-color: rgba(124, 58, 237, 0.3);
 }
 
-.post-item:hover::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(123, 172, 245, 0.4);
-  pointer-events: none;
+.post-item .post-content {
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes fadeUp {
@@ -533,15 +957,35 @@ const getAuthorsDisplay = (authorRefs) => {
   margin-bottom: 0.5em;
 }
 
+.read-more {
+  margin-top: 0.5em;
+}
+
 .read-more a {
   font-weight: bold;
   color: var(--primary-color, #548e9b);
   text-decoration: none;
   box-shadow: none;
+  display: inline-block;
+  transition: all 0.3s ease;
 }
 
 .read-more a:hover {
-  text-decoration: underline;
+  color: var(--primary-color);
+  transform: translateX(5px);
+}
+
+.post-item:hover .read-more a {
+  animation: bounce-arrow 0.8s ease-in-out infinite;
+}
+
+@keyframes bounce-arrow {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(8px);
+  }
 }
 
 .home-container {
@@ -550,11 +994,55 @@ const getAuthorsDisplay = (authorRefs) => {
   flex: 1;
   justify-content: center;
   min-height: 400px;
-  background-color: rgb(190, 214, 221, 0.5);
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(79, 172, 254, 0.15) 50%, rgba(103, 232, 249, 0.15) 100%);
   padding: 2rem;
   margin: 2rem auto;
-  border-radius: 16px;
+  border-radius: 24px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(124, 58, 237, 0.15);
+  transition: all 0.5s ease;
+}
+
+.home-container::before,
+.home-container::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
+  animation: sparkle-animation 3s ease-in-out infinite;
+}
+
+.home-container::before {
+  top: 20%;
+  right: 15%;
+  animation-delay: 0s;
+}
+
+.home-container::after {
+  bottom: 25%;
+  left: 10%;
+  animation-delay: 1.5s;
+}
+
+@keyframes sparkle-animation {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.home-container:hover {
+  box-shadow: 0 25px 80px rgba(124, 58, 237, 0.25);
+  transform: translateY(-5px);
 }
 
 .home-copy {
@@ -562,10 +1050,98 @@ const getAuthorsDisplay = (authorRefs) => {
   padding: 0 1em;
 }
 
-.home-copy h1 {
-  font-weight: 700;
-  margin-bottom: 0.5em;
-  line-height: 1.3;
+.title-container {
+  width: 100%;
+  margin: 0 auto 1em;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 6em;
+}
+
+.title-line-1 {
+  color: #667eea;
+  font-family: 'Fira Code', monospace;
+  font-weight: 800;
+  font-size: 1.5em;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+  display: inline-block;
+  width: 15ch;
+  position: relative;
+  clip-path: inset(0 100% 0 0);
+  animation: reveal-text 2s steps(40, end) forwards;
+}
+
+.title-line-1::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #667eea;
+  animation: hide-cursor 0s 2s forwards;
+}
+
+.title-line-2 {
+  font-family: var(--font-family-display, 'Cormorant Garamond', serif);
+  margin: 0 auto;
+  background: linear-gradient(to right, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  font-weight: 800;
+  font-size: 4em;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  white-space: nowrap;
+  display: inline-block;
+  width: 18ch;
+  position: relative;
+  clip-path: inset(0 100% 0 0);
+  animation: reveal-text-gradient 2.2s steps(40, end) 2s forwards, gradient-shift 3s ease-in-out 4.2s infinite;
+}
+
+.title-line-2::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #764ba2;
+  animation: hide-cursor 0s 4.2s forwards;
+}
+
+@keyframes reveal-text {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes reveal-text-gradient {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 50% center;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    background-position: 100% center;
+  }
+}
+
+@keyframes hide-cursor {
+  to {
+    opacity: 0;
+  }
 }
 
 .home-copy p {
@@ -575,6 +1151,9 @@ const getAuthorsDisplay = (authorRefs) => {
 .hero-image-container {
   margin: 0 1em;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .hero-image-container picture {
@@ -592,25 +1171,238 @@ const getAuthorsDisplay = (authorRefs) => {
   width: 100%;
   max-width: 550px;
   margin-bottom: 1em;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(124, 58, 237, 0.3);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+.hero-image:hover {
+  transform: scale(1.05) rotate(2deg);
+  box-shadow: 0 30px 80px rgba(249, 168, 212, 0.4);
 }
 .about-content {
   margin-top: 1.5em;
 }
 
-.about-content p {
+.typewriter-text {
   font-size: 1.1em;
-  line-height: 1.6;
-  margin-bottom: 1em;
+  line-height: 1.8;
+  margin-bottom: 1.5em;
+  min-height: 200px;
+}
+
+.typewriter-text p {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1em;
+  background: linear-gradient(90deg, #10b981 0%, #10b981 10%, #3b82f6 35%, #8b5cf6 60%, #2d2d3f 85%, #2d2d3f 100%);
+  background-size: 200% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-fade-to-black 7s ease-out forwards;
+}
+
+@keyframes gradient-fade-to-black {
+  0% {
+    background-position: 0% 0;
+  }
+  99% {
+    background-position: 100% 0;
+    -webkit-text-fill-color: transparent;
+  }
+  100% {
+    background-position: 100% 0;
+    -webkit-text-fill-color: #2d2d3f;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+/* Fireflies */
+.firefly {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 0.4vw;
+  height: 0.4vw;
+  margin: -0.2vw 0 0 9.8vw;
+  animation: ease 200s alternate infinite;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.firefly::before,
+.firefly::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform-origin: -10vw;
+}
+
+.firefly::before {
+  background: #ccaa00;
+  opacity: 0.3;
+  animation: drift ease alternate infinite;
+}
+
+.firefly::after {
+  background: #ffeb3b;
+  opacity: 0;
+  box-shadow: 0 0 0vw 0vw #ffeb3b;
+  animation: drift ease alternate infinite, flash ease infinite;
+}
+
+@keyframes drift {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes flash {
+  0%, 30%, 100% {
+    opacity: 0.2;
+    box-shadow: 0 0 0vw 0vw #ccaa00;
+  }
+  5% {
+    opacity: 1;
+    box-shadow: 0 0 2vw 0.4vw #ffeb3b;
+  }
+}
+
+/* Individual firefly animations */
+.firefly:nth-child(1) { animation-name: move1; }
+.firefly:nth-child(1)::before { animation-duration: 10s; }
+.firefly:nth-child(1)::after { animation-duration: 10s, 7000ms; animation-delay: 0ms, 2000ms; }
+
+.firefly:nth-child(2) { animation-name: move2; }
+.firefly:nth-child(2)::before { animation-duration: 12s; }
+.firefly:nth-child(2)::after { animation-duration: 12s, 8000ms; animation-delay: 0ms, 3000ms; }
+
+.firefly:nth-child(3) { animation-name: move3; }
+.firefly:nth-child(3)::before { animation-duration: 9s; }
+.firefly:nth-child(3)::after { animation-duration: 9s, 6500ms; animation-delay: 0ms, 1500ms; }
+
+.firefly:nth-child(4) { animation-name: move4; }
+.firefly:nth-child(4)::before { animation-duration: 11s; }
+.firefly:nth-child(4)::after { animation-duration: 11s, 9000ms; animation-delay: 0ms, 4000ms; }
+
+.firefly:nth-child(5) { animation-name: move5; }
+.firefly:nth-child(5)::before { animation-duration: 13s; }
+.firefly:nth-child(5)::after { animation-duration: 13s, 7500ms; animation-delay: 0ms, 2500ms; }
+
+.firefly:nth-child(6) { animation-name: move6; }
+.firefly:nth-child(6)::before { animation-duration: 10s; }
+.firefly:nth-child(6)::after { animation-duration: 10s, 8500ms; animation-delay: 0ms, 3500ms; }
+
+.firefly:nth-child(7) { animation-name: move7; }
+.firefly:nth-child(7)::before { animation-duration: 14s; }
+.firefly:nth-child(7)::after { animation-duration: 14s, 6000ms; animation-delay: 0ms, 1000ms; }
+
+.firefly:nth-child(8) { animation-name: move8; }
+.firefly:nth-child(8)::before { animation-duration: 11s; }
+.firefly:nth-child(8)::after { animation-duration: 11s, 9500ms; animation-delay: 0ms, 4500ms; }
+
+@keyframes move1 {
+  0% { transform: translateX(-20vw) translateY(-15vh) scale(0.5); }
+  25% { transform: translateX(10vw) translateY(20vh) scale(0.7); }
+  50% { transform: translateX(-15vw) translateY(-10vh) scale(0.9); }
+  75% { transform: translateX(25vw) translateY(15vh) scale(0.6); }
+  100% { transform: translateX(-20vw) translateY(-15vh) scale(0.5); }
+}
+
+@keyframes move2 {
+  0% { transform: translateX(30vw) translateY(10vh) scale(0.6); }
+  25% { transform: translateX(-10vw) translateY(-20vh) scale(0.8); }
+  50% { transform: translateX(20vw) translateY(15vh) scale(0.5); }
+  75% { transform: translateX(-25vw) translateY(-5vh) scale(0.7); }
+  100% { transform: translateX(30vw) translateY(10vh) scale(0.6); }
+}
+
+@keyframes move3 {
+  0% { transform: translateX(-30vw) translateY(20vh) scale(0.7); }
+  25% { transform: translateX(15vw) translateY(-15vh) scale(0.9); }
+  50% { transform: translateX(-20vw) translateY(10vh) scale(0.6); }
+  75% { transform: translateX(10vw) translateY(-20vh) scale(0.8); }
+  100% { transform: translateX(-30vw) translateY(20vh) scale(0.7); }
+}
+
+@keyframes move4 {
+  0% { transform: translateX(25vw) translateY(-20vh) scale(0.8); }
+  25% { transform: translateX(-15vw) translateY(15vh) scale(0.6); }
+  50% { transform: translateX(30vw) translateY(-10vh) scale(0.9); }
+  75% { transform: translateX(-20vw) translateY(20vh) scale(0.7); }
+  100% { transform: translateX(25vw) translateY(-20vh) scale(0.8); }
+}
+
+@keyframes move5 {
+  0% { transform: translateX(-25vw) translateY(-10vh) scale(0.9); }
+  25% { transform: translateX(20vw) translateY(25vh) scale(0.5); }
+  50% { transform: translateX(-30vw) translateY(-15vh) scale(0.7); }
+  75% { transform: translateX(15vw) translateY(10vh) scale(0.8); }
+  100% { transform: translateX(-25vw) translateY(-10vh) scale(0.9); }
+}
+
+@keyframes move6 {
+  0% { transform: translateX(15vw) translateY(15vh) scale(0.6); }
+  25% { transform: translateX(-20vw) translateY(-25vh) scale(0.8); }
+  50% { transform: translateX(25vw) translateY(20vh) scale(0.7); }
+  75% { transform: translateX(-10vw) translateY(-15vh) scale(0.9); }
+  100% { transform: translateX(15vw) translateY(15vh) scale(0.6); }
+}
+
+@keyframes move7 {
+  0% { transform: translateX(-15vw) translateY(25vh) scale(0.7); }
+  25% { transform: translateX(30vw) translateY(-10vh) scale(0.5); }
+  50% { transform: translateX(-25vw) translateY(15vh) scale(0.8); }
+  75% { transform: translateX(20vw) translateY(-20vh) scale(0.6); }
+  100% { transform: translateX(-15vw) translateY(25vh) scale(0.7); }
+}
+
+@keyframes move8 {
+  0% { transform: translateX(20vw) translateY(-15vh) scale(0.8); }
+  25% { transform: translateX(-25vw) translateY(20vh) scale(0.6); }
+  50% { transform: translateX(15vw) translateY(-25vh) scale(0.9); }
+  75% { transform: translateX(-30vw) translateY(10vh) scale(0.7); }
+  100% { transform: translateX(20vw) translateY(-15vh) scale(0.8); }
 }
 
 @media (max-width: 1200px) {
   p {
     font-size: 1.2em;
   }
-  .about-content p {
-    font-size: 1em;
+
+  .typewriter-text {
+    font-size: 1.1em;
+    min-height: 350px;
+  }
+
+  .title-container {
+    min-height: 5em;
+  }
+
+  .title-line-1 {
+    width: 15ch;
+  }
+
+  .title-line-2 {
+    font-size: 3em;
+    width: 18ch;
   }
 
   .hero-image {
@@ -621,17 +1413,55 @@ const getAuthorsDisplay = (authorRefs) => {
 @media (max-width: 800px) {
   .home-container {
     flex-direction: column;
+    padding: 1.5rem 1rem;
+    margin: 1rem;
   }
 
   .home-copy {
     flex: 0;
     padding-bottom: 1em;
     text-align: center;
+    padding: 0;
+    order: 1;
   }
-  
+
   .about-content {
     max-width: 600px;
     margin: 0 auto;
+  }
+
+  .typewriter-text {
+    font-size: 1.1em;
+    min-height: 300px;
+    text-align: left;
+  }
+
+  .title-container {
+    min-height: 4em;
+  }
+
+  .title-line-1 {
+    font-size: 1.2em;
+    width: 15ch;
+  }
+
+  .title-line-2 {
+    font-size: 2.2em;
+    width: 18ch;
+  }
+
+  .hero-image-container {
+    margin: 1em 0;
+    order: 2;
+  }
+
+  .hero-image {
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+
+  .newsletter-callout {
+    margin-top: 1em;
   }
 }
 </style>
@@ -647,8 +1477,72 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (!form || !modal) return;
 
+  // Function to create confetti explosion
+  function createConfettiExplosion(container) {
+    const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f093fb', '#667eea'];
+    const rect = container.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    for (let i = 0; i < 50; i++) {
+      setTimeout(() => {
+        const confetti = document.createElement('div');
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const angle = (Math.random() * 360) * (Math.PI / 180);
+        const velocity = 3 + Math.random() * 6;
+        const size = 6 + Math.random() * 6;
+
+        confetti.style.cssText = `
+          position: fixed;
+          width: ${size}px;
+          height: ${size}px;
+          background: ${color};
+          left: ${centerX}px;
+          top: ${centerY}px;
+          opacity: 1;
+          pointer-events: none;
+          z-index: 9999;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+        `;
+
+        document.body.appendChild(confetti);
+
+        const velocityX = Math.cos(angle) * velocity;
+        const velocityY = Math.sin(angle) * velocity;
+        let posX = 0;
+        let posY = 0;
+        let opacity = 1;
+        let rotation = 0;
+
+        const animate = () => {
+          posX += velocityX;
+          posY += velocityY + (posY * 0.1);
+          opacity -= 0.015;
+          rotation += 5;
+
+          confetti.style.transform = `translate(${posX}px, ${posY}px) rotate(${rotation}deg)`;
+          confetti.style.opacity = opacity;
+
+          if (opacity > 0) {
+            requestAnimationFrame(animate);
+          } else {
+            confetti.remove();
+          }
+        };
+
+        requestAnimationFrame(animate);
+      }, i * 10);
+    }
+  }
+
   // Function to show our success modal
   function showSuccessModal() {
+    // Trigger confetti explosion at the button location
+    const newsletterCallout = document.querySelector('.newsletter-callout');
+    if (newsletterCallout) {
+      createConfettiExplosion(newsletterCallout);
+    }
+
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     form.reset();
@@ -730,5 +1624,269 @@ document.addEventListener('DOMContentLoaded', function() {
       closeModal();
     }
   });
+});
+
+// ✨ EASTER EGGS ✨
+document.addEventListener('DOMContentLoaded', function() {
+  // Konami Code Easter Egg: ↑ ↑ ↓ ↓ ← → ← → B A
+  const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  let konamiIndex = 0;
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key.toLowerCase() === konamiCode[konamiIndex].toLowerCase()) {
+      konamiIndex++;
+      if (konamiIndex === konamiCode.length) {
+        activateMagicMode();
+        konamiIndex = 0;
+      }
+    } else {
+      konamiIndex = 0;
+    }
+  });
+
+  function activateMagicMode() {
+    // Create magical confetti explosion
+    const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe'];
+    for (let i = 0; i < 100; i++) {
+      createConfetti(colors[Math.floor(Math.random() * colors.length)]);
+    }
+
+    // Add secret message
+    const message = document.createElement('div');
+    message.textContent = '🎉 You found the secret! Welcome to the magical realm! 🎉';
+    message.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2em 3em;
+      border-radius: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+      z-index: 10000;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: magicAppear 0.5s ease;
+      text-align: center;
+    `;
+    document.body.appendChild(message);
+
+    setTimeout(() => {
+      message.style.animation = 'magicDisappear 0.5s ease forwards';
+      setTimeout(() => message.remove(), 500);
+    }, 3000);
+  }
+
+  function createConfetti(color) {
+    const confetti = document.createElement('div');
+    confetti.style.cssText = `
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: ${color};
+      left: ${Math.random() * 100}%;
+      top: ${Math.random() * 100}%;
+      opacity: 1;
+      pointer-events: none;
+      z-index: 9999;
+      border-radius: 50%;
+      animation: confettiFall ${2 + Math.random() * 3}s ease-out forwards;
+    `;
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 5000);
+  }
+
+  // Triple-click the main heading for surprise
+  const mainHeading = document.querySelector('.home-copy h1');
+  let clickCount = 0;
+  let clickTimer = null;
+
+  if (mainHeading) {
+    mainHeading.addEventListener('click', function() {
+      clickCount++;
+
+      if (clickTimer) clearTimeout(clickTimer);
+
+      if (clickCount === 3) {
+        // Change text temporarily
+        const originalText = mainHeading.textContent;
+        mainHeading.textContent = '✨ Magic Makers ✨';
+        mainHeading.style.transform = 'scale(1.2) rotate(5deg)';
+
+        setTimeout(() => {
+          mainHeading.textContent = originalText;
+          mainHeading.style.transform = '';
+        }, 2000);
+
+        clickCount = 0;
+      } else {
+        clickTimer = setTimeout(() => {
+          clickCount = 0;
+        }, 500);
+      }
+    });
+  }
+
+  // Secret sparkle trail on mouse move (activate by clicking the floating sparkle)
+  let sparkleTrailActive = false;
+  const homeContainer = document.querySelector('.home-container');
+
+  if (homeContainer) {
+    // The sparkle emoji in the corner activates this
+    homeContainer.addEventListener('click', function(e) {
+      const rect = homeContainer.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Check if click is near the top-right corner (the floating sparkle)
+      if (x > rect.width - 80 && y < 80) {
+        sparkleTrailActive = !sparkleTrailActive;
+
+        const notification = document.createElement('div');
+        notification.textContent = sparkleTrailActive ? '✨ Sparkle trail activated!' : '✨ Sparkle trail deactivated!';
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: rgba(124, 58, 237, 0.95);
+          color: white;
+          padding: 1em 2em;
+          border-radius: 12px;
+          font-weight: 600;
+          z-index: 10000;
+          animation: slideInRight 0.3s ease;
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 2000);
+      }
+    });
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    if (sparkleTrailActive && Math.random() > 0.9) {
+      const sparkle = document.createElement('div');
+      sparkle.textContent = '✨';
+      sparkle.style.cssText = `
+        position: fixed;
+        left: ${e.clientX}px;
+        top: ${e.clientY}px;
+        pointer-events: none;
+        z-index: 9999;
+        animation: sparkleDisappear 1s ease forwards;
+        font-size: ${10 + Math.random() * 20}px;
+      `;
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 1000);
+    }
+  });
+});
+
+// Add animations for easter eggs
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes magicAppear {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes magicDisappear {
+    to {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.5) rotate(10deg);
+    }
+  }
+
+  @keyframes confettiFall {
+    to {
+      transform: translateY(100vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes sparkleDisappear {
+    0% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0) translateY(-20px);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+`;
+document.head.appendChild(style);
+
+// Parallax scroll effects
+let ticking = false;
+
+function updateParallax() {
+  const scrolled = window.pageYOffset;
+  const parallaxElements = document.querySelectorAll('.home-container, .hero-image, .youtube-section');
+
+  parallaxElements.forEach((element, index) => {
+    const speed = 0.5 + (index * 0.1);
+    const yPos = -(scrolled * speed);
+    if (element.classList.contains('hero-image')) {
+      element.style.transform = `translateY(${yPos * 0.1}px)`;
+    }
+  });
+
+  ticking = false;
+}
+
+function requestTick() {
+  if (!ticking) {
+    window.requestAnimationFrame(updateParallax);
+    ticking = true;
+  }
+}
+
+window.addEventListener('scroll', requestTick, { passive: true });
+
+// Scroll reveal animations with typewriter effects
+const observerOptions = {
+  threshold: 0.15,
+  rootMargin: '0px 0px -100px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+
+      // Add typing animation to section titles
+      const sectionTitle = entry.target.querySelector('.section-title');
+      if (sectionTitle && !sectionTitle.classList.contains('typed')) {
+        sectionTitle.classList.add('typing');
+        sectionTitle.classList.add('typed');
+      }
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.youtube-section, .latest-section-wrapper').forEach(section => {
+  section.style.opacity = '0';
+  section.style.transform = 'translateY(50px)';
+  section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+  observer.observe(section);
 });
 </script>
