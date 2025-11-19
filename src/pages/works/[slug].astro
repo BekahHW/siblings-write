@@ -196,6 +196,28 @@ const structuredData = {
           </section>
         )}
 
+        <!-- Quiz CTA Section (Battle for Christmas only) -->
+        {work.id === 'battle-for-christmas' && (
+          <section class="quiz-cta-section">
+            <div class="quiz-cta-card">
+              <div class="quiz-cta-content">
+                <div class="quiz-icon">🎄</div>
+                <h3 class="quiz-cta-title">Which Nutcracker Village Character Are You?</h3>
+                <p class="quiz-cta-description">
+                  Take our interactive personality quiz to discover which character from <em>The Battle for Christmas</em> matches your personality!
+                </p>
+                <a
+                  href="/works/battle-for-christmas/which-character-are-you"
+                  class="cta-button quiz-button"
+                >
+                  <span class="button-text">Take the Quiz</span>
+                  <span class="button-icon">✨</span>
+                </a>
+              </div>
+            </div>
+          </section>
+        )}
+
         <!-- Final CTA Section -->
         <section class="final-cta-section">
           <div class="cta-card">
@@ -794,6 +816,100 @@ const structuredData = {
     margin-bottom: 0;
   }
 
+  /* Quiz CTA Section */
+  .quiz-cta-section {
+    margin-bottom: 4em;
+  }
+
+  .quiz-cta-card {
+    background:
+      linear-gradient(135deg, rgba(139, 35, 35, 0.15) 0%, rgba(46, 74, 54, 0.15) 100%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23F7F3EC"/><circle cx="20" cy="20" r="15" fill="%238B2323" opacity="0.05"/></svg>');
+    border-radius: 24px;
+    padding: 3em;
+    border: 3px solid rgba(217, 176, 90, 0.4);
+    box-shadow: 0 15px 50px rgba(139, 35, 35, 0.15);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .quiz-cta-card::before {
+    content: '❄️';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 4em;
+    opacity: 0.1;
+    animation: snowRotate 10s linear infinite;
+  }
+
+  @keyframes snowRotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .quiz-cta-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 60px rgba(139, 35, 35, 0.25);
+    border-color: rgba(217, 176, 90, 0.6);
+  }
+
+  .quiz-cta-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .quiz-icon {
+    font-size: 4em;
+    margin-bottom: 0.5em;
+    animation: iconBounce 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(139, 35, 35, 0.3));
+  }
+
+  @keyframes iconBounce {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-10px) scale(1.1);
+    }
+  }
+
+  .quiz-cta-title {
+    font-family: var(--font-family-display);
+    font-size: 2.5em;
+    color: #8B2323;
+    margin-bottom: 0.5em;
+  }
+
+  .quiz-cta-description {
+    font-size: 1.3em;
+    color: #2E4A36;
+    margin-bottom: 1.5em;
+    line-height: 1.6;
+  }
+
+  .quiz-cta-description em {
+    color: #8B2323;
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  .quiz-button {
+    background: linear-gradient(135deg, #2E4A36 0%, #3D6249 100%);
+    box-shadow: 0 8px 25px rgba(46, 74, 54, 0.4);
+  }
+
+  .quiz-button:hover {
+    box-shadow: 0 12px 35px rgba(46, 74, 54, 0.6);
+  }
+
   /* Trailer Section */
   .trailer-section {
     margin-bottom: 4em;
@@ -1079,6 +1195,18 @@ const structuredData = {
     .inspiration-section {
       padding: 2em;
     }
+
+    .quiz-cta-card {
+      padding: 2em;
+    }
+
+    .quiz-cta-title {
+      font-size: 2em;
+    }
+
+    .quiz-cta-description {
+      font-size: 1.2em;
+    }
   }
 
   @media (max-width: 768px) {
@@ -1149,6 +1277,22 @@ const structuredData = {
     .cta-card h3 {
       font-size: 1.8em;
     }
+
+    .quiz-cta-card {
+      padding: 1.5em;
+    }
+
+    .quiz-icon {
+      font-size: 3em;
+    }
+
+    .quiz-cta-title {
+      font-size: 1.8em;
+    }
+
+    .quiz-cta-description {
+      font-size: 1.1em;
+    }
   }
 
   @media (max-width: 480px) {
@@ -1189,6 +1333,18 @@ const structuredData = {
 
     .title-decoration {
       font-size: 0.8em;
+    }
+
+    .quiz-icon {
+      font-size: 2.5em;
+    }
+
+    .quiz-cta-title {
+      font-size: 1.5em;
+    }
+
+    .quiz-cta-description {
+      font-size: 1em;
     }
   }
 </style>
