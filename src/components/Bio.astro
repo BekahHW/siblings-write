@@ -19,6 +19,10 @@ const { name, bio, avatar } = Astro.props;
     align-items: center;
     display: flex;
     margin-bottom: 1.5rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   div:last-child {
@@ -31,9 +35,15 @@ const { name, bio, avatar } = Astro.props;
     border-radius: 100px;
     display: block;
     margin-right: 20px;
+    flex-shrink: 0;
   }
 
   p {
     font-size: 1.125rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1;
   }
 </style>

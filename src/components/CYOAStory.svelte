@@ -270,6 +270,10 @@
     border-radius: 12px;
     border: 1px solid rgba(124, 58, 237, 0.15);
     backdrop-filter: blur(10px);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .story-content.revealed {
@@ -305,6 +309,10 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
   }
 
   .choice-cards {
@@ -329,6 +337,10 @@
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 6px rgba(124, 58, 237, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .choice-card::before {
@@ -410,6 +422,10 @@
     color: var(--text-main);
     line-height: 1.4;
     font-family: var(--font-family-sans);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .card-arrow {
@@ -435,6 +451,10 @@
     border: 2px solid rgba(124, 58, 237, 0.2);
     position: relative;
     overflow: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .completion::before {
@@ -458,6 +478,10 @@
     background-clip: text;
     position: relative;
     z-index: 1;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
   }
 
   .completion p {
@@ -466,6 +490,9 @@
     color: var(--text-main);
     position: relative;
     z-index: 1;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
   }
 
   .reset-button {
