@@ -73,8 +73,9 @@ const structuredData = {
         <div class="hero-image-container">
           {trailerVideoId && work.id === 'battle-for-christmas' ? (
             <>
-              <div class="hero-video-background">
+              <div class="hero-video-background" id="heroVideoBackground">
                 <iframe
+                  id="heroVideoIframe"
                   src={`https://www.youtube.com/embed/${trailerVideoId}?autoplay=1&mute=1&loop=1&playlist=${trailerVideoId}&controls=0&showinfo=0&rel=0&modestbranding=1`}
                   title={`${title} - Background Trailer`}
                   frameborder="0"
@@ -82,8 +83,8 @@ const structuredData = {
                   allowfullscreen
                 ></iframe>
               </div>
-              <div class="hero-overlay hero-frosted"></div>
-              <div class="snowfall-container">
+              <div class="hero-overlay hero-frosted" id="heroOverlay"></div>
+              <div class="snowfall-container" id="snowfallContainer">
                 <div class="snowflake">❄</div>
                 <div class="snowflake">❄</div>
                 <div class="snowflake">❄</div>
@@ -95,10 +96,10 @@ const structuredData = {
                 <div class="snowflake">❄</div>
                 <div class="snowflake">❄</div>
               </div>
-              <div class="hero-content">
+              <div class="hero-content" id="heroContent">
                 <h1 class="hero-title hero-title-cinematic">{title}</h1>
                 <p class="hero-tagline">Watch for the Magic</p>
-                <button class="play-trailer-btn" data-trailer-id={trailerVideoId}>
+                <button class="play-trailer-btn" id="playTrailerBtn" data-trailer-id={trailerVideoId}>
                   <span class="play-icon">▶</span>
                   <span class="play-text">Play Trailer</span>
                 </button>
@@ -210,15 +211,6 @@ const structuredData = {
         </div>
       </div>
     </article>
-
-    <!-- Trailer Modal -->
-    <div id="trailerModal" class="trailer-modal">
-      <div class="trailer-modal-content">
-        <button class="trailer-modal-close" id="closeModal">×</button>
-        <div id="trailerVideoContainer"></div>
-      </div>
-    </div>
-
   </BaseLayout>
 </PostHogLayout>
 
@@ -1189,104 +1181,28 @@ const structuredData = {
       font-size: 0.8em;
     }
   }
-
-  /* Trailer Modal */
-  .trailer-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 10000;
-    animation: modalFadeIn 0.3s ease;
-  }
-
-  .trailer-modal.active {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  @keyframes modalFadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  .trailer-modal-content {
-    position: relative;
-    width: 90%;
-    max-width: 1200px;
-    aspect-ratio: 16 / 9;
-    animation: modalSlideUp 0.4s ease;
-  }
-
-  @keyframes modalSlideUp {
-    from {
-      opacity: 0;
-      transform: translateY(50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .trailer-modal-close {
-    position: absolute;
-    top: -50px;
-    right: 0;
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    font-size: 2em;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .trailer-modal-close:hover {
-    background: white;
-    color: black;
-    transform: rotate(90deg);
-  }
-
-  .trailer-modal iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    border-radius: 8px;
-  }
 </style>
 
 <script is:inline>
   (function() {
-    function initTrailerModal() {
-      const playBtn = document.querySelector('.play-trailer-btn');
-      const modal = document.getElementById('trailerModal');
-      const closeBtn = document.getElementById('closeModal');
-      const videoContainer = document.getElementById('trailerVideoContainer');
+    function initTrailerPlayer() {
+      const playBtn = document.getElementById('playTrailerBtn');
+      const heroVideoIframe = document.getElementById('heroVideoIframe');
+      const heroOverlay = document.getElementById('heroOverlay');
+      const snowfallContainer = document.getElementById('snowfallContainer');
+      const heroContent = document.getElementById('heroContent');
 
-      console.log('Trailer modal script running');
+      console.log('Trailer player script running');
       console.log('Elements found:', {
         playBtn: !!playBtn,
-        modal: !!modal,
-        closeBtn: !!closeBtn,
-        videoContainer: !!videoContainer
+        heroVideoIframe: !!heroVideoIframe,
+        heroOverlay: !!heroOverlay,
+        snowfallContainer: !!snowfallContainer,
+        heroContent: !!heroContent
       });
 
-      if (!playBtn || !modal || !videoContainer) {
-        console.error('Missing required elements for trailer modal');
+      if (!playBtn || !heroVideoIframe) {
+        console.log('Missing required elements for trailer player');
         return;
       }
 
@@ -1297,55 +1213,23 @@ const structuredData = {
         console.log('Play button clicked! Trailer ID:', trailerId);
 
         if (trailerId) {
-          const iframe = document.createElement('iframe');
-          iframe.src = 'https://www.youtube.com/embed/' + trailerId + '?autoplay=1';
-          iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-          iframe.allowFullscreen = true;
-          iframe.style.width = '100%';
-          iframe.style.height = '100%';
-          iframe.style.border = 'none';
-          iframe.style.borderRadius = '8px';
+          // Hide overlay, snowfall, and hero content
+          if (heroOverlay) heroOverlay.style.display = 'none';
+          if (snowfallContainer) snowfallContainer.style.display = 'none';
+          if (heroContent) heroContent.style.display = 'none';
 
-          videoContainer.innerHTML = '';
-          videoContainer.appendChild(iframe);
-          modal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-          console.log('Modal opened');
-        }
-      });
+          // Replace the background video with the full trailer with controls
+          heroVideoIframe.src = 'https://www.youtube.com/embed/' + trailerId + '?autoplay=1&controls=1&rel=0&modestbranding=1';
 
-      function closeModal() {
-        if (modal && videoContainer) {
-          modal.classList.remove('active');
-          videoContainer.innerHTML = '';
-          document.body.style.overflow = 'auto';
-          console.log('Modal closed');
-        }
-      }
-
-      if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
-      }
-
-      if (modal) {
-        modal.addEventListener('click', function(e) {
-          if (e.target === modal) {
-            closeModal();
-          }
-        });
-      }
-
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
-          closeModal();
+          console.log('Trailer now playing in header');
         }
       });
     }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initTrailerModal);
+      document.addEventListener('DOMContentLoaded', initTrailerPlayer);
     } else {
-      initTrailerModal();
+      initTrailerPlayer();
     }
   })();
 </script>
