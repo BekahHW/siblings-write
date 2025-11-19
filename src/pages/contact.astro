@@ -16,10 +16,141 @@ const permalink = `${Astro.site.href}contact`;
           <p>We'd love to hear from you! Whether you have a question, want to collaborate, or just want to say hi, feel free to reach out.</p>
           <p>Email us directly at: <a href="mailto:3siblingwriters@gmail.com">3siblingwriters@gmail.com</a></p>
         </div>
-        
+
         <div class="image-section">
           <img src="/assets/hawrotsib-logo.png" alt="The Hawrot Siblings feather logo" width="330">
         </div>
+      </div>
+
+      <!-- Photo Submission Section -->
+      <div class="photo-submission-section">
+        <h2>Share Your Photo</h2>
+        <p class="section-intro">Reading with us? We'd love to see it! Submit a photo of yourself with one of our novels, and we'll feature it on our website.</p>
+
+        <form
+          name="photo-submission"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          enctype="multipart/form-data"
+          class="photo-form"
+        >
+          <!-- Netlify form fields -->
+          <input type="hidden" name="form-name" value="photo-submission" />
+
+          <!-- Honeypot for spam prevention -->
+          <p class="hidden">
+            <label>
+              Don't fill this out if you're human: <input name="bot-field" />
+            </label>
+          </p>
+
+          <div class="form-grid">
+            <!-- Name Field -->
+            <div class="form-field">
+              <label for="name">Your Name *</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                placeholder="Enter your name"
+                aria-required="true"
+              />
+            </div>
+
+            <!-- Email Field -->
+            <div class="form-field">
+              <label for="email">Email Address *</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                placeholder="your.email@example.com"
+                aria-required="true"
+              />
+            </div>
+          </div>
+
+          <!-- Book Selection -->
+          <div class="form-field">
+            <label for="book">Which book are you reading? *</label>
+            <select id="book" name="book" required aria-required="true">
+              <option value="">Select a book...</option>
+              <option value="the-magic-shop">The Magic Shop</option>
+              <option value="walking-to-aldebaran">Walking to Aldebaran</option>
+              <option value="other">Other / Multiple Books</option>
+            </select>
+          </div>
+
+          <!-- Message Field -->
+          <div class="form-field">
+            <label for="message">Tell us about your experience (optional)</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              placeholder="What do you love about our stories?"
+            ></textarea>
+          </div>
+
+          <!-- Photo Upload -->
+          <div class="form-field">
+            <label for="photo">Upload Your Photo *</label>
+            <input
+              type="file"
+              id="photo"
+              name="photo"
+              accept="image/*"
+              required
+              aria-required="true"
+            />
+            <small class="field-help">
+              Accepted formats: JPG, PNG, GIF. Maximum file size: 10MB.
+            </small>
+          </div>
+
+          <!-- Social Media Handle (Optional) -->
+          <div class="form-field">
+            <label for="social">Social Media Handle (optional)</label>
+            <input
+              type="text"
+              id="social"
+              name="social"
+              placeholder="@yourusername"
+            />
+            <small class="field-help">We'll tag you when we share your photo</small>
+          </div>
+
+          <!-- Consent Checkbox -->
+          <div class="form-field checkbox-field">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                id="consent"
+                name="consent"
+                required
+                aria-required="true"
+              />
+              <span>
+                I give permission for my photo to be displayed on the Siblings Write website and social media channels. *
+              </span>
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button type="submit" class="submit-btn">
+              <span>Submit Photo</span>
+            </button>
+          </div>
+
+          <!-- Success message container -->
+          <div class="success-message" id="success-message">
+            <p>✨ Thank you for your submission! We'll review your photo and get back to you soon.</p>
+          </div>
+        </form>
       </div>
     </div>
   </BaseLayout>
@@ -47,7 +178,7 @@ const permalink = `${Astro.site.href}contact`;
   .image-section {
     flex-shrink: 0;
     max-width: 330px;
-    margin-top: 1em; /* Align with the heading */
+    margin-top: 1em;
   }
 
   .image-section img {
@@ -64,6 +195,189 @@ const permalink = `${Astro.site.href}contact`;
     line-height: 1.6;
   }
 
+  /* Photo Submission Section */
+  .photo-submission-section {
+    background: linear-gradient(135deg, rgba(84, 142, 155, 0.08) 0%, rgba(190, 214, 221, 0.2) 100%);
+    padding: 3em;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin: 3em 0;
+  }
+
+  .photo-submission-section h2 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 0.5em;
+    color: #333;
+    font-family: var(--font-family-serif);
+  }
+
+  .section-intro {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2em;
+    font-size: 1.1em;
+  }
+
+  .photo-form {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5em;
+  }
+
+  .form-field {
+    margin-bottom: 1.5em;
+  }
+
+  .form-field label {
+    display: block;
+    margin-bottom: 0.5em;
+    color: #333;
+    font-weight: 600;
+    font-size: 1em;
+  }
+
+  .form-field input[type="text"],
+  .form-field input[type="email"],
+  .form-field select,
+  .form-field textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: var(--font-family-sans);
+    background: white;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .form-field input[type="text"]:focus,
+  .form-field input[type="email"]:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    outline: none;
+    border-color: var(--primary-color, #548e9b);
+    box-shadow: 0 0 0 4px rgba(84, 142, 155, 0.1);
+  }
+
+  .form-field input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .form-field input[type="file"]:hover {
+    border-color: var(--primary-color, #548e9b);
+    background: rgba(84, 142, 155, 0.05);
+  }
+
+  .field-help {
+    display: block;
+    margin-top: 0.4em;
+    font-size: 0.85em;
+    color: #777;
+    font-style: italic;
+  }
+
+  .checkbox-field {
+    margin: 2em 0;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    font-weight: normal;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    margin-right: 0.8em;
+    margin-top: 0.2em;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .checkbox-label span {
+    color: #555;
+    line-height: 1.5;
+  }
+
+  .form-actions {
+    text-align: center;
+    margin-top: 2em;
+  }
+
+  .submit-btn {
+    padding: 16px 48px;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .submit-btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.5);
+  }
+
+  .success-message {
+    display: none;
+    margin-top: 2em;
+    padding: 1.5em;
+    background: #d4edda;
+    border: 2px solid #c3e6cb;
+    border-radius: 10px;
+    color: #155724;
+    text-align: center;
+    font-size: 1.1em;
+  }
+
+  .success-message.show {
+    display: block;
+  }
+
   @media (max-width: 800px) {
     .contact-header {
       flex-direction: column;
@@ -74,5 +388,115 @@ const permalink = `${Astro.site.href}contact`;
     .image-section {
       margin-top: 2em;
     }
+
+    .photo-submission-section {
+      padding: 2em 1.5em;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .submit-btn {
+      width: 100%;
+    }
   }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.photo-form');
+  const successMessage = document.getElementById('success-message');
+
+  if (!form) return;
+
+  // Function to create confetti explosion
+  function createConfettiExplosion(container) {
+    const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f093fb', '#667eea', '#548e9b'];
+    const rect = container.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    for (let i = 0; i < 60; i++) {
+      setTimeout(() => {
+        const confetti = document.createElement('div');
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const angle = (Math.random() * 360) * (Math.PI / 180);
+        const velocity = 3 + Math.random() * 7;
+        const size = 6 + Math.random() * 8;
+
+        confetti.style.cssText = `
+          position: fixed;
+          width: ${size}px;
+          height: ${size}px;
+          background: ${color};
+          left: ${centerX}px;
+          top: ${centerY}px;
+          opacity: 1;
+          pointer-events: none;
+          z-index: 9999;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+        `;
+
+        document.body.appendChild(confetti);
+
+        const velocityX = Math.cos(angle) * velocity;
+        const velocityY = Math.sin(angle) * velocity;
+        let posX = 0;
+        let posY = 0;
+        let opacity = 1;
+        let rotation = 0;
+
+        const animate = () => {
+          posX += velocityX;
+          posY += velocityY + (posY * 0.1);
+          opacity -= 0.015;
+          rotation += 5;
+
+          confetti.style.transform = `translate(${posX}px, ${posY}px) rotate(${rotation}deg)`;
+          confetti.style.opacity = opacity;
+
+          if (opacity > 0) {
+            requestAnimationFrame(animate);
+          } else {
+            confetti.remove();
+          }
+        };
+
+        requestAnimationFrame(animate);
+      }, i * 10);
+    }
+  }
+
+  // Handle form submission
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Get form data
+    const formData = new FormData(form);
+
+    // Submit to Netlify
+    fetch('/', {
+      method: 'POST',
+      body: formData
+    })
+    .then(() => {
+      // Show success message
+      if (successMessage) {
+        successMessage.classList.add('show');
+        createConfettiExplosion(successMessage);
+      }
+
+      // Reset form
+      form.reset();
+
+      // Scroll to success message
+      successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    })
+    .catch((error) => {
+      alert('Oops! There was a problem submitting your form. Please try again or contact us directly at 3siblingwriters@gmail.com');
+      console.error('Form submission error:', error);
+    });
+  });
+});
+</script>
