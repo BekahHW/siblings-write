@@ -273,9 +273,9 @@ const siteStructuredData = {
   /* Seasonal Modes Toggle Container */
   .seasonal-toggle-container {
     position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 9998;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 10001;
     animation: float-in 0.6s ease-out;
   }
 
@@ -292,8 +292,15 @@ const siteStructuredData = {
 
   @media screen and (max-width: 768px) {
     .seasonal-toggle-container {
-      bottom: 1rem;
+      bottom: 5rem;
       right: 1rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .seasonal-toggle-container {
+      bottom: 4.5rem;
+      right: 0.75rem;
     }
   }
 </style>
