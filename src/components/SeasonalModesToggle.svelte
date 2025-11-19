@@ -2,8 +2,8 @@
   import { onMount } from 'svelte';
 
   const rootEl = typeof document !== 'undefined' ? document.documentElement : null;
-  const seasons = ['default', 'winter', 'halloween', 'summer', 'spring'];
-  let season = 'default';
+  const seasons = ['winter', 'halloween', 'summer', 'spring'];
+  let season = null; // null means no seasonal theme active
   let mounted = false;
   let dropdownOpen = false;
   let toggleButtonEl;
@@ -12,7 +12,8 @@
   onMount(() => {
     mounted = true;
     if (typeof localStorage !== 'undefined' && localStorage.getItem('seasonal-mode')) {
-      season = localStorage.getItem('seasonal-mode');
+      const saved = localStorage.getItem('seasonal-mode');
+      season = saved === 'null' ? null : saved;
     }
     applySeasonalMode(season);
   });
@@ -22,10 +23,18 @@
       event.stopPropagation();
     }
     season = newSeason;
-    localStorage.setItem('seasonal-mode', season);
+    localStorage.setItem('seasonal-mode', season === null ? 'null' : season);
     applySeasonalMode(newSeason);
-    announceToScreenReader(`Seasonal mode changed to ${newSeason}`);
+    const message = newSeason === null ? 'Seasonal mode disabled' : `Seasonal mode changed to ${newSeason}`;
+    announceToScreenReader(message);
     dropdownOpen = false;
+  }
+
+  function clearSeasonalMode(event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    handleChange(null, event);
   }
 
   function announceToScreenReader(message) {
@@ -91,13 +100,11 @@
 
     // Remove all seasonal classes
     seasons.forEach(s => {
-      if (s !== 'default') {
-        rootEl.classList.remove(`season-${s}`);
-      }
+      rootEl.classList.remove(`season-${s}`);
     });
 
     // Add the selected seasonal class
-    if (mode !== 'default') {
+    if (mode !== null) {
       rootEl.classList.add(`season-${mode}`);
     }
 
@@ -114,7 +121,7 @@
       existingEffects.remove();
     }
 
-    if (mode === 'default') return;
+    if (mode === null) return;
 
     // Create effects container
     const effectsContainer = document.createElement('div');
@@ -188,9 +195,6 @@
   }
 
   const icons = {
-    default: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
-    </svg>`,
     winter: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
       <path d="M10 2L9 3v5H6L4 10l2 2h3v5l1 1 1-1v-5h3l2-2-2-2h-3V3l-1-1z"/>
       <circle cx="10" cy="10" r="1.5" fill="currentColor"/>
@@ -218,20 +222,40 @@
     class="toggle-button"
     on:click={toggleDropdown}
     on:keydown={handleKeyDown}
-    title={`Current mode: ${season}. Click or press Enter to change`}
-    aria-label={`Seasonal mode toggle. Current mode: ${season}. Press Enter to open menu`}
+    title={season ? `Current seasonal theme: ${season}. Click to change` : 'Choose a seasonal theme'}
+    aria-label={season ? `Seasonal themes. Current: ${season}. Press Enter to open menu` : 'Seasonal themes. Press Enter to open menu'}
     aria-haspopup="true"
     aria-expanded={dropdownOpen}
   >
-    {@html icons[season]}
-    <span class="mode-label">{season}</span>
+    {#if season}
+      {@html icons[season]}
+      <span class="mode-label">{season}</span>
+    {:else}
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd" />
+      </svg>
+      <span class="mode-label">Themes</span>
+    {/if}
   </button>
+
+  {#if season}
+    <button
+      class="clear-button"
+      on:click={clearSeasonalMode}
+      title="Remove seasonal theme"
+      aria-label="Remove seasonal theme"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+  {/if}
 
   <div
     bind:this={dropdownEl}
     class="mode-dropdown {dropdownOpen ? 'open' : ''}"
     role="menu"
-    aria-label="Seasonal mode options"
+    aria-label="Seasonal theme options"
   >
     {#each seasons as s}
       <button
@@ -239,8 +263,8 @@
         on:click={(e) => handleChange(s, e)}
         on:keydown={(e) => handleOptionKeyDown(e, s)}
         role="menuitem"
-        title={`Switch to ${s} mode`}
-        aria-label={`Switch to ${s} mode${season === s ? ' (current)' : ''}`}
+        title={`Switch to ${s} theme`}
+        aria-label={`Switch to ${s} theme${season === s ? ' (current)' : ''}`}
         aria-current={season === s ? 'true' : 'false'}
         tabindex={dropdownOpen ? 0 : -1}
       >
@@ -254,7 +278,9 @@
 <style>
   .seasonal-toggle {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .toggle-button {
@@ -299,6 +325,41 @@
 
   .mode-label {
     text-transform: capitalize;
+  }
+
+  .clear-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .clear-button:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #dc2626;
+    transform: scale(1.1);
+  }
+
+  .clear-button:focus {
+    outline: 2px solid #dc2626;
+    outline-offset: 2px;
+  }
+
+  .clear-button:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .clear-button:focus-visible {
+    outline: 2px solid #dc2626;
+    outline-offset: 2px;
   }
 
   .mode-dropdown {
