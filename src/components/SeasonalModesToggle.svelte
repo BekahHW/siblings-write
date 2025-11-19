@@ -5,6 +5,9 @@
   const seasons = ['default', 'winter', 'halloween', 'summer', 'spring'];
   let season = 'default';
   let mounted = false;
+  let dropdownOpen = false;
+  let toggleButtonEl;
+  let dropdownEl;
 
   onMount(() => {
     mounted = true;
@@ -17,7 +20,66 @@
   function handleChange(newSeason) {
     season = newSeason;
     localStorage.setItem('seasonal-mode', season);
-    applySeasonalMode(season);
+    applySeasonalMode(newSeason);
+    announceToScreenReader(`Seasonal mode changed to ${newSeason}`);
+    dropdownOpen = false;
+  }
+
+  function announceToScreenReader(message) {
+    if (typeof document === 'undefined') return;
+
+    // Create or get announcement element
+    let announcer = document.getElementById('seasonal-mode-announcer');
+    if (!announcer) {
+      announcer = document.createElement('div');
+      announcer.id = 'seasonal-mode-announcer';
+      announcer.setAttribute('role', 'status');
+      announcer.setAttribute('aria-live', 'polite');
+      announcer.setAttribute('aria-atomic', 'true');
+      announcer.style.position = 'absolute';
+      announcer.style.left = '-10000px';
+      announcer.style.width = '1px';
+      announcer.style.height = '1px';
+      announcer.style.overflow = 'hidden';
+      document.body.appendChild(announcer);
+    }
+
+    announcer.textContent = message;
+  }
+
+  function toggleDropdown() {
+    dropdownOpen = !dropdownOpen;
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleDropdown();
+    } else if (event.key === 'Escape') {
+      dropdownOpen = false;
+      toggleButtonEl?.focus();
+    } else if (event.key === 'ArrowDown' && !dropdownOpen) {
+      event.preventDefault();
+      dropdownOpen = true;
+    }
+  }
+
+  function handleOptionKeyDown(event, s) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleChange(s);
+      toggleButtonEl?.focus();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      dropdownOpen = false;
+      toggleButtonEl?.focus();
+    }
+  }
+
+  function handleClickOutside(event) {
+    if (dropdownOpen && dropdownEl && !dropdownEl.contains(event.target) && !toggleButtonEl?.contains(event.target)) {
+      dropdownOpen = false;
+    }
   }
 
   function applySeasonalMode(mode) {
@@ -144,28 +206,39 @@
   };
 </script>
 
+<svelte:window on:click={handleClickOutside} />
+
 <div class="seasonal-toggle">
   <button
+    bind:this={toggleButtonEl}
     class="toggle-button"
-    on:click={() => {
-      const currentIndex = seasons.indexOf(season);
-      const nextIndex = (currentIndex + 1) % seasons.length;
-      handleChange(seasons[nextIndex]);
-    }}
-    title={`Current mode: ${season}. Click to change`}
-    aria-label={`Seasonal mode toggle. Current: ${season}`}
+    on:click={toggleDropdown}
+    on:keydown={handleKeyDown}
+    title={`Current mode: ${season}. Click or press Enter to change`}
+    aria-label={`Seasonal mode toggle. Current mode: ${season}. Press Enter to open menu`}
+    aria-haspopup="true"
+    aria-expanded={dropdownOpen}
   >
     {@html icons[season]}
     <span class="mode-label">{season}</span>
   </button>
 
-  <div class="mode-dropdown">
+  <div
+    bind:this={dropdownEl}
+    class="mode-dropdown {dropdownOpen ? 'open' : ''}"
+    role="menu"
+    aria-label="Seasonal mode options"
+  >
     {#each seasons as s}
       <button
         class="mode-option {season === s ? 'active' : ''}"
         on:click={() => handleChange(s)}
+        on:keydown={(e) => handleOptionKeyDown(e, s)}
+        role="menuitem"
         title={`Switch to ${s} mode`}
-        aria-label={`Switch to ${s} mode`}
+        aria-label={`Switch to ${s} mode${season === s ? ' (current)' : ''}`}
+        aria-current={season === s ? 'true' : 'false'}
+        tabindex={dropdownOpen ? 0 : -1}
       >
         {@html icons[s]}
         <span>{s}</span>
@@ -205,6 +278,21 @@
     transform: translateY(0);
   }
 
+  /* Visible focus indicator for accessibility */
+  .toggle-button:focus {
+    outline: 3px solid #fbbf24;
+    outline-offset: 2px;
+  }
+
+  .toggle-button:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .toggle-button:focus-visible {
+    outline: 3px solid #fbbf24;
+    outline-offset: 2px;
+  }
+
   .mode-label {
     text-transform: capitalize;
   }
@@ -226,7 +314,8 @@
     z-index: 1000;
   }
 
-  .seasonal-toggle:hover .mode-dropdown {
+  .seasonal-toggle:hover .mode-dropdown,
+  .mode-dropdown.open {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -252,9 +341,30 @@
     background: #f3f4f6;
   }
 
+  .mode-option:focus {
+    outline: 2px solid #7c3aed;
+    outline-offset: -2px;
+    background: #f3f4f6;
+  }
+
+  .mode-option:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .mode-option:focus-visible {
+    outline: 2px solid #7c3aed;
+    outline-offset: -2px;
+    background: #f3f4f6;
+  }
+
   .mode-option.active {
     background: var(--primary-color, #7c3aed);
     color: white;
+  }
+
+  .mode-option.active:focus,
+  .mode-option.active:focus-visible {
+    outline-color: #fbbf24;
   }
 
   .mode-option span {
