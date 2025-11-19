@@ -2,12 +2,8 @@
   import { onMount } from 'svelte';
 
   const rootEl = typeof document !== 'undefined' ? document.documentElement : null;
-  const seasons = ['winter', 'halloween', 'summer', 'spring'];
   let season = null; // null means no seasonal theme active
   let mounted = false;
-  let dropdownOpen = false;
-  let toggleButtonEl;
-  let dropdownEl;
 
   onMount(() => {
     mounted = true;
@@ -18,29 +14,17 @@
     applySeasonalMode(season);
   });
 
-  function handleChange(newSeason, event) {
-    if (event) {
-      event.stopPropagation();
-    }
+  function handleChange(newSeason) {
     season = newSeason;
     localStorage.setItem('seasonal-mode', season === null ? 'null' : season);
     applySeasonalMode(newSeason);
-    const message = newSeason === null ? 'Seasonal mode disabled' : `Seasonal mode changed to ${newSeason}`;
+    const message = newSeason === null ? 'Default theme' : `${newSeason} theme activated`;
     announceToScreenReader(message);
-    dropdownOpen = false;
-  }
-
-  function clearSeasonalMode(event) {
-    if (event) {
-      event.stopPropagation();
-    }
-    handleChange(null, event);
   }
 
   function announceToScreenReader(message) {
     if (typeof document === 'undefined') return;
 
-    // Create or get announcement element
     let announcer = document.getElementById('seasonal-mode-announcer');
     if (!announcer) {
       announcer = document.createElement('div');
@@ -59,47 +43,12 @@
     announcer.textContent = message;
   }
 
-  function toggleDropdown() {
-    dropdownOpen = !dropdownOpen;
-  }
-
-  function handleKeyDown(event) {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      toggleDropdown();
-    } else if (event.key === 'Escape') {
-      dropdownOpen = false;
-      toggleButtonEl?.focus();
-    } else if (event.key === 'ArrowDown' && !dropdownOpen) {
-      event.preventDefault();
-      dropdownOpen = true;
-    }
-  }
-
-  function handleOptionKeyDown(event, s) {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      event.stopPropagation();
-      handleChange(s, event);
-      toggleButtonEl?.focus();
-    } else if (event.key === 'Escape') {
-      event.preventDefault();
-      dropdownOpen = false;
-      toggleButtonEl?.focus();
-    }
-  }
-
-  function handleClickOutside(event) {
-    if (dropdownOpen && dropdownEl && !dropdownEl.contains(event.target) && !toggleButtonEl?.contains(event.target)) {
-      dropdownOpen = false;
-    }
-  }
-
   function applySeasonalMode(mode) {
     if (!rootEl) return;
 
     // Remove all seasonal classes
-    seasons.forEach(s => {
+    const allSeasons = ['winter', 'halloween', 'summer', 'spring'];
+    allSeasons.forEach(s => {
       rootEl.classList.remove(`season-${s}`);
     });
 
@@ -193,258 +142,175 @@
       container.appendChild(light);
     }
   }
-
-  const icons = {
-    winter: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M10 2L9 3v5H6L4 10l2 2h3v5l1 1 1-1v-5h3l2-2-2-2h-3V3l-1-1z"/>
-      <circle cx="10" cy="10" r="1.5" fill="currentColor"/>
-    </svg>`,
-    halloween: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M10 2c-3 0-5 2-6 4-1 2-1 4 0 6 0 1 1 2 2 3l1 1c1 1 2 2 3 2s2-1 3-2l1-1c1-1 2-2 2-3 1-2 1-4 0-6-1-2-3-4-6-4zm-2 8a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2z"/>
-    </svg>`,
-    summer: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
-    </svg>`,
-    spring: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M10 3c-2 0-3 1-3 3 0 1 0 2 1 3-1 0-2 1-2 2s1 2 2 2c0 1 1 2 2 2s2-1 2-2c1 0 2-1 2-2s-1-2-2-2c1-1 1-2 1-3 0-2-1-3-3-3z"/>
-      <circle cx="7" cy="8" r="1" fill="currentColor"/>
-      <circle cx="13" cy="8" r="1" fill="currentColor"/>
-      <circle cx="10" cy="13" r="1" fill="currentColor"/>
-    </svg>`
-  };
 </script>
 
-<svelte:window on:click={handleClickOutside} />
-
-<div class="seasonal-toggle">
+<div class="seasonal-toggle-bar">
+  <!-- Default/Star -->
   <button
-    bind:this={toggleButtonEl}
-    class="toggle-button"
-    on:click={toggleDropdown}
-    on:keydown={handleKeyDown}
-    title={season ? `Current seasonal theme: ${season}. Click to change` : 'Choose a seasonal theme'}
-    aria-label={season ? `Seasonal themes. Current: ${season}. Press Enter to open menu` : 'Seasonal themes. Press Enter to open menu'}
-    aria-haspopup="true"
-    aria-expanded={dropdownOpen}
+    class="theme-btn {season === null ? 'active' : ''}"
+    on:click={() => handleChange(null)}
+    title="Default theme"
+    aria-label="Default theme"
+    aria-pressed={season === null}
   >
-    {#if season}
-      {@html icons[season]}
-      <span class="mode-label">{season}</span>
-    {:else}
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd" />
-      </svg>
-      <span class="mode-label">Themes</span>
-    {/if}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7.4-6.3-4.6-6.3 4.6 2.3-7.4-6-4.6h7.6z"/>
+    </svg>
   </button>
 
-  {#if season}
-    <button
-      class="clear-button"
-      on:click={clearSeasonalMode}
-      title="Remove seasonal theme"
-      aria-label="Remove seasonal theme"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-      </svg>
-    </button>
-  {/if}
-
-  <div
-    bind:this={dropdownEl}
-    class="mode-dropdown {dropdownOpen ? 'open' : ''}"
-    role="menu"
-    aria-label="Seasonal theme options"
+  <!-- Winter/Snowflake -->
+  <button
+    class="theme-btn {season === 'winter' ? 'active' : ''}"
+    on:click={() => handleChange('winter')}
+    title="Winter theme"
+    aria-label="Winter theme"
+    aria-pressed={season === 'winter'}
   >
-    {#each seasons as s}
-      <button
-        class="mode-option {season === s ? 'active' : ''}"
-        on:click={(e) => handleChange(s, e)}
-        on:keydown={(e) => handleOptionKeyDown(e, s)}
-        role="menuitem"
-        title={`Switch to ${s} theme`}
-        aria-label={`Switch to ${s} theme${season === s ? ' (current)' : ''}`}
-        aria-current={season === s ? 'true' : 'false'}
-        tabindex={dropdownOpen ? 0 : -1}
-      >
-        {@html icons[s]}
-        <span>{s}</span>
-      </button>
-    {/each}
-  </div>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 3L11 4v7H4L2 12l2 1h7v7l1 1 1-1v-7h7l2-1-2-1h-7V4l-1-1z"/>
+      <circle cx="12" cy="12" r="2" fill="currentColor"/>
+    </svg>
+  </button>
+
+  <!-- Halloween/Pumpkin -->
+  <button
+    class="theme-btn {season === 'halloween' ? 'active' : ''}"
+    on:click={() => handleChange('halloween')}
+    title="Halloween theme"
+    aria-label="Halloween theme"
+    aria-pressed={season === 'halloween'}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 3c-4 0-7 3-8 5-1 3-1 5 0 8 0 1 1 3 3 4l1 1c2 2 3 3 4 3s2-1 4-3l1-1c2-1 3-3 3-4 1-3 1-5 0-8-1-2-4-5-8-5zm-3 10a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm6 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
+    </svg>
+  </button>
+
+  <!-- Summer/Sun -->
+  <button
+    class="theme-btn {season === 'summer' ? 'active' : ''}"
+    on:click={() => handleChange('summer')}
+    title="Summer theme"
+    aria-label="Summer theme"
+    aria-pressed={season === 'summer'}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41m9.9 9.9l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41m9.9-9.9l1.41-1.41M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+    </svg>
+  </button>
+
+  <!-- Spring/Flower -->
+  <button
+    class="theme-btn {season === 'spring' ? 'active' : ''}"
+    on:click={() => handleChange('spring')}
+    title="Spring theme"
+    aria-label="Spring theme"
+    aria-pressed={season === 'spring'}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4c-2 0-4 2-4 4 0 1 0 3 2 4-2 0-3 1-3 3s1 3 3 3c0 2 2 4 4 4s4-2 4-4c2 0 3-1 3-3s-1-3-3-3c2-1 2-3 2-4 0-2-2-4-4-4z"/>
+      <circle cx="9" cy="10" r="1.5"/>
+      <circle cx="15" cy="10" r="1.5"/>
+      <circle cx="12" cy="16" r="1.5"/>
+    </svg>
+  </button>
 </div>
 
 <style>
-  .seasonal-toggle {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .toggle-button {
+  .seasonal-toggle-bar {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--primary-color, #7c3aed);
-    color: white;
-    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.5rem;
     border-radius: 2rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
   }
 
-  .toggle-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
-  }
-
-  .toggle-button:active {
-    transform: translateY(0);
-  }
-
-  /* Visible focus indicator for accessibility */
-  .toggle-button:focus {
-    outline: 3px solid #fbbf24;
-    outline-offset: 2px;
-  }
-
-  .toggle-button:focus:not(:focus-visible) {
-    outline: none;
-  }
-
-  .toggle-button:focus-visible {
-    outline: 3px solid #fbbf24;
-    outline-offset: 2px;
-  }
-
-  .mode-label {
-    text-transform: capitalize;
-  }
-
-  .clear-button {
+  .theme-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.5rem;
+    height: 2.5rem;
     padding: 0;
-    background: rgba(239, 68, 68, 0.1);
-    color: #dc2626;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: transparent;
+    color: #6b7280;
+    border: 2px solid transparent;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
-  .clear-button:hover {
-    background: rgba(239, 68, 68, 0.2);
-    border-color: #dc2626;
+  .theme-btn:hover {
+    background: rgba(124, 58, 237, 0.1);
+    color: #7c3aed;
     transform: scale(1.1);
   }
 
-  .clear-button:focus {
-    outline: 2px solid #dc2626;
+  .theme-btn:focus-visible {
+    outline: 2px solid #7c3aed;
     outline-offset: 2px;
   }
 
-  .clear-button:focus:not(:focus-visible) {
-    outline: none;
-  }
-
-  .clear-button:focus-visible {
-    outline: 2px solid #dc2626;
-    outline-offset: 2px;
-  }
-
-  .mode-dropdown {
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    right: 0;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    padding: 0.5rem;
-    min-width: 150px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    z-index: 1000;
-  }
-
-  .seasonal-toggle:hover .mode-dropdown,
-  .mode-dropdown.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-  }
-
-  .mode-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    background: transparent;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-    color: #2d2d3f;
-    transition: all 0.2s ease;
-    text-transform: capitalize;
-  }
-
-  .mode-option:hover {
-    background: #f3f4f6;
-  }
-
-  .mode-option:focus {
-    outline: 2px solid #7c3aed;
-    outline-offset: -2px;
-    background: #f3f4f6;
-  }
-
-  .mode-option:focus:not(:focus-visible) {
-    outline: none;
-  }
-
-  .mode-option:focus-visible {
-    outline: 2px solid #7c3aed;
-    outline-offset: -2px;
-    background: #f3f4f6;
-  }
-
-  .mode-option.active {
+  .theme-btn.active {
     background: var(--primary-color, #7c3aed);
     color: white;
+    border-color: var(--primary-color, #7c3aed);
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
   }
 
-  .mode-option.active:focus,
-  .mode-option.active:focus-visible {
-    outline-color: #fbbf24;
+  .theme-btn.active:hover {
+    transform: scale(1.05);
   }
 
-  .mode-option span {
-    flex: 1;
-    text-align: left;
+  /* Seasonal color variations for active states */
+  .theme-btn.active[aria-label="Winter theme"] {
+    background: #2563eb;
+    border-color: #2563eb;
+  }
+
+  .theme-btn.active[aria-label="Halloween theme"] {
+    background: #ff6b35;
+    border-color: #ff6b35;
+  }
+
+  .theme-btn.active[aria-label="Summer theme"] {
+    background: #dc2626;
+    border-color: #dc2626;
+  }
+
+  .theme-btn.active[aria-label="Spring theme"] {
+    background: #059669;
+    border-color: #059669;
+  }
+
+  .theme-btn.active[aria-label="Default theme"] {
+    background: #7c3aed;
+    border-color: #7c3aed;
   }
 
   @media (max-width: 768px) {
-    .toggle-button {
-      padding: 0.4rem 0.75rem;
-      font-size: 0.8rem;
+    .seasonal-toggle-bar {
+      gap: 0.375rem;
+      padding: 0.375rem;
     }
 
-    .mode-label {
-      display: none;
+    .theme-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .seasonal-toggle-bar {
+      gap: 0.25rem;
+      padding: 0.25rem;
+    }
+
+    .theme-btn {
+      width: 2rem;
+      height: 2rem;
     }
   }
 </style>
