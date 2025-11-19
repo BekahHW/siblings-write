@@ -17,7 +17,10 @@
     applySeasonalMode(season);
   });
 
-  function handleChange(newSeason) {
+  function handleChange(newSeason, event) {
+    if (event) {
+      event.stopPropagation();
+    }
     season = newSeason;
     localStorage.setItem('seasonal-mode', season);
     applySeasonalMode(newSeason);
@@ -67,7 +70,8 @@
   function handleOptionKeyDown(event, s) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      handleChange(s);
+      event.stopPropagation();
+      handleChange(s, event);
       toggleButtonEl?.focus();
     } else if (event.key === 'Escape') {
       event.preventDefault();
@@ -232,7 +236,7 @@
     {#each seasons as s}
       <button
         class="mode-option {season === s ? 'active' : ''}"
-        on:click={() => handleChange(s)}
+        on:click={(e) => handleChange(s, e)}
         on:keydown={(e) => handleOptionKeyDown(e, s)}
         role="menuitem"
         title={`Switch to ${s} mode`}
