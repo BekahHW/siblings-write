@@ -1,7 +1,6 @@
 ---
 import PostHogLayout from '../../../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
-import ShareButtons from '../../../../components/ShareButtons.astro';
 
 export async function getStaticPaths() {
   return [
@@ -145,24 +144,28 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
 
         <!-- Traits Section -->
         <section class="traits-section">
-          <div class="trait-box strengths">
-            <h3 class="trait-title">
-              <span class="trait-icon">⭐</span>
-              Strengths
-            </h3>
-            <ul class="trait-list">
-              {result.strengths.map(strength => <li>{strength}</li>)}
-            </ul>
-          </div>
+          <div class="trait-box combined">
+            <div class="trait-column">
+              <h3 class="trait-title">
+                <span class="trait-icon">⭐</span>
+                Strengths
+              </h3>
+              <ul class="trait-list">
+                {result.strengths.map(strength => <li>{strength}</li>)}
+              </ul>
+            </div>
 
-          <div class="trait-box growth">
-            <h3 class="trait-title">
-              <span class="trait-icon">🌱</span>
-              Growth Areas
-            </h3>
-            <ul class="trait-list">
-              {result.growthAreas.map(area => <li>{area}</li>)}
-            </ul>
+            <div class="trait-divider">🎄</div>
+
+            <div class="trait-column">
+              <h3 class="trait-title">
+                <span class="trait-icon">🌱</span>
+                Growth Areas
+              </h3>
+              <ul class="trait-list">
+                {result.growthAreas.map(area => <li>{area}</li>)}
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -176,7 +179,38 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
         <section class="share-section">
           <h2 class="section-title">Share Your Result!</h2>
           <p class="share-description">Let everyone know which character you are!</p>
-          <ShareButtons title={result.shareText} permalink={permalink} />
+
+          <div class="custom-share-buttons">
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(result.shareText)}&url=${encodeURIComponent(permalink)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="share-btn twitter"
+            >
+              <span class="share-icon">𝕏</span>
+              <span>Share on X</span>
+            </a>
+
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(permalink)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="share-btn facebook"
+            >
+              <span class="share-icon">f</span>
+              <span>Share on Facebook</span>
+            </a>
+
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(permalink)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="share-btn linkedin"
+            >
+              <span class="share-icon">in</span>
+              <span>Share on LinkedIn</span>
+            </a>
+          </div>
         </section>
 
         <!-- CTA Section -->
@@ -221,8 +255,8 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
     height: 100%;
     background:
       linear-gradient(135deg, rgba(247, 243, 236, 0.95) 0%, rgba(232, 224, 213, 0.95) 100%),
-      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23F7F3EC"/><path d="M0 0 L100 0 L100 50 L0 50 Z" fill="%23E8E0D5" opacity="0.3"/></svg>');
-    background-size: cover, 100px 100px;
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="%23F7F3EC"/><circle cx="30" cy="30" r="3" fill="%23D4282D" opacity="0.3"/><circle cx="170" cy="60" r="3" fill="%23D4282D" opacity="0.3"/><circle cx="90" cy="140" r="3" fill="%232E4A36" opacity="0.3"/><circle cx="150" cy="170" r="3" fill="%23D9B05A" opacity="0.3"/><path d="M50 100 L55 95 L60 100 L55 105 Z" fill="%232E4A36" opacity="0.2"/></svg>');
+    background-size: cover, 200px 200px;
     z-index: -1;
     pointer-events: none;
   }
@@ -250,6 +284,18 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
       radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
     pointer-events: none;
+  }
+
+  .result-hero::after {
+    content: '🌲 ❄️ 🌲';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5em;
+    opacity: 0.2;
+    letter-spacing: 2em;
+    text-indent: 2em;
   }
 
   .result-content {
@@ -353,9 +399,30 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
   .summary-section {
     margin-bottom: 3em;
     padding: 2.5em;
-    background: rgba(255, 255, 255, 0.9);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(247, 243, 236, 0.95) 100%);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(139, 35, 35, 0.1);
+    border: 2px solid rgba(217, 176, 90, 0.2);
+    position: relative;
+  }
+
+  .summary-section::before {
+    content: '✨';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 1.5em;
+    opacity: 0.3;
+  }
+
+  .summary-section::after {
+    content: '🎁';
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    font-size: 1.5em;
+    opacity: 0.3;
   }
 
   .summary-text {
@@ -368,26 +435,65 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
   }
 
   .traits-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2em;
     margin-bottom: 3em;
   }
 
-  .trait-box {
-    padding: 2em;
+  .trait-box.combined {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2em;
+    padding: 2.5em;
     border-radius: 20px;
+    background:
+      linear-gradient(135deg, rgba(217, 176, 90, 0.15) 0%, rgba(46, 74, 54, 0.15) 100%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="none"/><circle cx="20" cy="20" r="2" fill="%23D4282D" opacity="0.2"/><circle cx="80" cy="70" r="2" fill="%232E4A36" opacity="0.2"/></svg>');
+    border: 3px solid rgba(139, 35, 35, 0.2);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
   }
 
-  .trait-box.strengths {
-    background: linear-gradient(135deg, rgba(217, 176, 90, 0.2) 0%, rgba(217, 176, 90, 0.05) 100%);
-    border: 2px solid rgba(217, 176, 90, 0.3);
+  .trait-box.combined::before {
+    content: '🌟';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 1.8em;
+    opacity: 0.2;
   }
 
-  .trait-box.growth {
-    background: linear-gradient(135deg, rgba(46, 74, 54, 0.2) 0%, rgba(46, 74, 54, 0.05) 100%);
-    border: 2px solid rgba(46, 74, 54, 0.3);
+  .trait-box.combined::after {
+    content: '🎄';
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    font-size: 1.8em;
+    opacity: 0.2;
+  }
+
+  .trait-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .trait-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5em;
+    opacity: 0.3;
+    padding: 0 0.5em;
+    animation: gentlePulse 3s ease-in-out infinite;
+  }
+
+  @keyframes gentlePulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.1);
+    }
   }
 
   .trait-title {
@@ -431,9 +537,21 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
   .role-section {
     margin-bottom: 3em;
     padding: 2.5em;
-    background: linear-gradient(135deg, rgba(139, 35, 35, 0.1) 0%, rgba(46, 74, 54, 0.1) 100%);
+    background:
+      linear-gradient(135deg, rgba(139, 35, 35, 0.1) 0%, rgba(46, 74, 54, 0.1) 100%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="150" height="150" fill="none"/><circle cx="30" cy="30" r="2" fill="%23D4282D" opacity="0.3"/><circle cx="120" cy="60" r="2" fill="%23D9B05A" opacity="0.3"/><path d="M75 40 L80 50 L70 50 Z" fill="%232E4A36" opacity="0.2"/></svg>');
     border-radius: 20px;
     border: 2px solid rgba(139, 35, 35, 0.2);
+    position: relative;
+  }
+
+  .role-section::before {
+    content: '🏡';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 2em;
+    opacity: 0.2;
   }
 
   .role-text {
@@ -449,16 +567,122 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
   .share-section {
     margin-bottom: 3em;
     padding: 2.5em;
-    background: rgba(255, 255, 255, 0.9);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(247, 243, 236, 0.95) 100%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="none"/><circle cx="20" cy="20" r="2" fill="%23D4282D" opacity="0.3"/><circle cx="100" cy="40" r="2" fill="%232E4A36" opacity="0.3"/><circle cx="60" cy="100" r="2" fill="%23D9B05A" opacity="0.3"/></svg>');
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(139, 35, 35, 0.1);
+    border: 2px solid rgba(139, 35, 35, 0.15);
     text-align: center;
+    position: relative;
+  }
+
+  .share-section::before {
+    content: '🔔';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 1.8em;
+    opacity: 0.2;
+  }
+
+  .share-section::after {
+    content: '🎅';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.8em;
+    opacity: 0.2;
   }
 
   .share-description {
     font-size: 1.2em;
     color: #5B4636;
-    margin-bottom: 1.5em;
+    margin-bottom: 2em;
+  }
+
+  .custom-share-buttons {
+    display: flex;
+    gap: 1em;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 1em 1.8em;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .share-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s ease, height 0.5s ease;
+  }
+
+  .share-btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .share-btn:hover {
+    transform: translateY(-3px);
+  }
+
+  .share-btn.twitter {
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+    color: white;
+  }
+
+  .share-btn.twitter:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .share-btn.facebook {
+    background: linear-gradient(135deg, #1877F2 0%, #0d5dbf 100%);
+    color: white;
+  }
+
+  .share-btn.facebook:hover {
+    box-shadow: 0 6px 20px rgba(24, 119, 242, 0.4);
+  }
+
+  .share-btn.linkedin {
+    background: linear-gradient(135deg, #0A66C2 0%, #004182 100%);
+    color: white;
+  }
+
+  .share-btn.linkedin:hover {
+    box-shadow: 0 6px 20px rgba(10, 102, 194, 0.4);
+  }
+
+  .share-icon {
+    font-size: 1.3em;
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+  }
+
+  .share-btn span:last-child {
+    position: relative;
+    z-index: 1;
   }
 
   .cta-section {
@@ -468,11 +692,41 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
   .cta-card {
     padding: 3em;
     background:
-      linear-gradient(135deg, rgba(217, 176, 90, 0.2) 0%, rgba(139, 35, 35, 0.1) 100%);
+      linear-gradient(135deg, rgba(217, 176, 90, 0.2) 0%, rgba(139, 35, 35, 0.1) 100%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="150" height="150" fill="none"/><circle cx="25" cy="25" r="3" fill="%23D4282D" opacity="0.3"/><circle cx="125" cy="50" r="3" fill="%232E4A36" opacity="0.3"/><circle cx="75" cy="125" r="3" fill="%23D9B05A" opacity="0.3"/><path d="M60 60 L65 55 L70 60 L65 65 Z" fill="%232E4A36" opacity="0.15"/></svg>');
     border-radius: 24px;
     border: 3px solid #D9B05A;
     text-align: center;
     box-shadow: 0 15px 40px rgba(139, 35, 35, 0.2);
+    position: relative;
+  }
+
+  .cta-card::before {
+    content: '📚';
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 2em;
+    opacity: 0.2;
+  }
+
+  .cta-card::after {
+    content: '⭐';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2em;
+    opacity: 0.2;
+    animation: sparkleRotate 4s ease-in-out infinite;
+  }
+
+  @keyframes sparkleRotate {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
   }
 
   .cta-title {
@@ -587,6 +841,12 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
       margin: -1em -1em 2em -1em;
     }
 
+    .result-hero::after {
+      font-size: 1.2em;
+      letter-spacing: 1.5em;
+      text-indent: 1.5em;
+    }
+
     .character-name {
       font-size: 3em;
     }
@@ -599,9 +859,14 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
       padding: 0 1.5em 2em;
     }
 
-    .traits-section {
+    .trait-box.combined {
       grid-template-columns: 1fr;
       gap: 1.5em;
+    }
+
+    .trait-divider {
+      transform: rotate(90deg);
+      padding: 0.5em 0;
     }
 
     .section-title {
@@ -620,12 +885,28 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
     .cta-description {
       font-size: 1.1em;
     }
+
+    .custom-share-buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .share-btn {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   @media (max-width: 480px) {
     .result-hero {
       padding: 2em 1em;
       border-radius: 0 0 20px 20px;
+    }
+
+    .result-hero::after {
+      font-size: 1em;
+      letter-spacing: 1em;
+      text-indent: 1em;
     }
 
     .character-icons {
@@ -651,6 +932,10 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
       padding: 1.5em;
     }
 
+    .trait-box.combined {
+      padding: 1.5em;
+    }
+
     .section-title {
       font-size: 1.8em;
     }
@@ -659,6 +944,11 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
       padding: 1em 2em;
       font-size: 1.1em;
       width: 100%;
+    }
+
+    .share-btn {
+      font-size: 1em;
+      padding: 0.9em 1.5em;
     }
   }
 </style>

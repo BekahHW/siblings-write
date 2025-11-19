@@ -255,8 +255,8 @@
     min-height: 80vh;
     background:
       linear-gradient(135deg, rgba(139, 35, 35, 0.05) 0%, rgba(46, 74, 54, 0.05) 100%),
-      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23F7F3EC"/><path d="M0 0 L100 0 L100 50 L0 50 Z" fill="%23E8E0D5" opacity="0.3"/></svg>');
-    background-size: cover, 100px 100px;
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="%23F7F3EC"/><circle cx="30" cy="30" r="3" fill="%23D4282D" opacity="0.3"/><circle cx="170" cy="60" r="3" fill="%23D4282D" opacity="0.3"/><circle cx="90" cy="140" r="3" fill="%232E4A36" opacity="0.3"/><circle cx="150" cy="170" r="3" fill="%23D9B05A" opacity="0.3"/><path d="M50 100 L55 95 L60 100 L55 105 Z" fill="%232E4A36" opacity="0.2"/><path d="M140 50 L145 45 L150 50 L145 55 Z" fill="%232E4A36" opacity="0.2"/></svg>');
+    background-size: cover, 200px 200px;
     padding: 3em 2em;
     overflow: hidden;
   }
@@ -330,7 +330,8 @@
   .question-card {
     max-width: 800px;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.95);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 243, 236, 0.98) 100%);
     border-radius: 24px;
     padding: 3em;
     box-shadow:
@@ -342,13 +343,21 @@
   }
 
   .question-card::before {
-    content: '';
+    content: '🌲';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #8B2323, #D9B05A, #2E4A36);
+    top: 15px;
+    left: 15px;
+    font-size: 1.5em;
+    opacity: 0.15;
+  }
+
+  .question-card::after {
+    content: '🎁';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5em;
+    opacity: 0.15;
   }
 
   .question-header {
@@ -380,8 +389,9 @@
 
   .answer-button {
     position: relative;
-    padding: 1.5em 2em;
-    background: linear-gradient(135deg, rgba(247, 243, 236, 0.9) 0%, rgba(232, 224, 213, 0.9) 100%);
+    padding: 1.5em 2em 1.5em 3em;
+    background:
+      linear-gradient(135deg, rgba(247, 243, 236, 0.9) 0%, rgba(232, 224, 213, 0.9) 100%);
     border: 2px solid rgba(139, 35, 35, 0.2);
     border-radius: 16px;
     font-family: 'Arial', sans-serif;
@@ -393,12 +403,28 @@
     overflow: hidden;
   }
 
+  .answer-button::before {
+    content: '❄️';
+    position: absolute;
+    left: 0.8em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1em;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+  }
+
   .answer-button:hover:not(:disabled) {
     transform: translateY(-5px);
     border-color: #D9B05A;
     box-shadow:
       0 10px 30px rgba(217, 176, 90, 0.3),
       0 0 0 3px rgba(217, 176, 90, 0.2);
+  }
+
+  .answer-button:hover:not(:disabled)::before {
+    opacity: 0.6;
+    transform: translateY(-50%) scale(1.2);
   }
 
   .answer-button.selected {
@@ -409,6 +435,12 @@
     box-shadow:
       0 15px 40px rgba(139, 35, 35, 0.4),
       0 0 30px rgba(217, 176, 90, 0.6);
+  }
+
+  .answer-button.selected::before {
+    content: '🎄';
+    opacity: 1;
+    transform: translateY(-50%) scale(1.3);
   }
 
   .answer-button:disabled {
