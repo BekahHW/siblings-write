@@ -15,6 +15,10 @@ export async function getStaticPaths() {
 const { work } = Astro.props;
 const { title, description, image, headerImage, link, inspiredBy, summary, inspirationStory, spotifyPlaylist, trailerVideoId } = work.data;
 
+// Check if there's Behind the Story content for this work
+const behindTheStory = await getCollection('behindTheStory');
+const hasBehindTheStory = behindTheStory.some(bts => bts.data.work.id === work.id);
+
 const pageTitle = `${title} | Siblings Write`;
 const permalink = `${Astro.site?.href}works/${work.id}`;
 
@@ -163,6 +167,16 @@ const structuredData = {
               <span class="button-text">Buy Now on Amazon</span>
               <span class="button-icon">📚</span>
             </a>
+
+            {hasBehindTheStory && (
+              <a
+                href={`/works/${work.id}/behind-the-story`}
+                class="cta-button cta-behind-story"
+              >
+                <span class="button-text">Behind the Story</span>
+                <span class="button-icon">✨</span>
+              </a>
+            )}
           </div>
         </section>
 
@@ -736,6 +750,12 @@ const structuredData = {
     box-shadow: 0 8px 25px rgba(250, 112, 154, 0.4);
   }
 
+  .cta-behind-story {
+    background: var(--dream-gradient);
+    color: white;
+    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+  }
+
   .cta-button::before {
     content: '';
     position: absolute;
@@ -764,6 +784,10 @@ const structuredData = {
 
   .cta-secondary:hover {
     box-shadow: 0 12px 35px rgba(250, 112, 154, 0.6);
+  }
+
+  .cta-behind-story:hover {
+    box-shadow: 0 12px 35px rgba(79, 172, 254, 0.6);
   }
 
   .button-text {
