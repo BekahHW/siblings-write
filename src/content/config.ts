@@ -50,6 +50,7 @@ const works = defineCollection({
     inspiredBy: z.string().optional(), // One sentence about inspiration
     summary: z.string().optional(), // Full book summary
     inspirationStory: z.string().optional(), // Full paragraphs about what inspired the book
+    trailerVideoId: z.string().optional(), // YouTube video ID for book trailer
   }),
 });
 
