@@ -369,6 +369,10 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: 600;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
   }
 
   .question-text {
@@ -379,6 +383,10 @@
     margin-bottom: 2em;
     line-height: 1.4;
     font-weight: 700;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
   }
 
   .answers-container {
@@ -401,6 +409,10 @@
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-align: left;
     overflow: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .answer-button::before {
@@ -451,6 +463,9 @@
   .answer-text {
     position: relative;
     z-index: 2;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
   }
 
   .answer-glow {

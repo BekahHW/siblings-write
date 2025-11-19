@@ -188,6 +188,10 @@
   .popup-body {
     padding: 30px;
     text-align: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   /* Title */
@@ -198,6 +202,10 @@
     margin: 0 0 15px 0;
     text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
     animation: wiggle 2s ease-in-out infinite;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
   }
 
   /* Description */
@@ -207,6 +215,9 @@
     line-height: 1.6;
     color: #555;
     margin: 0 0 25px 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
   }
 
   /* CTA Button */
@@ -230,6 +241,10 @@
     letter-spacing: 1px;
     position: relative;
     overflow: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .cta-button::before {

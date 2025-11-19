@@ -115,12 +115,22 @@ h6 {
   font-size: 1.2em;
 }
 
+/* Text overflow prevention */
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
 p,
 ul,
 ol {
   font-size: 1.3rem;
   line-height: 1.75em;
   margin: 1.2em 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 ol,
@@ -293,6 +303,18 @@ td {
   margin: 0 auto;
   max-width: 42em;
   width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Button and interactive element text overflow prevention */
+button,
+[role="button"],
+input,
+textarea {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .content h1 {
