@@ -1,0 +1,664 @@
+---
+import PostHogLayout from '../../../../layouts/PostHogLayout.astro';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import ShareButtons from '../../../../components/ShareButtons.astro';
+
+export async function getStaticPaths() {
+  return [
+    { params: { character: 'tim' } },
+    { params: { character: 'shepherd' } },
+    { params: { character: 'mary-jo' } },
+    { params: { character: 'allen' } },
+    { params: { character: 'mrs-minto' } },
+    { params: { character: 'mrs-mcclauslin' } },
+    { params: { character: 'unchristmas' } }
+  ];
+}
+
+const { character } = Astro.params;
+
+const characterData = {
+  'tim': {
+    name: "Tim",
+    tagline: "Brave. Curious. Hopeful.",
+    summary: "You lead with heart and courage, even when you're not sure what comes next. You're a fixer, a doer, and someone who sees magic where others miss it.",
+    strengths: ["Bravery", "Loyalty", "Curiosity"],
+    growthAreas: ["Takes on too much too fast"],
+    villageRole: "You're the spark of adventure in the Nutcracker Village.",
+    shareText: "I got TIM in the Nutcracker Village quiz!",
+    palette: ["#B22222", "#FFD39B"],
+    icons: ["✨", "🪵"],
+    illustration: "A brave young boy standing in snowlight holding a carved nutcracker"
+  },
+  'shepherd': {
+    name: "The Shepherd",
+    tagline: "Wise. Steady. Guiding.",
+    summary: "You're patient, observant, and grounded. You offer guidance without demanding attention and provide clarity in difficult times.",
+    strengths: ["Wisdom", "Calm", "Compassion"],
+    growthAreas: ["Overthinks before acting"],
+    villageRole: "You keep the Light alive when others wander.",
+    shareText: "I got THE SHEPHERD in the Nutcracker Village quiz!",
+    palette: ["#C2A878", "#6E5A3A"],
+    icons: ["🕯️", "🐑"],
+    illustration: "Wooden shepherd nutcracker holding a lantern glowing warmly"
+  },
+  'unchristmas': {
+    name: "The UnChristmas",
+    tagline: "The Pull Toward Darkness.",
+    summary: "You represent exhaustion, numbness, and the quiet slide away from warmth. This doesn't make you 'bad' — it means you're overwhelmed and need restoration.",
+    strengths: ["Insight when restored", "Stillness"],
+    growthAreas: ["Withdraws", "Loses hope easily"],
+    villageRole: "You are the shadow side of the Village — a reminder of why the Light matters.",
+    shareText: "I got THE UNCHRISTMAS in the Nutcracker Village quiz!",
+    palette: ["#2A2A2A", "#4B4B4B"],
+    icons: ["🌑", "🕯️"],
+    illustration: "Shadowy figure with dim blue light fading into winter darkness"
+  },
+  'mary-jo': {
+    name: "Mary Jo",
+    tagline: "Warm. Protective. Steadfast.",
+    summary: "You are the heart of your family. You nurture, protect, and hold everything together even when you're uncertain.",
+    strengths: ["Empathy", "Stability", "Love"],
+    growthAreas: ["Carries everyone's burdens"],
+    villageRole: "You bring warmth and grounding to the Nutcracker Village.",
+    shareText: "I got MARY JO in the Nutcracker Village quiz!",
+    palette: ["#B85C38", "#EAC9A2"],
+    icons: ["🧣", "❤️"],
+    illustration: "A warm motherly figure in winter cloak beside glowing village lights"
+  },
+  'allen': {
+    name: "Allen",
+    tagline: "Dependable. Skilled. Quietly Strong.",
+    summary: "You're the steady force who works with your hands and leads with action. You're calm, talented, and dedicated.",
+    strengths: ["Reliability", "Craftsmanship", "Patience"],
+    growthAreas: ["Bottles stress"],
+    villageRole: "You keep the Village standing with quiet strength.",
+    shareText: "I got ALLEN — a steady hand — in the Nutcracker Village quiz!",
+    palette: ["#5B4636", "#D9C3A7"],
+    icons: ["🪚", "🪵"],
+    illustration: "A wooden craftsman nutcracker holding chisels in soft workshop light"
+  },
+  'mrs-minto': {
+    name: "Mrs. Minto",
+    tagline: "Community-Oriented. Cheerfully Organized.",
+    summary: "You connect people, organize events, and keep traditions alive. You ensure no one feels left out.",
+    strengths: ["Sociability", "Warmth", "Community leadership"],
+    growthAreas: ["Overcommits"],
+    villageRole: "You bring the whole Village together.",
+    shareText: "I got MRS. MINTO in the Nutcracker Village quiz!",
+    palette: ["#8C3F3F", "#F2D8BE"],
+    icons: ["🍪", "🎄"],
+    illustration: "A cheerful older woman in festive apron holding cookies or lantern"
+  },
+  'mrs-mcclauslin': {
+    name: "Mrs. McClauslin",
+    tagline: "Anxious but Kind-Hearted.",
+    summary: "You worry, care deeply, and always try your best to help, even when overwhelmed. You are sincere and earnest.",
+    strengths: ["Empathy", "Diligence", "Honesty"],
+    growthAreas: ["Anxiety"],
+    villageRole: "You are the concerned but caring neighbor everyone loves.",
+    shareText: "I got MRS. MCCLAUSLIN in the Nutcracker Village quiz!",
+    palette: ["#9E8E7C", "#F3EFE7"],
+    icons: ["📝", "🧣"],
+    illustration: "A kind older woman clutching a list, bundled in winter scarf"
+  }
+};
+
+const result = characterData[character];
+const pageTitle = `You are ${result.name}! | Battle for Christmas Quiz`;
+const description = `${result.tagline} - ${result.summary}`;
+const permalink = `${Astro.site?.href}works/battle-for-christmas/which-character-are-you/${character}`;
+const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1";
+---
+
+<PostHogLayout>
+  <BaseLayout title={pageTitle} description={description} permalink={permalink} current="works">
+    <article class="result-page">
+      <!-- Snowfall background -->
+      <div class="snowfall-bg"></div>
+
+      <!-- Result Hero -->
+      <header class="result-hero" style={`--primary-color: ${result.palette[0]}; --secondary-color: ${result.palette[1]};`}>
+        <div class="result-content">
+          <div class="character-icons">
+            {result.icons.map(icon => <span class="icon">{icon}</span>)}
+          </div>
+
+          <h1 class="character-name">{result.name}</h1>
+          <p class="character-tagline">{result.tagline}</p>
+
+          <div class="character-card">
+            <div class="illustration-placeholder">
+              <p class="illustration-text">{result.illustration}</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Results Content -->
+      <div class="results-container">
+        <!-- Summary Section -->
+        <section class="summary-section">
+          <h2 class="section-title">Your Character</h2>
+          <p class="summary-text">{result.summary}</p>
+        </section>
+
+        <!-- Traits Section -->
+        <section class="traits-section">
+          <div class="trait-box strengths">
+            <h3 class="trait-title">
+              <span class="trait-icon">⭐</span>
+              Strengths
+            </h3>
+            <ul class="trait-list">
+              {result.strengths.map(strength => <li>{strength}</li>)}
+            </ul>
+          </div>
+
+          <div class="trait-box growth">
+            <h3 class="trait-title">
+              <span class="trait-icon">🌱</span>
+              Growth Areas
+            </h3>
+            <ul class="trait-list">
+              {result.growthAreas.map(area => <li>{area}</li>)}
+            </ul>
+          </div>
+        </section>
+
+        <!-- Village Role -->
+        <section class="role-section">
+          <h2 class="section-title">Your Role in the Village</h2>
+          <p class="role-text">{result.villageRole}</p>
+        </section>
+
+        <!-- Share Section -->
+        <section class="share-section">
+          <h2 class="section-title">Share Your Result!</h2>
+          <p class="share-description">Let everyone know which character you are!</p>
+          <ShareButtons title={result.shareText} permalink={permalink} />
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+          <div class="cta-card">
+            <h3 class="cta-title">Discover the Full Story</h3>
+            <p class="cta-description">
+              Experience the magic of the Nutcracker Village and meet all the characters in <em>The Battle for Christmas: Reign of the Nutcrackers</em>
+            </p>
+            <a href={bookLink} target="_blank" rel="noopener noreferrer" class="cta-button">
+              <span class="button-text">Get the Book on Amazon</span>
+              <span class="button-icon">📚</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Retake Quiz -->
+        <div class="retake-section">
+          <a href="/works/battle-for-christmas/which-character-are-you" class="retake-link">
+            ← Take the Quiz Again
+          </a>
+        </div>
+      </div>
+    </article>
+  </BaseLayout>
+</PostHogLayout>
+
+<style>
+  .result-page {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .snowfall-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(135deg, rgba(247, 243, 236, 0.95) 0%, rgba(232, 224, 213, 0.95) 100%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23F7F3EC"/><path d="M0 0 L100 0 L100 50 L0 50 Z" fill="%23E8E0D5" opacity="0.3"/></svg>');
+    background-size: cover, 100px 100px;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .result-hero {
+    background:
+      linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    padding: 4em 2em;
+    text-align: center;
+    margin: -1em -2em 3em -2em;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .result-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  .character-icons {
+    font-size: 3em;
+    margin-bottom: 0.5em;
+    animation: iconFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes iconFloat {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .icon {
+    margin: 0 0.2em;
+    display: inline-block;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  }
+
+  .character-name {
+    font-family: 'Georgia', serif;
+    font-size: 4em;
+    color: #F7F3EC;
+    margin-bottom: 0.2em;
+    text-shadow:
+      0 2px 10px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(255, 255, 255, 0.3);
+    line-height: 1.2;
+  }
+
+  .character-tagline {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.8em;
+    color: #F7F3EC;
+    margin-bottom: 2em;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    font-weight: 600;
+  }
+
+  .character-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: 2em;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .illustration-placeholder {
+    padding: 3em 2em;
+    background: linear-gradient(135deg, rgba(247, 243, 236, 0.5) 0%, rgba(232, 224, 213, 0.5) 100%);
+    border-radius: 16px;
+    border: 2px dashed rgba(139, 35, 35, 0.3);
+  }
+
+  .illustration-text {
+    font-family: 'Georgia', serif;
+    font-size: 1.2em;
+    color: #5B4636;
+    font-style: italic;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .results-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2em 3em;
+  }
+
+  .section-title {
+    font-family: 'Georgia', serif;
+    font-size: 2.5em;
+    color: #8B2323;
+    text-align: center;
+    margin: 0 0 1em 0;
+    position: relative;
+  }
+
+  .section-title::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, #8B2323, #D9B05A, #2E4A36);
+    margin: 0.5em auto 0;
+    border-radius: 2px;
+  }
+
+  .summary-section {
+    margin-bottom: 3em;
+    padding: 2.5em;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(139, 35, 35, 0.1);
+  }
+
+  .summary-text {
+    font-family: 'Georgia', serif;
+    font-size: 1.5em;
+    line-height: 1.8;
+    color: #2E4A36;
+    text-align: center;
+    margin: 0;
+  }
+
+  .traits-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2em;
+    margin-bottom: 3em;
+  }
+
+  .trait-box {
+    padding: 2em;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .trait-box.strengths {
+    background: linear-gradient(135deg, rgba(217, 176, 90, 0.2) 0%, rgba(217, 176, 90, 0.05) 100%);
+    border: 2px solid rgba(217, 176, 90, 0.3);
+  }
+
+  .trait-box.growth {
+    background: linear-gradient(135deg, rgba(46, 74, 54, 0.2) 0%, rgba(46, 74, 54, 0.05) 100%);
+    border: 2px solid rgba(46, 74, 54, 0.3);
+  }
+
+  .trait-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.8em;
+    color: #8B2323;
+    margin-bottom: 1em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .trait-icon {
+    font-size: 1.2em;
+  }
+
+  .trait-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .trait-list li {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2em;
+    color: #5B4636;
+    padding: 0.5em 0;
+    padding-left: 1.5em;
+    position: relative;
+  }
+
+  .trait-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #D9B05A;
+    font-size: 1.5em;
+    line-height: 1;
+  }
+
+  .role-section {
+    margin-bottom: 3em;
+    padding: 2.5em;
+    background: linear-gradient(135deg, rgba(139, 35, 35, 0.1) 0%, rgba(46, 74, 54, 0.1) 100%);
+    border-radius: 20px;
+    border: 2px solid rgba(139, 35, 35, 0.2);
+  }
+
+  .role-text {
+    font-family: 'Georgia', serif;
+    font-size: 1.5em;
+    line-height: 1.8;
+    color: #2E4A36;
+    text-align: center;
+    margin: 0;
+    font-style: italic;
+  }
+
+  .share-section {
+    margin-bottom: 3em;
+    padding: 2.5em;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(139, 35, 35, 0.1);
+    text-align: center;
+  }
+
+  .share-description {
+    font-size: 1.2em;
+    color: #5B4636;
+    margin-bottom: 1.5em;
+  }
+
+  .cta-section {
+    margin-bottom: 3em;
+  }
+
+  .cta-card {
+    padding: 3em;
+    background:
+      linear-gradient(135deg, rgba(217, 176, 90, 0.2) 0%, rgba(139, 35, 35, 0.1) 100%);
+    border-radius: 24px;
+    border: 3px solid #D9B05A;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(139, 35, 35, 0.2);
+  }
+
+  .cta-title {
+    font-family: 'Georgia', serif;
+    font-size: 2.5em;
+    color: #8B2323;
+    margin-bottom: 0.5em;
+  }
+
+  .cta-description {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.3em;
+    color: #5B4636;
+    margin-bottom: 1.5em;
+    line-height: 1.6;
+  }
+
+  .cta-description em {
+    color: #8B2323;
+    font-style: italic;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    padding: 1.2em 2.5em;
+    font-size: 1.3em;
+    font-weight: 700;
+    font-family: 'Arial', sans-serif;
+    text-decoration: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #8B2323 0%, #B22222 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(139, 35, 35, 0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .cta-button:hover::before {
+    width: 400px;
+    height: 400px;
+  }
+
+  .cta-button:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(139, 35, 35, 0.6);
+  }
+
+  .button-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .button-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 1.2em;
+    animation: float 2s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  .retake-section {
+    text-align: center;
+    padding: 2em 0;
+  }
+
+  .retake-link {
+    display: inline-block;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #8B2323;
+    text-decoration: none;
+    padding: 1em 2em;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: rgba(139, 35, 35, 0.1);
+  }
+
+  .retake-link:hover {
+    background: rgba(139, 35, 35, 0.2);
+    transform: translateX(-5px);
+  }
+
+  @media (max-width: 768px) {
+    .result-hero {
+      padding: 3em 1.5em;
+      margin: -1em -1em 2em -1em;
+    }
+
+    .character-name {
+      font-size: 3em;
+    }
+
+    .character-tagline {
+      font-size: 1.5em;
+    }
+
+    .results-container {
+      padding: 0 1.5em 2em;
+    }
+
+    .traits-section {
+      grid-template-columns: 1fr;
+      gap: 1.5em;
+    }
+
+    .section-title {
+      font-size: 2em;
+    }
+
+    .summary-text,
+    .role-text {
+      font-size: 1.3em;
+    }
+
+    .cta-title {
+      font-size: 2em;
+    }
+
+    .cta-description {
+      font-size: 1.1em;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .result-hero {
+      padding: 2em 1em;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .character-icons {
+      font-size: 2em;
+    }
+
+    .character-name {
+      font-size: 2.5em;
+    }
+
+    .character-tagline {
+      font-size: 1.2em;
+    }
+
+    .results-container {
+      padding: 0 1em 2em;
+    }
+
+    .summary-section,
+    .role-section,
+    .share-section,
+    .cta-card {
+      padding: 1.5em;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+    }
+
+    .cta-button {
+      padding: 1em 2em;
+      font-size: 1.1em;
+      width: 100%;
+    }
+  }
+</style>
