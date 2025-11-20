@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PostHog from '../components/posthog.astro';
 import AnnouncementPopup from '../components/AnnouncementPopup.svelte';
+import SecretUnlock from '../components/SecretUnlock.svelte';
 import { getCollection } from 'astro:content';
 
 export interface Props {
@@ -147,6 +148,9 @@ const siteStructuredData = {
       showOnce={activeAnnouncement.data.showOnce}
     />
   )}
+
+  <!-- Secret unlock component - listens for "luminary" keyword -->
+  <SecretUnlock client:load />
 
   <script is:inline>
     // Reading Progress Bar with Sparkle

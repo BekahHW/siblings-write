@@ -421,14 +421,46 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Watch for successful submission
-  form.addEventListener('submit', function() {
+  form.addEventListener('submit', function(e) {
+    const emailInput = form.querySelector('input[name="email_address"]');
+    const email = emailInput ? emailInput.value : '';
+
     // Delay slightly to allow form validation
     setTimeout(() => {
       const formSection = document.querySelector('.form-section');
       if (formSection) {
         createConfettiExplosion(formSection);
       }
+
+      // Save subscriber status to localStorage
+      if (email) {
+        localStorage.setItem('siblings-write-subscriber', 'true');
+        localStorage.setItem('siblings-write-subscriber-email', email);
+        localStorage.setItem('siblings-write-subscriber-date', new Date().toISOString());
+      }
     }, 500);
   });
+
+  // Also watch for the success message appearing (ConvertKit shows this)
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.addedNodes.length) {
+        const successMessage = document.querySelector('[data-element="success"]');
+        if (successMessage && successMessage.textContent.includes('Success')) {
+          const emailInput = form.querySelector('input[name="email_address"]');
+          const email = emailInput ? emailInput.value : '';
+
+          if (email) {
+            localStorage.setItem('siblings-write-subscriber', 'true');
+            localStorage.setItem('siblings-write-subscriber-email', email);
+            localStorage.setItem('siblings-write-subscriber-date', new Date().toISOString());
+          }
+        }
+      }
+    });
+  });
+
+  // Observe the form for success message
+  observer.observe(form, { childList: true, subtree: true });
 });
 </script>
