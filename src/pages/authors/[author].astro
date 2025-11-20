@@ -4,6 +4,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry } from 'astro:content';
 
+export const prerender = true;
+
 // Debugging: Log all authors retrieved
 export async function getStaticPaths() {
 

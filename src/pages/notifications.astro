@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Notifications from '../components/Notifications.svelte';
+
+export const prerender = false;
+---
+
+<BaseLayout 
+  title="Notifications | Siblings Write"
+  description="Your collaborative storytelling notifications"
+  current="notifications"
+>
+  <Notifications client:load />
+</BaseLayout>
