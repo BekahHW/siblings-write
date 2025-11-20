@@ -154,15 +154,27 @@ const structuredData = {
               </div>
             )}
 
-            <a
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="cta-button cta-primary"
-            >
-              <span class="button-text">Buy Now on Amazon</span>
-              <span class="button-icon">📚</span>
-            </a>
+            <div class="button-group">
+              <a
+                href="https://dub.sh/bookshop-b4c"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="cta-button cta-bookshop"
+              >
+                <span class="button-text">Buy Now on Bookshop</span>
+                <span class="button-icon">📖</span>
+                <span class="tooltip">A not-for-profit that donates proceeds from book sales to indie bookstores</span>
+              </a>
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="cta-button cta-primary"
+              >
+                <span class="button-text">Buy Now on Amazon</span>
+                <span class="button-icon">📚</span>
+              </a>
+            </div>
           </div>
         </section>
 
@@ -258,15 +270,27 @@ const structuredData = {
           <div class="cta-card">
             <h3>Ready to Start Your Adventure?</h3>
             <p>Get your copy today and discover the magic for yourself!</p>
-            <a
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="cta-button cta-secondary"
-            >
-              <span class="button-text">Order Your Copy Now</span>
-              <span class="button-icon">🚀</span>
-            </a>
+            <div class="button-group">
+              <a
+                href="https://dub.sh/bookshop-b4c"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="cta-button cta-bookshop"
+              >
+                <span class="button-text">Buy Now on Bookshop</span>
+                <span class="button-icon">📖</span>
+                <span class="tooltip">A not-for-profit that donates proceeds from book sales to indie bookstores</span>
+              </a>
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="cta-button cta-secondary"
+              >
+                <span class="button-text">Order Your Copy Now</span>
+                <span class="button-icon">🚀</span>
+              </a>
+            </div>
           </div>
         </section>
 
@@ -710,6 +734,14 @@ const structuredData = {
     color: var(--text-main);
   }
 
+  /* Button Group */
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    width: 100%;
+  }
+
   /* CTA Buttons */
   .cta-button {
     display: inline-flex;
@@ -724,7 +756,7 @@ const structuredData = {
     border-radius: 16px;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     border: none;
     cursor: pointer;
   }
@@ -739,6 +771,12 @@ const structuredData = {
     background: var(--sunset-gradient);
     color: white;
     box-shadow: 0 8px 25px rgba(250, 112, 154, 0.4);
+  }
+
+  .cta-bookshop {
+    background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+    color: white;
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4);
   }
 
   .cta-button::before {
@@ -769,6 +807,49 @@ const structuredData = {
 
   .cta-secondary:hover {
     box-shadow: 0 12px 35px rgba(250, 112, 154, 0.6);
+  }
+
+  .cta-bookshop:hover {
+    box-shadow: 0 12px 35px rgba(139, 69, 19, 0.6);
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.8em 1.2em;
+    border-radius: 8px;
+    font-size: 0.85em;
+    font-weight: 500;
+    white-space: normal;
+    max-width: 280px;
+    text-align: center;
+    line-height: 1.4;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+  }
+
+  .cta-button:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
   }
 
   .button-text {
@@ -1106,6 +1187,15 @@ const structuredData = {
     box-shadow: 0 12px 35px rgba(22, 163, 74, 0.7);
   }
 
+  [data-work-id="battle-for-christmas"] .cta-bookshop {
+    background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.5);
+  }
+
+  [data-work-id="battle-for-christmas"] .cta-bookshop:hover {
+    box-shadow: 0 12px 35px rgba(139, 69, 19, 0.7);
+  }
+
   [data-work-id="battle-for-christmas"] .summary-section {
     background: white;
     border: 3px solid rgba(220, 38, 38, 0.3);
@@ -1321,10 +1411,20 @@ const structuredData = {
       padding: 1.5em;
     }
 
+    .button-group {
+      gap: 1em;
+    }
+
     .cta-button {
       padding: 1em 2em;
       font-size: 1.1em;
       width: 100%;
+    }
+
+    .tooltip {
+      max-width: 220px;
+      font-size: 0.8em;
+      padding: 0.7em 1em;
     }
 
     .cta-card h3 {
@@ -1398,6 +1498,12 @@ const structuredData = {
 
     .quiz-cta-description {
       font-size: 1em;
+    }
+
+    .tooltip {
+      max-width: 180px;
+      font-size: 0.75em;
+      padding: 0.6em 0.9em;
     }
   }
 </style>
