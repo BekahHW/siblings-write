@@ -6,7 +6,7 @@ const { current = '' } = Astro.props;
 
 // Check if there are any visible CYOA stories
 const cyoaStories = await getCollection('cyoa', ({ data }) => data.hidden !== true);
-const showCyoa = cyoaStories.length > 0;
+const showCyoa = cyoaStories.length > 1;
 ---
 
 <style>
