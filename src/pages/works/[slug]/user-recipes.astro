@@ -1,0 +1,757 @@
+---
+import PostHogLayout from '../../../layouts/PostHogLayout.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import userRecipes from '../../../data/user-recipes.json';
+
+// Get the work from the slug param
+export async function getStaticPaths() {
+  // Only generate this page for battle-for-christmas
+  return [
+    {
+      params: { slug: 'battle-for-christmas' }
+    }
+  ];
+}
+
+const { slug } = Astro.params;
+const work = await getEntry('works', slug);
+
+if (!work || work.id !== 'battle-for-christmas') {
+  return Astro.redirect('/404');
+}
+
+const title = `${work.data.title} - Community Recipes`;
+const description = 'Reader-submitted recipes and treats for enjoying while reading The Battle for Christmas';
+const permalink = `${Astro.site?.href}works/${work.id}/user-recipes`;
+
+// Breadcrumbs
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Our Work', href: '/works' },
+  { label: work.data.title, href: `/works/${work.id}` },
+  { label: 'Community Recipes' }
+];
+
+// Structured data for SEO
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": title,
+  "description": description,
+  "url": permalink
+};
+---
+
+<PostHogLayout>
+  <BaseLayout title={title} description={description} permalink={permalink}>
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+    <article class="user-recipes-page">
+      <Breadcrumbs items={breadcrumbItems} />
+
+      <div class="page-hero">
+        <div class="hero-badge">
+          <span class="badge-icon">📖</span>
+          <span>Community Recipes</span>
+        </div>
+        <h1 class="page-title">Reader Recipes</h1>
+        <p class="page-subtitle">
+          Cozy treats and beverages shared by our wonderful reading community
+        </p>
+      </div>
+
+      <div class="recipes-grid">
+        {userRecipes.map((recipe) => (
+          <div class="recipe-card" data-recipe-id={recipe.id}>
+            <div class="card-header">
+              <h2 class="recipe-name">{recipe.name}</h2>
+              <div class="recipe-author">by {recipe.submittedBy}</div>
+            </div>
+            <button class="view-recipe-btn" data-recipe-id={recipe.id}>
+              <span>View Recipe</span>
+              <span class="btn-icon">→</span>
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {userRecipes.length === 0 && (
+        <div class="empty-state">
+          <p class="empty-icon">🍪</p>
+          <p class="empty-text">No recipes yet! Be the first to share your favorite reading treat.</p>
+          <a href={`/works/${work.id}/recipe`} class="submit-link">
+            Submit Your Recipe
+          </a>
+        </div>
+      )}
+
+      <div class="cta-section">
+        <h2 class="cta-title">Share Your Recipe</h2>
+        <p class="cta-description">
+          Do you have a favorite treat or beverage you enjoy while reading? We'd love to hear about it!
+        </p>
+        <a href={`/works/${work.id}/recipe`} class="cta-button">
+          <span>Submit Your Recipe</span>
+          <span class="button-icon">→</span>
+        </a>
+      </div>
+
+      <div class="back-link-container">
+        <a href={`/works/${work.id}`} class="back-link">
+          ← Back to {work.data.title}
+        </a>
+      </div>
+    </article>
+
+    <!-- Modal -->
+    <div id="recipe-modal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <button class="modal-close" aria-label="Close modal">×</button>
+        <div class="modal-header">
+          <h2 id="modal-recipe-name" class="modal-title"></h2>
+          <div id="modal-recipe-author" class="modal-author"></div>
+        </div>
+        <div id="modal-recipe-content" class="modal-body"></div>
+        <div class="modal-footer">
+          <button id="copy-recipe-btn" class="copy-button">
+            <span class="copy-icon">📋</span>
+            <span class="copy-text">Copy Recipe</span>
+          </button>
+          <div id="copy-success" class="copy-success" style="display: none;">
+            <span class="success-icon">✓</span>
+            <span>Copied!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </BaseLayout>
+</PostHogLayout>
+
+<style>
+  .user-recipes-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* Hero Section */
+  .page-hero {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    border-radius: 24px;
+    margin-bottom: 3rem;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .badge-icon {
+    font-size: 1.2rem;
+  }
+
+  .page-title {
+    font-family: var(--font-family-display);
+    font-size: 3rem;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+  }
+
+  .page-subtitle {
+    font-family: var(--font-family-serif);
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Recipes Grid */
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .recipe-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 2px solid rgba(124, 58, 237, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.2);
+    border-color: rgba(124, 58, 237, 0.3);
+  }
+
+  .card-header {
+    flex: 1;
+  }
+
+  .recipe-name {
+    font-family: var(--font-family-display);
+    font-size: 1.6rem;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+  }
+
+  .recipe-author {
+    font-family: var(--font-family-serif);
+    font-size: 0.95rem;
+    color: #666;
+    font-style: italic;
+  }
+
+  .view-recipe-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-family-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(124, 58, 237, 0.2);
+  }
+
+  .view-recipe-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .btn-icon {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+  }
+
+  .view-recipe-btn:hover .btn-icon {
+    transform: translateX(4px);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: rgba(124, 58, 237, 0.05);
+    border-radius: 20px;
+    margin-bottom: 3rem;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin: 0 0 1rem 0;
+  }
+
+  .empty-text {
+    font-family: var(--font-family-serif);
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0 0 2rem 0;
+  }
+
+  .submit-link {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: var(--primary-gradient);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .submit-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+  }
+
+  /* CTA Section */
+  .cta-section {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 20px;
+    margin-bottom: 3rem;
+  }
+
+  .cta-title {
+    font-family: var(--font-family-display);
+    font-size: 2rem;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+  }
+
+  .cta-description {
+    font-family: var(--font-family-serif);
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: var(--primary-gradient);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-family: var(--font-family-sans);
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+  }
+
+  .button-icon {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+  }
+
+  .cta-button:hover .button-icon {
+    transform: translateX(4px);
+  }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
+
+  .modal.active {
+    display: block;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translate(-50%, -40%);
+      opacity: 0;
+    }
+    to {
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover {
+    background: rgba(220, 38, 38, 0.2);
+    color: #dc2626;
+    transform: rotate(90deg);
+  }
+
+  .modal-header {
+    padding: 2.5rem 3rem 1rem 2.5rem;
+    border-bottom: 2px solid rgba(124, 58, 237, 0.1);
+  }
+
+  .modal-title {
+    font-family: var(--font-family-display);
+    font-size: 2rem;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+  }
+
+  .modal-author {
+    font-family: var(--font-family-serif);
+    font-size: 1rem;
+    color: #666;
+    font-style: italic;
+  }
+
+  .modal-body {
+    padding: 2rem 2.5rem;
+    font-family: var(--font-family-sans);
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #333;
+    white-space: pre-wrap;
+  }
+
+  .modal-footer {
+    padding: 1.5rem 2.5rem 2.5rem;
+    border-top: 2px solid rgba(124, 58, 237, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .copy-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-family-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(124, 58, 237, 0.2);
+  }
+
+  .copy-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .copy-button:active {
+    transform: scale(0.95);
+  }
+
+  .copy-icon {
+    font-size: 1.2rem;
+  }
+
+  .copy-success {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(34, 197, 94, 0.1);
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    border-radius: 8px;
+    color: #166534;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .success-icon {
+    font-size: 1.2rem;
+  }
+
+  /* Back Link */
+  .back-link-container {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .back-link {
+    display: inline-block;
+    padding: 0.9rem 1.8rem;
+    background: rgba(124, 58, 237, 0.1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .back-link:hover {
+    background: rgba(124, 58, 237, 0.2);
+    transform: translateX(-5px);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .user-recipes-page {
+      padding: 1rem;
+    }
+
+    .page-hero {
+      padding: 2rem 1rem;
+      border-radius: 16px;
+    }
+
+    .page-title {
+      font-size: 2rem;
+    }
+
+    .page-subtitle {
+      font-size: 1rem;
+    }
+
+    .recipes-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .recipe-card {
+      padding: 1.5rem;
+    }
+
+    .modal-content {
+      width: 95%;
+      max-height: 90vh;
+    }
+
+    .modal-header {
+      padding: 2rem 2.5rem 1rem 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.6rem;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem 1.5rem;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .copy-button {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .copy-success {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-title {
+      font-size: 1.6rem;
+    }
+
+    .hero-badge {
+      font-size: 0.8rem;
+      padding: 0.4rem 1rem;
+    }
+
+    .cta-title {
+      font-size: 1.6rem;
+    }
+  }
+</style>
+
+<script>
+  // Store recipes data for the modal
+  const recipesData = [
+    {
+      "id": 1,
+      "name": "Sarah's Hot Cocoa",
+      "submittedBy": "Sarah M.",
+      "recipe": "My favorite reading treat is a rich hot cocoa made with:\n\n• 2 cups whole milk\n• 3 tbsp cocoa powder\n• 2 tbsp sugar\n• 1/4 tsp vanilla extract\n• Pinch of salt\n• Whipped cream on top\n\nHeat milk in a saucepan, whisk in cocoa and sugar until smooth. Add vanilla and salt. Top with whipped cream and enjoy with your favorite chapter!"
+    },
+    {
+      "id": 2,
+      "name": "Classic Gingerbread Cookies",
+      "submittedBy": "Mike R.",
+      "recipe": "These gingerbread cookies are perfect for reading on a cozy afternoon:\n\nIngredients:\n• 3 cups flour\n• 1 tsp baking soda\n• 2 tsp ground ginger\n• 1 tsp cinnamon\n• 1/2 tsp cloves\n• 1/4 tsp salt\n• 3/4 cup butter, softened\n• 3/4 cup brown sugar\n• 1/2 cup molasses\n• 1 egg\n\nInstructions:\n1. Mix dry ingredients\n2. Cream butter and sugar, add molasses and egg\n3. Combine wet and dry ingredients\n4. Chill dough for 1 hour\n5. Roll out and cut shapes\n6. Bake at 350°F for 8-10 minutes"
+    },
+    {
+      "id": 3,
+      "name": "Spiced Chai Latte",
+      "submittedBy": "Emily K.",
+      "recipe": "My go-to drink while reading:\n\n• 2 cups water\n• 4 black tea bags\n• 2 cinnamon sticks\n• 4 cardamom pods\n• 4 whole cloves\n• 1-inch fresh ginger, sliced\n• 2 cups milk\n• Honey to taste\n\nBoil water with spices for 5 minutes. Add tea bags, steep for 3 minutes. Add milk and heat (don't boil). Strain and sweeten with honey. Perfect for curling up with a good book!"
+    }
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('recipe-modal');
+    const modalOverlay = modal?.querySelector('.modal-overlay');
+    const modalClose = modal?.querySelector('.modal-close');
+    const viewButtons = document.querySelectorAll('.view-recipe-btn');
+    const copyButton = document.getElementById('copy-recipe-btn');
+    const copySuccess = document.getElementById('copy-success');
+
+    // Open modal
+    viewButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const recipeId = parseInt(button.getAttribute('data-recipe-id') || '0');
+        const recipe = recipesData.find(r => r.id === recipeId);
+
+        if (recipe && modal) {
+          // Populate modal
+          const modalTitle = document.getElementById('modal-recipe-name');
+          const modalAuthor = document.getElementById('modal-recipe-author');
+          const modalContent = document.getElementById('modal-recipe-content');
+
+          if (modalTitle) modalTitle.textContent = recipe.name;
+          if (modalAuthor) modalAuthor.textContent = `by ${recipe.submittedBy}`;
+          if (modalContent) modalContent.textContent = recipe.recipe;
+
+          // Store current recipe for copying
+          if (copyButton) {
+            copyButton.setAttribute('data-recipe-text', recipe.recipe);
+          }
+
+          // Show modal
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+    });
+
+    // Close modal
+    const closeModal = () => {
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+
+        // Hide copy success message
+        if (copySuccess) {
+          copySuccess.style.display = 'none';
+        }
+      }
+    };
+
+    modalOverlay?.addEventListener('click', closeModal);
+    modalClose?.addEventListener('click', closeModal);
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    // Copy recipe
+    copyButton?.addEventListener('click', async () => {
+      const recipeText = copyButton.getAttribute('data-recipe-text');
+      const modalTitle = document.getElementById('modal-recipe-name');
+      const modalAuthor = document.getElementById('modal-recipe-author');
+
+      if (recipeText) {
+        const fullText = `${modalTitle?.textContent || ''}\n${modalAuthor?.textContent || ''}\n\n${recipeText}`;
+
+        try {
+          await navigator.clipboard.writeText(fullText);
+
+          // Show success message
+          if (copySuccess) {
+            copySuccess.style.display = 'flex';
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+              copySuccess.style.display = 'none';
+            }, 3000);
+          }
+        } catch (err) {
+          console.error('Failed to copy:', err);
+
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = fullText;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-9999px';
+          document.body.appendChild(textArea);
+          textArea.select();
+
+          try {
+            document.execCommand('copy');
+            if (copySuccess) {
+              copySuccess.style.display = 'flex';
+              setTimeout(() => {
+                copySuccess.style.display = 'none';
+              }, 3000);
+            }
+          } catch (e) {
+            console.error('Fallback copy failed:', e);
+          }
+
+          document.body.removeChild(textArea);
+        }
+      }
+    });
+  });
+</script>

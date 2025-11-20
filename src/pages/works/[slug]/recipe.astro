@@ -1,0 +1,683 @@
+---
+import PostHogLayout from '../../../layouts/PostHogLayout.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+
+// Get the work from the slug param
+export async function getStaticPaths() {
+  // Only generate this page for battle-for-christmas
+  return [
+    {
+      params: { slug: 'battle-for-christmas' }
+    }
+  ];
+}
+
+const { slug } = Astro.params;
+const work = await getEntry('works', slug);
+
+if (!work || work.id !== 'battle-for-christmas') {
+  return Astro.redirect('/404');
+}
+
+const title = `${work.data.title} - Secret Recipe`;
+const description = 'Mrs. Stewart\'s Peppermint Cocoa Cookies - A hidden bonus recipe from The Battle for Christmas';
+const permalink = `${Astro.site?.href}works/${work.id}/recipe`;
+
+// Breadcrumbs
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Our Work', href: '/works' },
+  { label: work.data.title, href: `/works/${work.id}` },
+  { label: 'Secret Recipe' }
+];
+
+// Structured data for SEO
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Recipe",
+  "name": "Mrs. Stewart's Peppermint Cocoa Cookies",
+  "recipeIngredient": [
+    "1 stick butter (softened)",
+    "½ cup sugar",
+    "½ cup brown sugar",
+    "1 egg",
+    "1 tsp vanilla",
+    "1⅓ cups flour",
+    "¼ cup cocoa powder",
+    "½ tsp baking soda",
+    "½ tsp salt",
+    "½ cup crushed peppermint",
+    "mini marshmallows (optional)"
+  ],
+  "recipeInstructions": [
+    "Preheat oven to 350°F.",
+    "Cream butter + sugars.",
+    "Add egg + vanilla.",
+    "Mix dry ingredients separately, then combine.",
+    "Fold in crushed peppermint.",
+    "Scoop onto parchment-lined sheet.",
+    "Bake 9–11 minutes.",
+    "Press 2–3 mini marshmallows on top of warm cookies."
+  ]
+};
+---
+
+<PostHogLayout>
+  <BaseLayout title={title} description={description} permalink={permalink}>
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+    <article class="recipe-page">
+      <Breadcrumbs items={breadcrumbItems} />
+
+      <div class="recipe-hero">
+        <div class="secret-badge">
+          <span class="badge-icon">🎁</span>
+          <span>Secret Bonus Content</span>
+        </div>
+        <h1 class="recipe-title">Mrs. Stewart's Peppermint Cocoa Cookies</h1>
+        <p class="recipe-subtitle">A cozy treat to enjoy while reading your favorite chapter</p>
+      </div>
+
+      <div class="recipe-container">
+        <div class="recipe-card">
+          <section class="recipe-section">
+            <h2 class="section-title">
+              <span class="section-icon">🥄</span>
+              Ingredients
+            </h2>
+            <ul class="ingredients-list">
+              <li>1 stick butter (softened)</li>
+              <li>½ cup sugar</li>
+              <li>½ cup brown sugar</li>
+              <li>1 egg</li>
+              <li>1 tsp vanilla</li>
+              <li>1⅓ cups flour</li>
+              <li>¼ cup cocoa powder</li>
+              <li>½ tsp baking soda</li>
+              <li>½ tsp salt</li>
+              <li>½ cup crushed peppermint</li>
+              <li class="optional">Optional: mini marshmallows</li>
+            </ul>
+          </section>
+
+          <section class="recipe-section">
+            <h2 class="section-title">
+              <span class="section-icon">📝</span>
+              Instructions
+            </h2>
+            <ol class="instructions-list">
+              <li>Preheat oven to 350°F.</li>
+              <li>Cream butter + sugars.</li>
+              <li>Add egg + vanilla.</li>
+              <li>Mix dry ingredients separately, then combine.</li>
+              <li>Fold in crushed peppermint.</li>
+              <li>Scoop onto parchment-lined sheet.</li>
+              <li>Bake 9–11 minutes.</li>
+              <li>Press 2–3 mini marshmallows on top of warm cookies.</li>
+            </ol>
+          </section>
+
+          <div class="serving-tip">
+            <span class="tip-icon">☕</span>
+            <p>Serve warm while reading your favorite chapter.</p>
+          </div>
+        </div>
+
+        <div class="share-recipe-section">
+          <div class="share-recipe-card">
+            <h2 class="share-title">
+              <span class="share-icon">📖</span>
+              Share Your Reading Recipe
+            </h2>
+            <p class="share-description">
+              What's your favorite treat to enjoy while reading <em>The Battle for Christmas</em>?
+              Share your recipe with us and join our community of cozy readers!
+            </p>
+
+            <form
+              id="recipe-form"
+              class="recipe-submit-form"
+              action="https://formspree.io/f/xovrjobj"
+              method="POST"
+            >
+              <div class="form-group">
+                <label for="name">Your Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="Enter your name"
+                  class="form-input"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email (optional)</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="your@email.com"
+                  class="form-input"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="recipe-name">Recipe/Treat Name</label>
+                <input
+                  type="text"
+                  id="recipe-name"
+                  name="recipe-name"
+                  required
+                  placeholder="e.g., Hot Cocoa, Gingerbread, etc."
+                  class="form-input"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="recipe-details">Recipe or Description</label>
+                <textarea
+                  id="recipe-details"
+                  name="recipe-details"
+                  rows="6"
+                  required
+                  placeholder="Share the recipe or describe your favorite reading treat..."
+                  class="form-textarea"
+                ></textarea>
+              </div>
+
+              <button type="submit" class="submit-button">
+                <span>Share Your Recipe</span>
+                <span class="button-icon">→</span>
+              </button>
+            </form>
+
+            <div id="form-success" class="form-message success-message" style="display: none;">
+              <span class="message-icon">✨</span>
+              <p>Thank you for sharing your recipe! We can't wait to try it.</p>
+            </div>
+
+            <div id="form-error" class="form-message error-message" style="display: none;">
+              <span class="message-icon">⚠️</span>
+              <p>Oops! Something went wrong. Please try again.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="back-link-container">
+        <a href={`/works/${work.id}`} class="back-link">
+          ← Back to {work.data.title}
+        </a>
+      </div>
+    </article>
+  </BaseLayout>
+</PostHogLayout>
+
+<style>
+  .recipe-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* Hero Section */
+  .recipe-hero {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+    border-radius: 24px;
+    margin-bottom: 3rem;
+  }
+
+  .secret-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    background: var(--magic-gradient);
+    color: white;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+  }
+
+  .badge-icon {
+    font-size: 1.2rem;
+  }
+
+  .recipe-title {
+    font-family: var(--font-family-display);
+    font-size: 3rem;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+  }
+
+  .recipe-subtitle {
+    font-family: var(--font-family-serif);
+    font-size: 1.2rem;
+    color: #666;
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* Recipe Container */
+  .recipe-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .recipe-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(124, 58, 237, 0.1);
+  }
+
+  .recipe-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .recipe-section:last-of-type {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-family: var(--font-family-display);
+    font-size: 1.8rem;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-icon {
+    font-size: 1.5rem;
+  }
+
+  /* Ingredients */
+  .ingredients-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ingredients-list li {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: rgba(124, 58, 237, 0.05);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 8px;
+    font-family: var(--font-family-sans);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .ingredients-list li:hover {
+    background: rgba(124, 58, 237, 0.1);
+    transform: translateX(5px);
+  }
+
+  .ingredients-list li.optional {
+    border-left-color: #999;
+    background: rgba(0, 0, 0, 0.03);
+    font-style: italic;
+    color: #666;
+  }
+
+  /* Instructions */
+  .instructions-list {
+    padding-left: 0;
+    margin: 0;
+    counter-reset: step-counter;
+    list-style: none;
+  }
+
+  .instructions-list li {
+    position: relative;
+    padding: 1rem 1rem 1rem 3.5rem;
+    margin-bottom: 1rem;
+    background: rgba(220, 38, 38, 0.05);
+    border-radius: 12px;
+    font-family: var(--font-family-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    counter-increment: step-counter;
+    transition: all 0.3s ease;
+  }
+
+  .instructions-list li:hover {
+    background: rgba(220, 38, 38, 0.1);
+    transform: translateX(5px);
+  }
+
+  .instructions-list li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    background: var(--sunset-gradient);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+  }
+
+  /* Serving Tip */
+  .serving-tip {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
+    border-radius: 12px;
+    border: 2px dashed rgba(250, 112, 154, 0.3);
+  }
+
+  .tip-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .serving-tip p {
+    margin: 0;
+    font-family: var(--font-family-serif);
+    font-size: 1.1rem;
+    font-style: italic;
+    color: #333;
+  }
+
+  /* Share Recipe Section */
+  .share-recipe-section {
+    margin-top: 2rem;
+  }
+
+  .share-recipe-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    border: 2px solid rgba(124, 58, 237, 0.15);
+  }
+
+  .share-title {
+    font-family: var(--font-family-display);
+    font-size: 2rem;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .share-icon {
+    font-size: 1.8rem;
+  }
+
+  .share-description {
+    font-family: var(--font-family-serif);
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+  }
+
+  /* Form Styles */
+  .recipe-submit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-family: var(--font-family-sans);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .submit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--font-family-sans);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    align-self: flex-start;
+  }
+
+  .submit-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+  }
+
+  .submit-button:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .button-icon {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+  }
+
+  .submit-button:hover .button-icon {
+    transform: translateX(4px);
+  }
+
+  /* Form Messages */
+  .form-message {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+  }
+
+  .success-message {
+    background: rgba(34, 197, 94, 0.1);
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    color: #166534;
+  }
+
+  .error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    color: #991b1b;
+  }
+
+  .message-icon {
+    font-size: 1.5rem;
+  }
+
+  .form-message p {
+    margin: 0;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+  }
+
+  /* Back Link */
+  .back-link-container {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .back-link {
+    display: inline-block;
+    padding: 0.9rem 1.8rem;
+    background: rgba(124, 58, 237, 0.1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .back-link:hover {
+    background: rgba(124, 58, 237, 0.2);
+    transform: translateX(-5px);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .recipe-page {
+      padding: 1rem;
+    }
+
+    .recipe-hero {
+      padding: 2rem 1rem;
+      border-radius: 16px;
+    }
+
+    .recipe-title {
+      font-size: 2rem;
+    }
+
+    .recipe-subtitle {
+      font-size: 1rem;
+    }
+
+    .recipe-card,
+    .share-recipe-card {
+      padding: 1.5rem;
+      border-radius: 16px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+    }
+
+    .share-title {
+      font-size: 1.6rem;
+    }
+
+    .instructions-list li {
+      padding-left: 3rem;
+    }
+
+    .submit-button {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .recipe-title {
+      font-size: 1.6rem;
+    }
+
+    .secret-badge {
+      font-size: 0.8rem;
+      padding: 0.4rem 1rem;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+
+<script>
+  // Handle form submission
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('recipe-form') as HTMLFormElement;
+    const successMessage = document.getElementById('form-success');
+    const errorMessage = document.getElementById('form-error');
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Hide any existing messages
+        if (successMessage) successMessage.style.display = 'none';
+        if (errorMessage) errorMessage.style.display = 'none';
+
+        try {
+          const formData = new FormData(form);
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            // Show success message
+            if (successMessage) {
+              successMessage.style.display = 'flex';
+            }
+            // Reset form
+            form.reset();
+            // Scroll to success message
+            successMessage?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            throw new Error('Form submission failed');
+          }
+        } catch (error) {
+          // Show error message
+          if (errorMessage) {
+            errorMessage.style.display = 'flex';
+          }
+          console.error('Form submission error:', error);
+        }
+      });
+    }
+  });
+</script>
