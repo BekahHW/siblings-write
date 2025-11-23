@@ -36,6 +36,17 @@ const cyoa = defineCollection({
   }),
 });
 
+// Define the schema for the collabs collection (collaborative stories)
+const collabs = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/collabs" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    publishDate: z.string(),
+    hidden: z.boolean().optional(),
+  }),
+});
+
 // Define the schema for the works collection
 const works = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/works" }),
@@ -86,4 +97,4 @@ const announcements = defineCollection({
 });
 
 // Export the collections
-export const collections = { authors, blog, cyoa, works, pages, announcements };
+export const collections = { authors, blog, cyoa, collabs, works, pages, announcements };

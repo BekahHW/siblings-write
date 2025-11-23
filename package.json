@@ -7,10 +7,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "cms:local": "decap-server",
     "import-newsletter": "node scripts/newsletter-import.js",
     "import-newsletter:dry": "node scripts/newsletter-import.js --dry-run",
-    "fetch-youtube": "node scripts/youtube-fetch.js",
     "test": "vitest run --config vitest.config.mjs",
     "test:watch": "vitest --config vitest.config.mjs",
     "test:blog": "vitest run --config vitest.config.mjs tests/blog-content.test.js",
@@ -19,6 +17,7 @@
   "dependencies": {
     "22": "^0.0.0",
     "@astrojs/mdx": "^4.2.1",
+    "@astrojs/node": "^9.5.0",
     "@astrojs/rss": "^4.0.13",
     "@astrojs/sitemap": "^3.6.0",
     "@astrojs/svelte": "^7.0.6",
@@ -27,7 +26,9 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@sentry/astro": "^10.25.0",
+    "@supabase/supabase-js": "^2.81.0",
     "astro": "^5.5.3",
+    "bad-words": "^4.0.0",
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "js-yaml": "^4.1.0",
@@ -38,15 +39,14 @@
     "rehype-external-links": "^3.0.0",
     "remark-gfm": "^4.0.0",
     "remark-smartypants": "^2.0.0",
+    "stripe": "^20.0.0",
     "svelte": "^5.23.1",
     "typescript": "^5.8.2",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@testing-library/svelte": "^5.2.8",
-    "decap-server": "^3.4.0",
     "jsdom": "^26.1.0",
-    "netlify-cms-app": "^2.15.72",
     "vitest": "^3.2.4"
   }
 }

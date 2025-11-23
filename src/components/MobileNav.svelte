@@ -31,6 +31,7 @@
 <nav class="mobile-nav" class:active={menuOpen}>
   <a class={current === "" ? "selected" : ""} href='/'>home</a>
   <a class={current === "blog" ? "selected" : ""} href='/blog'>shorts</a>
+  <a class={current === "one-word-story" ? "selected" : ""} href='/one-word-story'>collab</a>
   {#if showCyoa}
     <a class={current === "cyoa" ? "selected" : ""} href='/cyoa'>CYOA</a>
   {/if}

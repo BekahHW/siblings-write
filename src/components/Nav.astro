@@ -1,5 +1,6 @@
 ---
 import MobileNav from './MobileNav.svelte';
+import AuthControls from './AuthControls.svelte';
 import { getCollection } from 'astro:content';
 
 const { current = '' } = Astro.props;
@@ -61,6 +62,10 @@ const showCyoa = cyoaStories.length > 1;
     align-items: center;
   }
 
+  .auth-controls-container {
+    margin-left: 12px;
+  }
+
   /* Hide only the links on mobile, not the entire nav */
   @media screen and (max-width: 768px) {
     .nav-links {
@@ -74,10 +79,14 @@ const showCyoa = cyoaStories.length > 1;
   <div class="nav-links">
   <a class={current === "" ? "selected" : ""} href='/'>home</a>
   <a class={current === "blog" ? "selected" : ""} href='/blog'>shorts</a>
+  <a class={current === "one-word-story" ? "selected" : ""} href='/one-word-story'>collab</a>
   {showCyoa && <a class={current === "cyoa" ? "selected" : ""} href='/cyoa'>CYOA</a>}
   <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
   <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
   <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
+  </div>
+  <div class="auth-controls-container">
+    <AuthControls client:load />
   </div>
   <MobileNav client:load current={current} showCyoa={showCyoa} />
 </nav>
