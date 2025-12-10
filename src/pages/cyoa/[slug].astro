@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import CYOAStory from '../../components/CYOAStory.svelte';
@@ -68,7 +67,7 @@ const prevStory = currentIndex > 0 ? allCYOAStories[currentIndex - 1] : null;
 
 const permalink = `${Astro.site.href}cyoa/${entry.id}`;
 ---
-<PostHogLayout>
+
   <BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="cyoa">
     <header>
       <p>{entry.data.publishDate}</p>
@@ -112,7 +111,7 @@ const permalink = `${Astro.site.href}cyoa/${entry.id}`;
       <ShareButtons title={entry.data.title} permalink={permalink} />
     </div>
   </BaseLayout>
-</PostHogLayout>
+
 
 <style>
   header {

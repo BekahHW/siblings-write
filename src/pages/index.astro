@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
 import YouTubeVideosList from '../components/YouTubeVideosList.astro';
@@ -41,7 +40,7 @@ const getAuthorsDisplay = (authorRefs) => {
 };
 ---
 
-<PostHogLayout>
+
   <BaseLayout title={title} description={description} permalink={permalink}>
     <!-- Background Animation Container -->
     <div class="bg-animation">
@@ -200,7 +199,7 @@ const getAuthorsDisplay = (authorRefs) => {
       </div>
     </div>
   </BaseLayout>
-</PostHogLayout>
+
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Limelight&family=Playwrite+HU:wght@100..400&display=swap');

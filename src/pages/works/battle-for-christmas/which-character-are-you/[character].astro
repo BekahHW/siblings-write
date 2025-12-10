@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../../../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
@@ -110,7 +109,7 @@ const permalink = `${Astro.site?.href}works/battle-for-christmas/which-character
 const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1";
 ---
 
-<PostHogLayout>
+
   <BaseLayout title={pageTitle} description={description} permalink={permalink} current="works">
     <article class="result-page">
       <!-- Snowfall background -->
@@ -236,7 +235,7 @@ const bookLink = "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B
       </div>
     </article>
   </BaseLayout>
-</PostHogLayout>
+
 
 <style>
   .result-page {

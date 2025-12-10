@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getEntry } from 'astro:content';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
@@ -44,7 +43,7 @@ const structuredData = {
 };
 ---
 
-<PostHogLayout>
+
   <BaseLayout title={title} description={description} permalink={permalink}>
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
@@ -128,7 +127,7 @@ const structuredData = {
       </div>
     </div>
   </BaseLayout>
-</PostHogLayout>
+
 
 <style>
   .user-recipes-page {

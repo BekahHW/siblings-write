@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry } from 'astro:content';
@@ -37,7 +36,7 @@ const authorPosts = allPosts
 const permalink = `${Astro.site.href}authors/${authorEntry.id}`;
 ---
 
-<PostHogLayout>
+
   <BaseLayout title={`Posts by ${authorEntry.data.name}`} description={`All posts by ${authorEntry.data.name}`} permalink={permalink}>
     <div class="container">
       <h1>Posts by {authorEntry.data.name}</h1>
@@ -66,4 +65,3 @@ const permalink = `${Astro.site.href}authors/${authorEntry.id}`;
       </ul>
     </div>
   </BaseLayout>
-</PostHogLayout>

@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import { getCollection, getEntry, render } from 'astro:content';
@@ -140,7 +139,7 @@ const articleStructuredData = {
   ]
 };
 ---
-<PostHogLayout>
+
   <BaseLayout title={entry.data.title} description={entry.data.description} permalink={permalink} current="blog">
     <script type="application/ld+json" set:html={JSON.stringify(articleStructuredData)} />
     <Breadcrumbs items={breadcrumbItems} />
@@ -197,7 +196,7 @@ const articleStructuredData = {
       <ShareButtons title={entry.data.title} permalink={permalink} />
     </div>
   </BaseLayout>
-</PostHogLayout>
+
 
 <style>
   header {
