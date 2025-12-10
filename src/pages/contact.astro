@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = 'Contact';
@@ -7,7 +6,7 @@ const description = 'Get in touch with us.';
 const permalink = `${Astro.site.href}contact`;
 ---
 
-<PostHogLayout>
+
   <BaseLayout title={title} description={description} permalink={permalink} current="contact">
     <div class="container">
       <div class="contact-header">
@@ -23,7 +22,7 @@ const permalink = `${Astro.site.href}contact`;
       </div>
     </div>
   </BaseLayout>
-</PostHogLayout>
+
 
 <style>
   .container {

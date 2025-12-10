@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
@@ -17,7 +16,7 @@ const getAuthorName = (authorId) => {
   return author ? author.data.name : authorId;
 };
 ---
-<PostHogLayout>
+
   <BaseLayout title={title} description={description} permalink={permalink} current="cyoa">
     <div class="container">
       <h1>Choose Your Own Adventure</h1>
@@ -48,7 +47,7 @@ const getAuthorName = (authorId) => {
       })}
     </div>
   </BaseLayout>
-</PostHogLayout>
+
 
 <style>
   .intro {

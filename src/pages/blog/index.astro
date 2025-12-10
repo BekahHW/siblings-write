@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
 import NewsletterCTA from '../../components/NewsletterCTA.astro';
@@ -48,7 +47,7 @@ const getAuthorsDisplay = (authorRefs) => {
   return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
 };
 ---
-<PostHogLayout>
+
   <BaseLayout title={title} description={description} permalink={permalink} current="blog">
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
     <div class="container">
@@ -82,7 +81,7 @@ const getAuthorsDisplay = (authorRefs) => {
       })}
     </div>
   </BaseLayout>
-</PostHogLayout>
+
 
 <style>
   h2,

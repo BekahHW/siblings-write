@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../../../layouts/PostHogLayout.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ChristmasQuiz from '../../../components/ChristmasQuiz.svelte';
 
@@ -8,26 +7,24 @@ const description = "Discover which character from The Battle for Christmas: Rei
 const permalink = `${Astro.site?.href}works/battle-for-christmas/which-character-are-you`;
 ---
 
-<PostHogLayout>
-  <BaseLayout title={pageTitle} description={description} permalink={permalink} current="works">
-    <article class="quiz-page">
-      <!-- Hero Header -->
-      <header class="quiz-hero">
-        <div class="hero-content">
-          <h1 class="hero-title">Which Nutcracker Village Character Are You?</h1>
-          <p class="hero-description">
-            Answer 10 questions to discover which character from <em>The Battle for Christmas: Reign of the Nutcrackers</em> best matches your personality!
-          </p>
-        </div>
-      </header>
-
-      <!-- Quiz Component -->
-      <div class="quiz-wrapper">
-        <ChristmasQuiz client:load />
+<BaseLayout title={pageTitle} description={description} permalink={permalink} current="works">
+  <article class="quiz-page">
+    <!-- Hero Header -->
+    <header class="quiz-hero">
+      <div class="hero-content">
+        <h1 class="hero-title">Which Nutcracker Village Character Are You?</h1>
+        <p class="hero-description">
+          Answer 10 questions to discover which character from <em>The Battle for Christmas: Reign of the Nutcrackers</em> best matches your personality!
+        </p>
       </div>
-    </article>
-  </BaseLayout>
-</PostHogLayout>
+    </header>
+
+    <!-- Quiz Component -->
+    <div class="quiz-wrapper">
+      <ChristmasQuiz client:load />
+    </div>
+  </article>
+</BaseLayout>
 
 <style>
   .quiz-page {

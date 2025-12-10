@@ -1,5 +1,4 @@
 ---
-import PostHogLayout from '../layouts/PostHogLayout.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = 'Subscribe';
@@ -7,7 +6,7 @@ const description = 'Subscribe to get our short stories first!';
 const permalink = `${Astro.site.href}subscribe`;
 ---
 
-<PostHogLayout>
+
   <BaseLayout title={title} description={description} permalink={permalink} current="about" hideNewsletterFooter={true}>
     <div class="subscribe-page">
       <!-- Hero Section -->
@@ -80,7 +79,7 @@ const permalink = `${Astro.site.href}subscribe`;
       </div>
     </div>
   </BaseLayout>
-</PostHogLayout>
+
 
 <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
 
