@@ -1632,7 +1632,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let konamiIndex = 0;
 
   document.addEventListener('keydown', function(e) {
-    if (e.key.toLowerCase() === konamiCode[konamiIndex].toLowerCase()) {
+    if (e.key && e.key.toLowerCase() === konamiCode[konamiIndex].toLowerCase()) {
       konamiIndex++;
       if (konamiIndex === konamiCode.length) {
         activateMagicMode();
