@@ -89,6 +89,7 @@
   let revealedContent = $state<string[]>([]);
   let isAnimating = $state(false);
   let showingConfetti = $state(false);
+  let copySuccess = $state(false);
 
   // Confetti effect
   function createConfetti(event: MouseEvent) {
@@ -200,12 +201,80 @@
     revealedContent = [];
     isAnimating = false;
     showingConfetti = false;
+    copySuccess = false;
+
+    // Update URL to remove path parameter
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('path');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }
+
+  // Generate shareable URL with the current story path
+  function getShareableURL(): string {
+    if (typeof window === 'undefined') return '';
+    const url = new URL(window.location.href);
+    url.searchParams.set('path', selectedChoices.join(','));
+    return url.toString();
+  }
+
+  // Copy shareable URL to clipboard
+  async function shareStory() {
+    const url = getShareableURL();
+    try {
+      await navigator.clipboard.writeText(url);
+      copySuccess = true;
+      setTimeout(() => {
+        copySuccess = false;
+      }, 3000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  }
+
+  // Replay choices from URL parameter
+  function replayFromURL() {
+    if (typeof window === 'undefined') return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const pathParam = urlParams.get('path');
+
+    if (!pathParam) return;
+
+    const choices = pathParam.split(',').filter(c => c.trim());
+    if (choices.length === 0) return;
+
+    // Validate and replay each choice
+    for (const choiceId of choices) {
+      const sectionIndex = currentStep;
+      if (sectionIndex >= choiceSections.length) break;
+
+      const section = choiceSections[sectionIndex];
+      const choice = section.choices.find(c => c.id === choiceId);
+
+      if (choice) {
+        selectedChoices.push(choice.id);
+        revealedContent.push(choice.content);
+        currentStep++;
+      } else {
+        // Invalid choice ID, stop replaying
+        break;
+      }
+    }
   }
 
   // Get the current choice section to display
   $effect(() => {
     // This effect runs when currentStep changes
     // We can use it for any side effects if needed
+  });
+
+  // Replay story from URL on mount
+  $effect(() => {
+    if (typeof window !== 'undefined' && currentStep === 0 && selectedChoices.length === 0) {
+      replayFromURL();
+    }
   });
 </script>
 
@@ -246,10 +315,20 @@
   {:else if currentStep > 0}
     <div class="completion">
       <h3>The End</h3>
-      <p>Thank you for reading! Would you like to start over and make different choices?</p>
-      <button class="reset-button" onclick={reset}>
-        Start Over
-      </button>
+      <p>Thank you for reading! Share your unique story journey with others!</p>
+
+      <div class="completion-buttons">
+        <button class="share-button" onclick={shareStory}>
+          {#if copySuccess}
+            ✓ Link Copied!
+          {:else}
+            Share My Story
+          {/if}
+        </button>
+        <button class="reset-button" onclick={reset}>
+          Start Over
+        </button>
+      </div>
     </div>
   {/if}
 </div>
@@ -495,6 +574,16 @@
     max-width: 100%;
   }
 
+  .completion-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .share-button,
   .reset-button {
     position: relative;
     padding: 1rem 2.5rem;
@@ -533,8 +622,22 @@
     box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
   }
 
-  .reset-button:active {
+  .reset-button:active,
+  .share-button:active {
     transform: translateY(-1px);
+  }
+
+  .share-button {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    min-width: 180px;
+  }
+
+  .share-button::before {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  }
+
+  .share-button:hover {
+    box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
   }
 
   /* Animations */
@@ -596,9 +699,14 @@
       font-size: 1rem;
     }
 
+    .share-button,
     .reset-button {
       padding: 0.875rem 2rem;
       font-size: 1rem;
+    }
+
+    .share-button {
+      min-width: 160px;
     }
   }
 
