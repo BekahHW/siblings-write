@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Bookshelf from '../components/Bookshelf.astro';
 import { getCollection, getEntry } from 'astro:content';
 
 // Get all works and sort by order
@@ -60,49 +61,53 @@ const structuredData = {
       <h1>{title}</h1>
       <p>{intro}</p>
 
-      <!-- Featured Works Section -->
+      <!-- Interactive Bookshelf -->
+      <Bookshelf />
+
+      <!-- Fallback card grid (accessibility + SEO) -->
       {featuredWorks.length > 0 && (
-        <>
-          <h2>{featuredTitle}</h2>
-          {featuredWorks.map((work) => (
-            <article class="book-section" itemscope itemtype="https://schema.org/Book">
-              <a href={`/works/${work.id}`} class="book-cover-link">
-                <img
-                  src={work.data.image}
-                  alt={`Book cover for ${work.data.title}`}
-                  width="200"
-                  itemprop="image"
-                  loading="lazy"
-                >
-              </a>
-              <div>
-                <p>
-                  <strong itemprop="name">
-                    <a href={`/works/${work.id}`} class="work-title-link">{work.data.title}</a>
-                  </strong><br/>
-                  <span itemprop="description">{work.data.description}</span>
-                </p>
-                <div class="button-group">
-                  <a
-                    href={`/works/${work.id}`}
-                    class="learn-more-button"
-                  >
-                    Learn More
+        <div class="fallback-grid-wrapper">
+          <details class="fallback-details">
+            <summary class="fallback-summary">Browse all books</summary>
+            <div class="fallback-grid">
+              {featuredWorks.map((work) => (
+                <article class="book-section" itemscope itemtype="https://schema.org/Book">
+                  <a href={`/works/${work.id}`} class="book-cover-link">
+                    <img
+                      src={work.data.image}
+                      alt={`Book cover for ${work.data.title}`}
+                      width="200"
+                      itemprop="image"
+                      loading="lazy"
+                    >
                   </a>
-                  <a
-                    href={work.data.link}
-                    target="_blank"
-                    rel="noopener"
-                    class="buy-button"
-                    itemprop="url"
-                  >
-                    Buy Now on Amazon
-                  </a>
-                </div>
-              </div>
-            </article>
-          ))}
-        </>
+                  <div>
+                    <p>
+                      <strong itemprop="name">
+                        <a href={`/works/${work.id}`} class="work-title-link">{work.data.title}</a>
+                      </strong><br/>
+                      <span itemprop="description">{work.data.description}</span>
+                    </p>
+                    <div class="button-group">
+                      <a href={`/works/${work.id}`} class="learn-more-button">
+                        Learn More
+                      </a>
+                      <a
+                        href={work.data.link}
+                        target="_blank"
+                        rel="noopener"
+                        class="buy-button"
+                        itemprop="url"
+                      >
+                        Buy Now on Amazon
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </details>
+        </div>
       )}
 
       <!-- Reader Testimonials -->
@@ -267,6 +272,55 @@ const structuredData = {
   .learn-more-button:hover {
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 10px 30px rgba(79, 172, 254, 0.5);
+  }
+
+  /* ─── Fallback grid ─────────────────────────────────────────────── */
+  .fallback-grid-wrapper {
+    margin: 3em 0 1em;
+  }
+
+  .fallback-details {
+    border: 1px solid rgba(124, 58, 237, 0.14);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .fallback-summary {
+    padding: 1em 1.5em;
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 0.95em;
+    color: var(--primary-color);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    background: rgba(124, 58, 237, 0.04);
+    transition: background 0.2s ease;
+  }
+
+  .fallback-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .fallback-summary::before {
+    content: '▶';
+    font-size: 0.7em;
+    transition: transform 0.25s ease;
+    display: inline-block;
+  }
+
+  details[open] .fallback-summary::before {
+    transform: rotate(90deg);
+  }
+
+  .fallback-summary:hover {
+    background: rgba(124, 58, 237, 0.08);
+  }
+
+  .fallback-grid {
+    padding: 0 1.5em 1.5em;
   }
 
   .testimonials-section {

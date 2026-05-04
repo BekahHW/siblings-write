@@ -1,0 +1,771 @@
+---
+const books = [
+  {
+    id: 'battle-for-christmas',
+    title: "The Battle for Christmas: Reign of the Nutcrackers",
+    spineTitle: "Battle for Christmas",
+    href: "/works/battle-for-christmas",
+    buyHref: "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1/",
+    theme: "christmas",
+    label: "Holiday Fantasy",
+    description: "A holiday adventure about hope, family, and the magic that refuses to go out.",
+    icon: "❄️",
+  },
+  {
+    id: 'escape-from-browns-island',
+    title: "Escape from Browns Island",
+    spineTitle: "Browns Island",
+    href: "/works/escape-from-browns-island",
+    buyHref: "https://dub.sh/browns-island",
+    theme: "river",
+    label: "Ohio River Mystery",
+    description: "A dare sends Tommy to an abandoned Ohio River island — but the island is not as empty as everyone thinks.",
+    icon: "🌲",
+  },
+  {
+    id: 'mitch-and-the-sand-bridge',
+    title: "The Wild Adventure of Mitch and the Sand Bridge",
+    spineTitle: "Sand Bridge",
+    href: "/works/mitch-and-the-sand-bridge",
+    buyHref: "https://www.amazon.com/Wild-Adventure-Mitch-Sand-Bridge/dp/B0CK3MXXDY/",
+    theme: "beach",
+    label: "Beach Adventure",
+    description: "A beach vacation turns into an alien octopus invasion, and Mitch has to decide whether he can become the hero.",
+    icon: "🐙",
+  },
+  {
+    id: 'short-story-collection',
+    title: "The Short Story Collection",
+    spineTitle: "Coming Soon",
+    href: "/shorts/",
+    buyHref: null,
+    theme: "mystery",
+    label: "Coming Soon",
+    description: "Strange, funny, magical, and mysterious tales from the Ohio Valley and beyond.",
+    icon: "✨",
+  },
+];
+---
+
+<section class="bookshelf-section" aria-labelledby="bookshelf-heading">
+  <h2 id="bookshelf-heading">Choose a Book from the Shelf</h2>
+  <p class="bookshelf-intro">
+    Every story starts with a door, a dare, a strange question, or a little bit of magic.
+    Pull a book from the shelf to explore our published adventures — and see what&rsquo;s coming next.
+  </p>
+
+  <div class="shelf-outer">
+    <div class="books-row" role="list" aria-label="Our published books">
+      {books.map((book) => (
+        <div class={`book-slot book-slot-${book.theme}`} role="listitem">
+          <a
+            href={book.href}
+            class={`book-spine theme-${book.theme}`}
+            aria-label={`${book.title} — ${book.label}`}
+            data-title={book.title}
+            data-description={book.description}
+            data-label={book.label}
+            data-buy-href={book.buyHref ?? ''}
+            data-icon={book.icon}
+            data-theme={book.theme}
+          >
+            <span class="spine-icon" aria-hidden="true">{book.icon}</span>
+            <span class="spine-title" aria-hidden="true">{book.spineTitle}</span>
+            <span class="spine-bottom-deco" aria-hidden="true"></span>
+          </a>
+        </div>
+      ))}
+    </div>
+    <div class="shelf-board" aria-hidden="true"></div>
+  </div>
+
+  <div class="preview-zone">
+    <div class="preview-placeholder" id="preview-placeholder" aria-hidden="true">
+      <span class="placeholder-arrow">↑</span>
+      <span>Hover or tap a book to preview it</span>
+    </div>
+    <div
+      class="preview-card"
+      id="preview-card"
+      role="region"
+      aria-label="Selected book preview"
+      aria-live="polite"
+      hidden
+    >
+    </div>
+  </div>
+</section>
+
+<script>
+  const bookSpines = document.querySelectorAll<HTMLAnchorElement>('.book-spine');
+  const previewCard = document.getElementById('preview-card') as HTMLDivElement;
+  const previewPlaceholder = document.getElementById('preview-placeholder') as HTMLElement;
+
+  function buildPreview(spine: HTMLAnchorElement): string {
+    const title = spine.dataset.title ?? '';
+    const description = spine.dataset.description ?? '';
+    const label = spine.dataset.label ?? '';
+    const buyHref = spine.dataset.buyHref ?? '';
+    const icon = spine.dataset.icon ?? '';
+    const theme = spine.dataset.theme ?? '';
+    const href = spine.getAttribute('href') ?? '#';
+    const isComing = !buyHref;
+
+    const buyBtn = isComing
+      ? `<a href="${href}" class="preview-btn preview-btn-soon">Read Short Stories &rarr;</a>`
+      : `<a href="${buyHref}" target="_blank" rel="noopener noreferrer" class="preview-btn preview-btn-buy">Buy Now on Amazon</a>`;
+
+    return `
+      <div class="preview-label-row">
+        <span class="preview-genre theme-label-${theme}">${label}</span>
+      </div>
+      <h3 class="preview-title">${icon} ${title}</h3>
+      <p class="preview-desc">${description}</p>
+      <div class="preview-actions">
+        <a href="${href}" class="preview-btn preview-btn-learn">Learn More</a>
+        ${buyBtn}
+      </div>
+    `;
+  }
+
+  function showPreview(spine: HTMLAnchorElement) {
+    const theme = spine.dataset.theme ?? '';
+    previewCard.innerHTML = buildPreview(spine);
+    previewCard.className = `preview-card theme-preview-${theme}`;
+    previewCard.hidden = false;
+    previewPlaceholder.hidden = true;
+
+    bookSpines.forEach(s => s.classList.remove('is-active'));
+    spine.classList.add('is-active');
+  }
+
+  bookSpines.forEach(spine => {
+    spine.addEventListener('pointerenter', () => showPreview(spine));
+    spine.addEventListener('focus', () => showPreview(spine));
+  });
+</script>
+
+<style>
+  /* ─── Section ──────────────────────────────────────────────────── */
+  .bookshelf-section {
+    margin: 3em 0 2em;
+  }
+
+  .bookshelf-section h2 {
+    font-family: var(--font-family-storybook);
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: var(--text-main);
+    margin-bottom: 0.4em;
+  }
+
+  .bookshelf-intro {
+    color: var(--text-secondary);
+    font-size: 1.05em;
+    max-width: 62ch;
+    margin-bottom: 2em;
+    line-height: 1.65;
+  }
+
+  /* ─── Shelf outer container ────────────────────────────────────── */
+  .shelf-outer {
+    background: linear-gradient(180deg, #1a0e06 0%, #2a1a0c 60%, #1a0e06 100%);
+    border-radius: 12px 12px 0 0;
+    padding: 32px 28px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    box-shadow:
+      inset 0 0 80px rgba(0, 0, 0, 0.5),
+      0 4px 0 #5c3d08;
+  }
+
+  .shelf-outer::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 600px) {
+    .shelf-outer {
+      scroll-snap-type: x mandatory;
+      padding: 24px 20px 0;
+    }
+  }
+
+  /* ─── Books row ────────────────────────────────────────────────── */
+  .books-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    min-width: max-content;
+  }
+
+  /* ─── Shelf board (wooden plank) ───────────────────────────────── */
+  .shelf-board {
+    height: 22px;
+    margin: 6px -28px 0;
+    background: linear-gradient(180deg, #b5842a 0%, #8b6215 28%, #7a5510 62%, #5c3d08 100%);
+    box-shadow:
+      0 8px 28px rgba(0, 0, 0, 0.65),
+      0 3px 8px rgba(0, 0, 0, 0.45),
+      inset 0 2px 0 rgba(255, 255, 255, 0.13),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+    border-radius: 0 0 8px 8px;
+    position: relative;
+  }
+
+  .shelf-board::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 0 0 8px 8px;
+  }
+
+  @media (max-width: 600px) {
+    .shelf-board {
+      margin: 6px -20px 0;
+    }
+  }
+
+  /* ─── Book slot wrapper ────────────────────────────────────────── */
+  .book-slot {
+    position: relative;
+    flex-shrink: 0;
+    scroll-snap-align: center;
+  }
+
+  /* ─── Snow effect on Christmas book slot ──────────────────────── */
+  @keyframes snow-fall {
+    0% {
+      transform: translateX(-50%) translateY(0) rotate(0deg);
+      opacity: 0.9;
+    }
+    100% {
+      transform: translateX(-50%) translateY(290px) rotate(540deg);
+      opacity: 0;
+    }
+  }
+
+  .book-slot-christmas::before {
+    content: '❄  ❅  ❆';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 20;
+    letter-spacing: 4px;
+  }
+
+  .book-slot-christmas:hover::before,
+  .book-slot-christmas:focus-within::before {
+    animation: snow-fall 2.8s linear infinite;
+  }
+
+  /* ─── Book spine ───────────────────────────────────────────────── */
+  .book-spine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 78px;
+    height: 272px;
+    padding: 14px 8px 12px;
+    border-radius: 3px 10px 10px 3px;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow:
+      4px 5px 14px rgba(0, 0, 0, 0.7),
+      inset 4px 0 8px rgba(255, 255, 255, 0.06),
+      inset -2px 0 4px rgba(0, 0, 0, 0.4);
+    transition:
+      transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.3s ease,
+      filter 0.3s ease,
+      opacity 0.3s ease;
+  }
+
+  .book-spine:hover,
+  .book-spine:focus-visible,
+  .book-spine.is-active {
+    transform: translateY(-26px) rotate(-2deg);
+    z-index: 10;
+    outline: none;
+  }
+
+  .book-spine:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.85);
+    outline-offset: 3px;
+  }
+
+  /* Page-edge illusion on the right side */
+  .book-spine::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    right: -3px;
+    bottom: 6px;
+    width: 6px;
+    background: repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0px,
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* ─── Spine text elements ──────────────────────────────────────── */
+  .spine-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  }
+
+  .spine-title {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-family-serif);
+    font-size: 0.67rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.6px;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .spine-bottom-deco {
+    display: block;
+    width: 28px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+  }
+
+  /* ─── Theme: Christmas ─────────────────────────────────────────── */
+  .theme-christmas {
+    background: linear-gradient(180deg, #6b0f0f 0%, #9b1515 38%, #8a1010 66%, #5a0808 100%);
+    border-right: 4px solid #c9a227;
+  }
+
+  .theme-christmas .spine-title {
+    color: #fce8c3;
+  }
+
+  .theme-christmas .spine-bottom-deco {
+    background: rgba(201, 162, 39, 0.5);
+  }
+
+  .theme-christmas:hover,
+  .theme-christmas:focus-visible,
+  .theme-christmas.is-active {
+    box-shadow:
+      6px 8px 26px rgba(0, 0, 0, 0.85),
+      0 0 30px rgba(201, 162, 39, 0.45),
+      inset 4px 0 8px rgba(255, 220, 100, 0.08);
+  }
+
+  /* Inner shimmer overlay on hover */
+  .theme-christmas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 230, 100, 0.12) 0%,
+      transparent 50%,
+      rgba(255, 180, 50, 0.06) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .theme-christmas:hover::before,
+  .theme-christmas:focus-visible::before,
+  .theme-christmas.is-active::before {
+    opacity: 1;
+  }
+
+  /* ─── Theme: River (Browns Island) ────────────────────────────── */
+  .theme-river {
+    background: linear-gradient(180deg, #0a1a0a 0%, #163016 38%, #122712 66%, #080f08 100%);
+    border-right: 4px solid #2a5c1a;
+  }
+
+  .theme-river .spine-title {
+    color: #c0e8b8;
+  }
+
+  .theme-river .spine-bottom-deco {
+    background: rgba(42, 92, 26, 0.7);
+  }
+
+  .theme-river:hover,
+  .theme-river:focus-visible,
+  .theme-river.is-active {
+    box-shadow:
+      6px 8px 26px rgba(0, 0, 0, 0.85),
+      0 0 28px rgba(50, 150, 50, 0.35),
+      inset 0 0 20px rgba(80, 180, 60, 0.06);
+  }
+
+  @keyframes fog-creep {
+    0%, 100% { opacity: 0.25; transform: scaleX(1); }
+    50% { opacity: 0.6; transform: scaleX(1.03); }
+  }
+
+  .theme-river::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 45%;
+    background: linear-gradient(180deg, transparent 0%, rgba(80, 160, 60, 0.2) 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .theme-river:hover::before,
+  .theme-river:focus-visible::before,
+  .theme-river.is-active::before {
+    opacity: 1;
+    animation: fog-creep 3.5s ease-in-out infinite;
+  }
+
+  /* ─── Theme: Beach (Mitch) ─────────────────────────────────────── */
+  .theme-beach {
+    background: linear-gradient(180deg, #062040 0%, #0e4878 38%, #0c3d6b 66%, #061530 100%);
+    border-right: 4px solid #c2a23f;
+  }
+
+  .theme-beach .spine-title {
+    color: #bde0ff;
+  }
+
+  .theme-beach .spine-bottom-deco {
+    background: rgba(194, 162, 63, 0.55);
+  }
+
+  .theme-beach:hover,
+  .theme-beach:focus-visible,
+  .theme-beach.is-active {
+    box-shadow:
+      6px 8px 26px rgba(0, 0, 0, 0.85),
+      0 0 30px rgba(14, 105, 194, 0.55),
+      inset 0 0 20px rgba(100, 180, 255, 0.08);
+  }
+
+  @keyframes wave-shimmer {
+    0%, 100% { transform: translateY(0); opacity: 0.3; }
+    50% { transform: translateY(-4px); opacity: 0.65; }
+  }
+
+  .theme-beach::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 38%;
+    background: linear-gradient(180deg, transparent 0%, rgba(100, 170, 255, 0.22) 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .theme-beach:hover::before,
+  .theme-beach:focus-visible::before,
+  .theme-beach.is-active::before {
+    opacity: 1;
+    animation: wave-shimmer 2.2s ease-in-out infinite;
+  }
+
+  /* ─── Theme: Mystery (Coming Soon) ────────────────────────────── */
+  .theme-mystery {
+    background: linear-gradient(180deg, #151020 0%, #251d3f 38%, #1e1635 66%, #100c1c 100%);
+    border-right: 4px solid #7b5fa0;
+    opacity: 0.78;
+    width: 66px;
+  }
+
+  .theme-mystery .spine-title {
+    color: #d4c0f0;
+    letter-spacing: 1px;
+  }
+
+  .theme-mystery .spine-bottom-deco {
+    background: rgba(123, 95, 160, 0.6);
+  }
+
+  .theme-mystery:hover,
+  .theme-mystery:focus-visible,
+  .theme-mystery.is-active {
+    opacity: 1;
+    box-shadow:
+      6px 8px 26px rgba(0, 0, 0, 0.85),
+      0 0 30px rgba(123, 95, 160, 0.55),
+      inset 0 0 25px rgba(180, 130, 255, 0.1);
+  }
+
+  @keyframes mystery-pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.65; }
+  }
+
+  .theme-mystery::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 50% 40%,
+      rgba(180, 130, 255, 0.25) 0%,
+      transparent 70%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .theme-mystery:hover::before,
+  .theme-mystery:focus-visible::before,
+  .theme-mystery.is-active::before {
+    animation: mystery-pulse 2.8s ease-in-out infinite;
+  }
+
+  /* ─── Preview zone ─────────────────────────────────────────────── */
+  .preview-zone {
+    margin-top: 2.5em;
+    min-height: 110px;
+  }
+
+  .preview-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 2em;
+    border: 2px dashed rgba(124, 58, 237, 0.18);
+    border-radius: 14px;
+    font-size: 0.9em;
+    background: rgba(124, 58, 237, 0.03);
+  }
+
+  @keyframes bounce-up {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .placeholder-arrow {
+    font-style: normal;
+    animation: bounce-up 2s ease-in-out infinite;
+    font-size: 1.1em;
+  }
+
+  /* ─── Preview card ─────────────────────────────────────────────── */
+  @keyframes preview-appear {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .preview-card {
+    padding: 1.6em 2em;
+    border-radius: 16px;
+    border: 2px solid rgba(124, 58, 237, 0.15);
+    background: linear-gradient(135deg, rgba(249, 168, 212, 0.07) 0%, rgba(167, 139, 250, 0.07) 100%);
+    animation: preview-appear 0.3s ease-out;
+  }
+
+  .theme-preview-christmas {
+    border-color: rgba(201, 162, 39, 0.3);
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.07) 0%, rgba(201, 162, 39, 0.07) 100%);
+  }
+
+  .theme-preview-river {
+    border-color: rgba(42, 92, 26, 0.35);
+    background: linear-gradient(135deg, rgba(10, 26, 10, 0.09) 0%, rgba(80, 180, 60, 0.07) 100%);
+  }
+
+  .theme-preview-beach {
+    border-color: rgba(14, 72, 120, 0.3);
+    background: linear-gradient(135deg, rgba(6, 32, 64, 0.09) 0%, rgba(194, 162, 63, 0.07) 100%);
+  }
+
+  .theme-preview-mystery {
+    border-color: rgba(123, 95, 160, 0.3);
+    background: linear-gradient(135deg, rgba(21, 16, 32, 0.09) 0%, rgba(180, 130, 255, 0.07) 100%);
+  }
+
+  .preview-label-row {
+    margin-bottom: 0.6em;
+  }
+
+  .preview-genre {
+    font-family: var(--font-family-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .theme-label-christmas {
+    background: rgba(201, 162, 39, 0.18);
+    color: #7a5210;
+  }
+
+  .theme-label-river {
+    background: rgba(42, 92, 26, 0.18);
+    color: #2a5c1a;
+  }
+
+  .theme-label-beach {
+    background: rgba(14, 72, 120, 0.14);
+    color: #0e4878;
+  }
+
+  .theme-label-mystery {
+    background: rgba(123, 95, 160, 0.18);
+    color: #7b5fa0;
+  }
+
+  .preview-card :global(.preview-title) {
+    font-family: var(--font-family-display);
+    font-size: clamp(1.1rem, 3vw, 1.45rem);
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0.3em 0 0.5em;
+    line-height: 1.25;
+  }
+
+  .preview-card :global(.preview-desc) {
+    font-size: 0.95em;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin: 0 0 1.2em;
+  }
+
+  .preview-card :global(.preview-actions) {
+    display: flex;
+    gap: 0.75em;
+    flex-wrap: wrap;
+  }
+
+  .preview-card :global(.preview-btn) {
+    display: inline-block;
+    padding: 0.65em 1.4em;
+    border-radius: 10px;
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 0.88em;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .preview-card :global(.preview-btn-learn) {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(79, 172, 254, 0.3);
+  }
+
+  .preview-card :global(.preview-btn-learn:hover) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.5);
+  }
+
+  .preview-card :global(.preview-btn-buy) {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+  }
+
+  .preview-card :global(.preview-btn-buy:hover) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+  }
+
+  .preview-card :global(.preview-btn-soon) {
+    background: linear-gradient(135deg, #7b5fa0 0%, #4a3a6b 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(123, 95, 160, 0.3);
+  }
+
+  .preview-card :global(.preview-btn-soon:hover) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(123, 95, 160, 0.5);
+  }
+
+  /* ─── Reduced motion ───────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .book-spine {
+      transition: box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .book-spine:hover,
+    .book-spine:focus-visible,
+    .book-spine.is-active {
+      transform: translateY(-10px);
+    }
+
+    .book-slot-christmas::before,
+    .theme-christmas::before,
+    .theme-river::before,
+    .theme-beach::before,
+    .theme-mystery::before {
+      animation: none !important;
+    }
+
+    .preview-card {
+      animation: none;
+    }
+
+    .placeholder-arrow {
+      animation: none;
+    }
+
+    .preview-card :global(.preview-btn:hover) {
+      transform: none;
+    }
+  }
+
+  /* ─── Mobile ───────────────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    .book-spine {
+      width: 70px;
+      height: 245px;
+    }
+
+    .theme-mystery {
+      width: 60px;
+    }
+
+    .bookshelf-intro {
+      font-size: 0.95em;
+    }
+
+    .preview-card {
+      padding: 1.2em 1.4em;
+    }
+  }
+</style>
