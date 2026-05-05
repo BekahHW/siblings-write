@@ -41,21 +41,8 @@ const books = [
         <ul class="books-row" role="list" aria-label="Our published books">
           {books.map((book) => (
             <li class="book-item" role="listitem">
-              <a
-                href={book.href}
-                class={`book-card${book.comingSoon ? ' book-card--coming-soon' : ''}`}
-                aria-label={book.comingSoon ? `${book.title} — Coming Soon` : `View ${book.title}`}
-              >
-                {book.image ? (
-                  <img
-                    class="book-cover-img"
-                    src={book.image}
-                    alt={`Cover of ${book.title}`}
-                    loading="lazy"
-                    width="160"
-                    height="240"
-                  />
-                ) : (
+              {book.comingSoon ? (
+                <div class="book-card book-card--coming-soon">
                   <div class="book-cover-placeholder" role="img" aria-label="Coming Soon: Short Story Collection">
                     <div class="ph-border" aria-hidden="true"></div>
                     <div class="ph-top">
@@ -80,8 +67,23 @@ const books = [
                       <span class="ph-rule" aria-hidden="true"></span>
                     </div>
                   </div>
-                )}
-              </a>
+                </div>
+              ) : (
+                <a
+                  href={book.href}
+                  class="book-card"
+                  aria-label={`View ${book.title}`}
+                >
+                  <img
+                    class="book-cover-img"
+                    src={book.image!}
+                    alt={`Cover of ${book.title}`}
+                    loading="lazy"
+                    width="160"
+                    height="240"
+                  />
+                </a>
+              )}
             </li>
           ))}
         </ul>
@@ -211,14 +213,18 @@ const books = [
     outline-offset: 4px;
   }
 
-  /* Coming soon: slightly muted at rest */
+  /* Coming soon: not interactive — muted, no pointer, no lift */
   .book-card--coming-soon {
-    filter: saturate(0.85) brightness(0.92);
+    cursor: default;
+    filter: saturate(0.82) brightness(0.88);
   }
 
-  .book-card--coming-soon:hover,
-  .book-card--coming-soon:focus-visible {
-    filter: saturate(1) brightness(1);
+  .book-card--coming-soon:hover {
+    transform: none;
+    box-shadow:
+      6px 8px 20px rgba(0, 0, 0, 0.7),
+      -3px 0 8px rgba(0, 0, 0, 0.4),
+      inset 4px 0 14px rgba(0, 0, 0, 0.25);
   }
 
   /* ─── Cover image ──────────────────────────────────────────────── */
