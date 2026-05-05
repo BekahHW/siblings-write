@@ -2,30 +2,26 @@
 const books = [
   {
     title: "The Battle for Christmas: Reign of the Nutcrackers",
-    shortTitle: "Battle for Christmas",
     href: "/works/battle-for-christmas",
     image: "/assets/nutcracker.jpg",
     comingSoon: false,
   },
   {
     title: "Escape from Browns Island",
-    shortTitle: "Escape from Browns Island",
     href: "/works/escape-from-browns-island",
     image: "/assets/brownsisland.jpg",
     comingSoon: false,
   },
   {
     title: "The Wild Adventure of Mitch and the Sand Bridge",
-    shortTitle: "Mitch and the Sand Bridge",
     href: "/works/mitch-and-the-sand-bridge",
     image: "/assets/mitch-sand-bridge.jpg",
     comingSoon: false,
   },
   {
-    title: "Short Story Collection — Coming Soon",
-    shortTitle: "Coming Soon",
+    title: "Short Story Collection",
     href: "/shorts/",
-    image: "/assets/short-story-collection.png",
+    image: null,
     comingSoon: true,
   },
 ];
@@ -35,30 +31,61 @@ const books = [
   <h2 id="bookshelf-heading" class="sr-only">Our Books</h2>
 
   <div class="shelf-unit">
-    <!-- Dark back panel — horizontally scrollable on small screens -->
-    <div class="shelf-back">
-      <ul class="books-row" role="list" aria-label="Our published books">
-        {books.map((book) => (
-          <li class="book-item" role="listitem">
-            <a
-              href={book.href}
-              class={`book-card${book.comingSoon ? ' book-card--coming-soon' : ''}`}
-              aria-label={book.comingSoon
-                ? `${book.title}`
-                : `View ${book.title}`}
-            >
-              <img
-                class="book-cover-img"
-                src={book.image}
-                alt={`Cover of ${book.title}`}
-                loading="lazy"
-                width="160"
-                height="240"
-              />
-            </a>
-          </li>
-        ))}
-      </ul>
+    <!--
+      Two-layer structure:
+      .shelf-back-panel  → dark background, no overflow (avoids vertical clip)
+      .shelf-scroll      → horizontal scroll only
+    -->
+    <div class="shelf-back-panel">
+      <div class="shelf-scroll">
+        <ul class="books-row" role="list" aria-label="Our published books">
+          {books.map((book) => (
+            <li class="book-item" role="listitem">
+              <a
+                href={book.href}
+                class={`book-card${book.comingSoon ? ' book-card--coming-soon' : ''}`}
+                aria-label={book.comingSoon ? `${book.title} — Coming Soon` : `View ${book.title}`}
+              >
+                {book.image ? (
+                  <img
+                    class="book-cover-img"
+                    src={book.image}
+                    alt={`Cover of ${book.title}`}
+                    loading="lazy"
+                    width="160"
+                    height="240"
+                  />
+                ) : (
+                  <div class="book-cover-placeholder" role="img" aria-label="Coming Soon: Short Story Collection">
+                    <div class="ph-border" aria-hidden="true"></div>
+                    <div class="ph-top">
+                      <span class="ph-coming">Coming</span>
+                      <span class="ph-soon">Soon!</span>
+                    </div>
+                    <div class="ph-middle" aria-hidden="true">
+                      <svg class="ph-compass" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="30" cy="30" r="28" stroke="#8b6215" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+                        <line x1="30" y1="4" x2="30" y2="56" stroke="#8b6215" stroke-width="0.75" opacity="0.4"/>
+                        <line x1="4" y1="30" x2="56" y2="30" stroke="#8b6215" stroke-width="0.75" opacity="0.4"/>
+                        <polygon points="30,6 33,28 30,24 27,28" fill="#8b6215" opacity="0.7"/>
+                        <polygon points="30,54 33,32 30,36 27,32" fill="#8b6215" opacity="0.35"/>
+                        <circle cx="30" cy="30" r="3.5" fill="#8b6215" opacity="0.6"/>
+                        <text x="30" y="16" text-anchor="middle" font-size="7" fill="#8b6215" opacity="0.6" font-family="serif">N</text>
+                      </svg>
+                      <p class="ph-tagline">Strange tales from the<br/>Ohio Valley &amp; beyond</p>
+                    </div>
+                    <div class="ph-bottom">
+                      <span class="ph-rule" aria-hidden="true"></span>
+                      <span class="ph-siblings">The Hawrot Siblings</span>
+                      <span class="ph-rule" aria-hidden="true"></span>
+                    </div>
+                  </div>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
 
     <!-- Wooden shelf plank -->
@@ -66,13 +93,6 @@ const books = [
       <div class="shelf-board-edge"></div>
     </div>
   </div>
-
-  <!-- Titles below the shelf — hidden on mobile -->
-  <ul class="shelf-titles" aria-hidden="true">
-    {books.map((book) => (
-      <li class="shelf-title">{book.shortTitle}</li>
-    ))}
-  </ul>
 </section>
 
 <style>
@@ -94,26 +114,27 @@ const books = [
     margin: 2.5em 0 3em;
   }
 
-  /* ─── Shelf unit wrapper ───────────────────────────────────────── */
-  .shelf-unit {
-    /* intentionally no overflow:hidden — lets shelf-board be full width */
+  /* ─── Dark back panel — NO overflow property ───────────────────── */
+  /*
+    Critical: this element must NOT set overflow.
+    overflow-x:auto implies overflow-y:auto per CSS spec, which would
+    clip the vertical dimension and cut off book bottoms.
+  */
+  .shelf-back-panel {
+    background: linear-gradient(180deg, #120a04 0%, #1e1008 45%, #2a1a0c 100%);
+    border-radius: 10px 10px 0 0;
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
   }
 
-  /* ─── Dark back panel ──────────────────────────────────────────── */
-  .shelf-back {
-    background:
-      linear-gradient(180deg, #120a04 0%, #1e1008 40%, #2a1a0c 100%);
-    border-radius: 10px 10px 0 0;
-    padding: 40px 40px 0;
+  /* ─── Scroll wrapper — handles horizontal overflow only ─────────── */
+  .shelf-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    box-shadow:
-      inset 0 0 100px rgba(0, 0, 0, 0.5),
-      inset 0 -6px 20px rgba(0, 0, 0, 0.4);
+    padding: 40px 40px 0;
   }
 
-  .shelf-back::-webkit-scrollbar {
+  .shelf-scroll::-webkit-scrollbar {
     display: none;
   }
 
@@ -143,10 +164,9 @@ const books = [
     border-radius: 4px 6px 6px 4px;
     overflow: hidden;
 
-    /* Resting depth shadow */
     box-shadow:
-      6px 8px 20px rgba(0, 0, 0, 0.65),
-      -3px 0 8px rgba(0, 0, 0, 0.35),
+      6px 8px 20px rgba(0, 0, 0, 0.7),
+      -3px 0 8px rgba(0, 0, 0, 0.4),
       inset 4px 0 14px rgba(0, 0, 0, 0.25);
 
     transition:
@@ -156,7 +176,7 @@ const books = [
     will-change: transform;
   }
 
-  /* Spine binding shadow — always visible */
+  /* Spine binding shadow */
   .book-card::before {
     content: '';
     position: absolute;
@@ -172,7 +192,6 @@ const books = [
     );
     z-index: 2;
     pointer-events: none;
-    border-radius: 4px 0 0 4px;
   }
 
   /* Hover/focus — "picking up" the book */
@@ -180,8 +199,8 @@ const books = [
   .book-card:focus-visible {
     transform: translateY(-24px) scale(1.09);
     box-shadow:
-      10px 28px 55px rgba(0, 0, 0, 0.75),
-      0 12px 25px rgba(0, 0, 0, 0.45),
+      10px 30px 60px rgba(0, 0, 0, 0.8),
+      0 14px 28px rgba(0, 0, 0, 0.5),
       inset 4px 0 14px rgba(0, 0, 0, 0.25);
     z-index: 10;
     outline: none;
@@ -190,12 +209,11 @@ const books = [
   .book-card:focus-visible {
     outline: 3px solid rgba(255, 255, 255, 0.85);
     outline-offset: 4px;
-    border-radius: 4px 6px 6px 4px;
   }
 
-  /* Coming soon: very slightly desaturated at rest, pops on hover */
+  /* Coming soon: slightly muted at rest */
   .book-card--coming-soon {
-    filter: saturate(0.88) brightness(0.94);
+    filter: saturate(0.85) brightness(0.92);
   }
 
   .book-card--coming-soon:hover,
@@ -210,6 +228,139 @@ const books = [
     height: 240px;
     object-fit: cover;
     object-position: center top;
+  }
+
+  /* ─── Coming Soon CSS placeholder ─────────────────────────────── */
+  .book-cover-placeholder {
+    width: 160px;
+    height: 240px;
+    background: linear-gradient(160deg, #ede0c4 0%, #dcc89a 45%, #c9a96e 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Aged paper texture overlay */
+  .book-cover-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        47deg,
+        transparent 0px,
+        transparent 18px,
+        rgba(139, 98, 21, 0.04) 18px,
+        rgba(139, 98, 21, 0.04) 19px
+      );
+    pointer-events: none;
+  }
+
+  /* Decorative inner border */
+  .ph-border {
+    position: absolute;
+    inset: 7px;
+    border: 1px solid rgba(139, 98, 21, 0.35);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Top banner */
+  .ph-top {
+    width: 100%;
+    padding: 16px 10px 12px;
+    background: linear-gradient(180deg, #7a4f0a 0%, #a06c18 60%, #8b5e10 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  .ph-coming,
+  .ph-soon {
+    display: block;
+    font-family: var(--font-family-storybook);
+    font-weight: 900;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .ph-coming {
+    font-size: 0.88rem;
+    color: #fce8b8;
+  }
+
+  .ph-soon {
+    font-size: 1.3rem;
+    color: #fff8e8;
+  }
+
+  /* Middle section */
+  .ph-middle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ph-compass {
+    width: 52px;
+    height: 52px;
+    opacity: 0.75;
+  }
+
+  .ph-tagline {
+    font-family: var(--font-family-serif);
+    font-size: 0.58rem;
+    font-style: italic;
+    color: #6b4a0c;
+    text-align: center;
+    line-height: 1.5;
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  /* Bottom banner */
+  .ph-bottom {
+    width: 100%;
+    padding: 8px 10px 10px;
+    background: linear-gradient(180deg, #8b5e10 0%, #6b4208 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ph-siblings {
+    font-family: var(--font-family-sans);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 240, 200, 0.9);
+    white-space: nowrap;
+  }
+
+  .ph-rule {
+    display: block;
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 240, 200, 0.35);
   }
 
   /* ─── Wooden shelf board ───────────────────────────────────────── */
@@ -233,7 +384,7 @@ const books = [
     overflow: hidden;
   }
 
-  /* Wood grain streaks */
+  /* Wood grain */
   .shelf-board::before {
     content: '';
     position: absolute;
@@ -261,31 +412,6 @@ const books = [
     border-radius: 0 0 10px 10px;
   }
 
-  /* ─── Titles row ───────────────────────────────────────────────── */
-  .shelf-titles {
-    display: flex;
-    justify-content: center;
-    gap: 28px;
-    list-style: none;
-    margin: 0;
-    padding: 14px 40px 0;
-  }
-
-  .shelf-title {
-    width: 160px;
-    flex-shrink: 0;
-    font-family: var(--font-family-sans);
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-align: center;
-    line-height: 1.35;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
   /* ─── Reduced motion ───────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     .book-card {
@@ -300,7 +426,7 @@ const books = [
 
   /* ─── Mobile ───────────────────────────────────────────────────── */
   @media (max-width: 700px) {
-    .shelf-back {
+    .shelf-scroll {
       padding: 28px 24px 0;
       scroll-snap-type: x mandatory;
     }
@@ -310,23 +436,20 @@ const books = [
       gap: 20px;
     }
 
-    .book-cover-img {
+    .book-cover-img,
+    .book-cover-placeholder {
       width: 140px;
       height: 210px;
-    }
-
-    /* Titles don't scroll in sync with books on mobile — hide them */
-    .shelf-titles {
-      display: none;
     }
   }
 
   @media (max-width: 440px) {
-    .shelf-back {
+    .shelf-scroll {
       padding: 24px 16px 0;
     }
 
-    .book-cover-img {
+    .book-cover-img,
+    .book-cover-placeholder {
       width: 124px;
       height: 186px;
     }
