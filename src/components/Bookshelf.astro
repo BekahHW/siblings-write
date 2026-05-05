@@ -21,7 +21,7 @@ const books = [
   {
     title: "Short Story Collection",
     href: "/shorts/",
-    image: null,
+    image: "/assets/short-story-collection.png",
     comingSoon: true,
   },
 ];
@@ -43,30 +43,14 @@ const books = [
             <li class="book-item" role="listitem">
               {book.comingSoon ? (
                 <div class="book-card book-card--coming-soon">
-                  <div class="book-cover-placeholder" role="img" aria-label="Coming Soon: Short Story Collection">
-                    <div class="ph-border" aria-hidden="true"></div>
-                    <div class="ph-top">
-                      <span class="ph-coming">Coming</span>
-                      <span class="ph-soon">Soon!</span>
-                    </div>
-                    <div class="ph-middle" aria-hidden="true">
-                      <svg class="ph-compass" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <circle cx="30" cy="30" r="28" stroke="#8b6215" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
-                        <line x1="30" y1="4" x2="30" y2="56" stroke="#8b6215" stroke-width="0.75" opacity="0.4"/>
-                        <line x1="4" y1="30" x2="56" y2="30" stroke="#8b6215" stroke-width="0.75" opacity="0.4"/>
-                        <polygon points="30,6 33,28 30,24 27,28" fill="#8b6215" opacity="0.7"/>
-                        <polygon points="30,54 33,32 30,36 27,32" fill="#8b6215" opacity="0.35"/>
-                        <circle cx="30" cy="30" r="3.5" fill="#8b6215" opacity="0.6"/>
-                        <text x="30" y="16" text-anchor="middle" font-size="7" fill="#8b6215" opacity="0.6" font-family="serif">N</text>
-                      </svg>
-                      <p class="ph-tagline">Strange tales from the<br/>Ohio Valley &amp; beyond</p>
-                    </div>
-                    <div class="ph-bottom">
-                      <span class="ph-rule" aria-hidden="true"></span>
-                      <span class="ph-siblings">The Hawrot Siblings</span>
-                      <span class="ph-rule" aria-hidden="true"></span>
-                    </div>
-                  </div>
+                  <img
+                    class="book-cover-img"
+                    src={book.image!}
+                    alt="Coming Soon: Short Story Collection by The Hawrot Siblings"
+                    loading="lazy"
+                    width="160"
+                    height="240"
+                  />
                 </div>
               ) : (
                 <a
@@ -234,139 +218,6 @@ const books = [
     height: 240px;
     object-fit: cover;
     object-position: center top;
-  }
-
-  /* ─── Coming Soon CSS placeholder ─────────────────────────────── */
-  .book-cover-placeholder {
-    width: 160px;
-    height: 240px;
-    background: linear-gradient(160deg, #ede0c4 0%, #dcc89a 45%, #c9a96e 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Aged paper texture overlay */
-  .book-cover-placeholder::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      repeating-linear-gradient(
-        47deg,
-        transparent 0px,
-        transparent 18px,
-        rgba(139, 98, 21, 0.04) 18px,
-        rgba(139, 98, 21, 0.04) 19px
-      );
-    pointer-events: none;
-  }
-
-  /* Decorative inner border */
-  .ph-border {
-    position: absolute;
-    inset: 7px;
-    border: 1px solid rgba(139, 98, 21, 0.35);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* Top banner */
-  .ph-top {
-    width: 100%;
-    padding: 16px 10px 12px;
-    background: linear-gradient(180deg, #7a4f0a 0%, #a06c18 60%, #8b5e10 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-    position: relative;
-    z-index: 2;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
-  }
-
-  .ph-coming,
-  .ph-soon {
-    display: block;
-    font-family: var(--font-family-storybook);
-    font-weight: 900;
-    text-align: center;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-    letter-spacing: 1px;
-    line-height: 1;
-  }
-
-  .ph-coming {
-    font-size: 0.88rem;
-    color: #fce8b8;
-  }
-
-  .ph-soon {
-    font-size: 1.3rem;
-    color: #fff8e8;
-  }
-
-  /* Middle section */
-  .ph-middle {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 8px 14px;
-    position: relative;
-    z-index: 2;
-  }
-
-  .ph-compass {
-    width: 52px;
-    height: 52px;
-    opacity: 0.75;
-  }
-
-  .ph-tagline {
-    font-family: var(--font-family-serif);
-    font-size: 0.58rem;
-    font-style: italic;
-    color: #6b4a0c;
-    text-align: center;
-    line-height: 1.5;
-    margin: 0;
-    opacity: 0.85;
-  }
-
-  /* Bottom banner */
-  .ph-bottom {
-    width: 100%;
-    padding: 8px 10px 10px;
-    background: linear-gradient(180deg, #8b5e10 0%, #6b4208 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    position: relative;
-    z-index: 2;
-  }
-
-  .ph-siblings {
-    font-family: var(--font-family-sans);
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(255, 240, 200, 0.9);
-    white-space: nowrap;
-  }
-
-  .ph-rule {
-    display: block;
-    flex: 1;
-    height: 1px;
-    background: rgba(255, 240, 200, 0.35);
   }
 
   /* ─── Wooden shelf board ───────────────────────────────────────── */
