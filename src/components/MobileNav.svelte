@@ -35,6 +35,7 @@
     <a class={current === "cyoa" ? "selected" : ""} href='/cyoa'>CYOA</a>
   {/if}
   <a class={current === "works" ? "selected" : ""} href='/works'>works</a>
+  <a class={current === "screenplays" ? "selected" : ""} href='/screenplays'>screenplays</a>
   <a class={current === "subscribe" ? "selected" : ""} href='/subscribe'>subscribe</a>
   <a class={current === "contact" ? "selected" : ""} href='/contact'>contact</a>
 </nav>

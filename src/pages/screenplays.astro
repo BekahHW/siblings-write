@@ -1,0 +1,393 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const title = 'Screen & Teleplays';
+const description = 'Original screenplays and teleplays from the Hawrot siblings: big-hearted comedies, high-concept thrillers, and ordinary people caught in extraordinary trouble.';
+const permalink = `${Astro.site.href}screenplays`;
+
+const projects = [
+  {
+    title: 'Quietus',
+    format: 'Feature Screenplay',
+    genre: 'Sci-Fi Thriller',
+    logline: "Benjamin Braverly inherited an empire built on one product: the mandatory death of every American who turns sixty. But when he learns the truth behind the business, he becomes the next target and has to hide in the one place no one will look: the death facilities he financed. Now, he must decide whether to save himself or help the Resistance expose everything.",
+    tags: ['Tense', 'Moral', 'Urgent'],
+    accent: 'quietus',
+  },
+  {
+    title: 'Stuck',
+    format: 'Feature Screenplay',
+    genre: 'Romantic Comedy',
+    logline: "A couple finds their lives at a turning point when (another) argument leads to a wham-bam divorce. But just before it's finalized, a job crisis and missing 20k from their bank account halts the divorce, forcing the two to live together. Now the idealistic dreamer and the would-be chef have one month under the same roof to figure out who they are apart, unless they figure out who they are together first.",
+    tags: ['Warm', 'Wry', 'Hopeful'],
+    accent: 'stuck',
+  },
+  {
+    title: 'Doughnut Sunday',
+    format: 'Television Pilot',
+    genre: 'Dark Comedy',
+    logline: 'When a cynical New York teenager is sent to spend the summer with his devout Catholic aunt in an Ohio town the police have all but abandoned, he is drawn into a band of Bible-quoting parishioners waging an increasingly unholy war against neighborhood crime.',
+    tags: ['Offbeat', 'Faithful', 'Fierce'],
+    accent: 'doughnut',
+  },
+  {
+    title: 'When Time Stops',
+    format: 'Feature Screenplay',
+    genre: 'Action Thriller',
+    logline: "A CIA assassin who can move through stopped time learns her targets all shared her gift. Now, unless she destroys the agency that made her, they'll use her to destroy everything else.",
+    tags: ['Relentless', 'High-Concept', 'Defiant'],
+    accent: 'time-stops',
+  },
+  {
+    title: 'Homesteaders',
+    format: 'Television Pilot',
+    genre: 'Family Comedy',
+    logline: "The day Lily, a perfectionist wedding planner, loses her job, her incurably optimistic husband reveals his biggest surprise yet. He's bought them a rural homestead, and the kids are already naming the chickens. Now the woman who color-codes everything must survive livestock, mud, and a family that's thriving in the chaos she can't control.",
+    tags: ['Chaotic', 'Tender', 'Funny'],
+    accent: 'homesteaders',
+  },
+  {
+    title: 'The Parish',
+    format: 'Television Pilot',
+    genre: 'Dramedy',
+    logline: 'When a well-meaning priest who never wanted to be in charge of anything inherits a struggling Rust Belt parish still devoted to his beloved predecessor, he must survive feuding parishioners, terrible Christian rock, and relentless parish politics, all while every crisis in town somehow ends up at his rectory door.',
+    tags: ['Wry', 'Weary', 'Hopeful'],
+    accent: 'parish',
+  },
+];
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://www.siblingswrite.com/screenplays#breadcrumb",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.siblingswrite.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Screen & Teleplays", "item": "https://www.siblingswrite.com/screenplays" }
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://www.siblingswrite.com/screenplays#slate",
+      "itemListElement": projects.map((project, index) => ({
+        "@type": "CreativeWork",
+        "position": index + 1,
+        "name": project.title,
+        "description": project.logline,
+        "genre": project.genre,
+        "additionalType": project.format
+      }))
+    }
+  ]
+};
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="screenplays">
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  <div class="container-new">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Screen & Teleplays' }]} />
+
+    <section class="hero">
+      <p class="eyebrow">Original Screen &amp; Teleplays</p>
+      <h1 class="hero-title">
+        Stories made<br /><span class="accent-text">to move.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Big-hearted comedies, high-concept thrillers, and ordinary people caught in extraordinary trouble.
+      </p>
+    </section>
+
+    <section class="pov">
+      <p class="eyebrow">Our Point of View</p>
+      <p class="pov-statement">
+        We write characters worth rooting for, worlds with a little wonder in the walls, and stories that
+        find humor and hope even when the stakes get serious.
+      </p>
+    </section>
+
+    <section class="slate">
+      <div class="slate-header">
+        <div>
+          <p class="eyebrow">Selected Projects</p>
+          <h2>The current slate</h2>
+        </div>
+        <p class="slate-subtitle">Six original stories spanning feature and television.</p>
+      </div>
+
+      <ol class="project-list">
+        {projects.map((project, index) => (
+          <li class={`project ${project.accent}`}>
+            <span class="project-number">{String(index + 1).padStart(2, '0')}</span>
+            <div class="project-body">
+              <p class="project-meta">{project.format}<br />{project.genre}</p>
+              <h3 class="project-title">{project.title}</h3>
+              <p class="project-logline">{project.logline}</p>
+              <p class="project-tags">
+                {project.tags.map((tag, tagIndex) => (
+                  <>
+                    {tagIndex > 0 && <span class="tag-dot">·</span>}
+                    <span>{tag.toUpperCase()}</span>
+                  </>
+                ))}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .container-new {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2em;
+  }
+
+  .eyebrow {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--primary-color);
+    margin: 0 0 0.75em 0;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 3em 0 2em;
+    text-align: left;
+  }
+
+  .hero-title {
+    font-family: var(--font-family-sans);
+    font-size: 3.6em;
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 0 0 0.5em 0;
+    color: var(--text-main);
+  }
+
+  .accent-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 1.3em;
+    max-width: 40em;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* Point of view */
+  .pov {
+    padding: 2em 0;
+    border-top: 1px solid rgba(124, 58, 237, 0.12);
+  }
+
+  .pov-statement {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 1.8em;
+    line-height: 1.35;
+    color: var(--text-main);
+    margin: 0;
+    max-width: 38em;
+  }
+
+  /* Slate */
+  .slate {
+    padding: 2em 0 1em;
+    border-top: 1px solid rgba(124, 58, 237, 0.12);
+  }
+
+  .slate-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1em;
+    margin-bottom: 1em;
+  }
+
+  .slate-header h2 {
+    margin: 0;
+  }
+
+  .slate-subtitle {
+    font-size: 1.05em;
+    color: var(--text-secondary);
+    margin: 0;
+    max-width: 20em;
+  }
+
+  .project-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .project {
+    display: flex;
+    gap: 1.5em;
+    padding: 2.5em 0;
+    border-top: 1px solid rgba(124, 58, 237, 0.12);
+    transition: transform 0.3s ease;
+  }
+
+  .project:last-child {
+    border-bottom: 1px solid rgba(124, 58, 237, 0.12);
+  }
+
+  .project:hover {
+    transform: translateX(6px);
+  }
+
+  .project-number {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 0.9em;
+    color: var(--primary-color);
+    flex-shrink: 0;
+    width: 2.5em;
+  }
+
+  .project-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .project-meta {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin: 0 0 0.5em 0;
+    line-height: 1.5;
+  }
+
+  .project-title {
+    font-family: var(--font-family-sans);
+    font-weight: 800;
+    font-size: 2.4em;
+    margin: 0 0 0.3em 0;
+    line-height: 1.1;
+  }
+
+  .project-logline {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: var(--text-main);
+    max-width: 42em;
+    margin: 0 0 0.75em 0;
+  }
+
+  .project-tags {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .tag-dot {
+    margin: 0 0.5em;
+    opacity: 0.6;
+  }
+
+  /* Title accent colors */
+  .quietus .project-title {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stuck .project-title {
+    background: var(--magic-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .doughnut .project-title {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .time-stops .project-title {
+    background: var(--dream-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .homesteaders .project-title {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .parish .project-title {
+    background: var(--sunset-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @media (max-width: 768px) {
+    .container-new {
+      padding: 1.5em;
+    }
+
+    .hero {
+      padding: 2em 0 1.5em;
+    }
+
+    .hero-title {
+      font-size: 2.4em;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1em;
+    }
+
+    .pov-statement {
+      font-size: 1.4em;
+    }
+
+    .project {
+      flex-direction: column;
+      gap: 0.5em;
+      padding: 2em 0;
+    }
+
+    .project-title {
+      font-size: 1.8em;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container-new {
+      padding: 1em;
+    }
+
+    .hero-title {
+      font-size: 2em;
+    }
+  }
+</style>
