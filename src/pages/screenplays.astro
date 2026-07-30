@@ -55,6 +55,14 @@ const projects = [
     tags: ['Wry', 'Weary', 'Hopeful'],
     accent: 'parish',
   },
+  {
+    title: 'Scavengers',
+    format: 'Feature Screenplay',
+    genre: 'Coming of Age',
+    logline: "Benji has one summer after high school to figure out who he is — but between a sociopathic girlfriend, running away to an abandoned house in the woods, and a scavenger hunt that keeps turning criminal, growing up keeps getting pushed back.",
+    tags: ['Reckless', 'Nostalgic', 'Unflinching'],
+    accent: 'scavengers',
+  },
 ];
 
 const structuredData = {
@@ -334,6 +342,13 @@ const structuredData = {
 
   .parish .project-title {
     background: var(--sunset-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .scavengers .project-title {
+    background: linear-gradient(135deg, #0f766e 0%, #1e293b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
