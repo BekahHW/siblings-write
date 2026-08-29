@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import UserProfile from '../components/UserProfile.svelte';
+
+export const prerender = false;
+---
+
+<BaseLayout 
+  title="Profile | Siblings Write"
+  description="Your collaborative storytelling profile"
+  current="profile"
+>
+  <UserProfile client:load />
+</BaseLayout>

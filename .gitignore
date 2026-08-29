@@ -23,3 +23,6 @@ pnpm-debug.log*
 
 # Vitest
 coverage/
+
+# One Word Story data
+data/
