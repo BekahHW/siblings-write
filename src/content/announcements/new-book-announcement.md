@@ -1,7 +1,7 @@
 ---
 title: "The Valley of Almost True Things Is Here!"
 description: "Our newest adventure just landed. Follow the paw prints, the fountain, the old Luna theater, and every almost-true story the valley has been holding onto. Get your copy today!"
-image: "/assets/the-valley-of-almost-true-things.jpg"
+image: "/assets/the-valley.png"
 ctaText: "Get Your Copy!"
 ctaLink: "https://dub.sh/the-valley"
 active: true
