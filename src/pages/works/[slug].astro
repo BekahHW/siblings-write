@@ -154,16 +154,18 @@ const structuredData = {
             )}
 
             <div class="button-group">
-              <a
-                href="https://dub.sh/bookshop-b4c"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="cta-button cta-bookshop"
-              >
-                <span class="button-text">Buy Now on Bookshop</span>
-                <span class="button-icon">📖</span>
-                <span class="tooltip">A not-for-profit that donates proceeds from book sales to indie bookstores</span>
-              </a>
+              {work.id !== 'the-valley-of-almost-true-things' && (
+                <a
+                  href="https://dub.sh/bookshop-b4c"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="cta-button cta-bookshop"
+                >
+                  <span class="button-text">Buy Now on Bookshop</span>
+                  <span class="button-icon">📖</span>
+                  <span class="tooltip">A not-for-profit that donates proceeds from book sales to indie bookstores</span>
+                </a>
+              )}
               <a
                 href={link}
                 target="_blank"
@@ -270,16 +272,18 @@ const structuredData = {
             <h3>Ready to Start Your Adventure?</h3>
             <p>Get your copy today and discover the magic for yourself!</p>
             <div class="button-group">
-              <a
-                href="https://dub.sh/bookshop-b4c"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="cta-button cta-bookshop"
-              >
-                <span class="button-text">Buy Now on Bookshop</span>
-                <span class="button-icon">📖</span>
-                <span class="tooltip">A not-for-profit that donates proceeds from book sales to indie bookstores</span>
-              </a>
+              {work.id !== 'the-valley-of-almost-true-things' && (
+                <a
+                  href="https://dub.sh/bookshop-b4c"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="cta-button cta-bookshop"
+                >
+                  <span class="button-text">Buy Now on Bookshop</span>
+                  <span class="button-icon">📖</span>
+                  <span class="tooltip">A not-for-profit that donates proceeds from book sales to indie bookstores</span>
+                </a>
+              )}
               <a
                 href={link}
                 target="_blank"
