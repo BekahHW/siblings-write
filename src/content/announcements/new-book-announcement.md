@@ -1,19 +1,11 @@
 ---
-title: "Our New Book is Coming!"
-description: "We're thrilled to announce our latest adventure is almost here! Join us on an epic journey filled with wonder, magic, and unforgettable characters. Be the first to get your copy!"
-image: "/assets/social.png"
-ctaText: "Preorder Now!"
-ctaLink: "/works"
-active: false
+title: "The Valley of Almost True Things Is Here!"
+description: "Our newest adventure just landed. Follow the paw prints, the fountain, the old Luna theater, and every almost-true story the valley has been holding onto. Get your copy today!"
+image: "/assets/the-valley-of-almost-true-things.jpg"
+ctaText: "Get Your Copy!"
+ctaLink: "https://dub.sh/the-valley"
+active: true
 showOnce: true
 ---
 
-This is a sample announcement for the whimsical popup! You can edit this content through the CMS at /admin.
-
-The popup will appear automatically on page load with:
-- A whimsical, colorful design with gradient backgrounds
-- An animated entrance with bounce effects
-- Sparkly CTA button with hover effects
-- Easy close button in the top right
-- Session-based display (shows once per session if enabled)
-- Optional start/end dates for scheduling announcements
+The Valley of Almost True Things is out now! Grab your copy at https://dub.sh/the-valley or learn more on our Works page.

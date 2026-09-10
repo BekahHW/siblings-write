@@ -42,6 +42,29 @@ const getAuthorsDisplay = (authorRefs) => {
 
 
   <BaseLayout title={title} description={description} permalink={permalink}>
+    <!-- New Release Announcement -->
+    <section class="new-release-banner">
+      <div class="new-release-content">
+        <img
+          class="new-release-cover"
+          src="/assets/the-valley-of-almost-true-things.jpg"
+          alt="Cover of The Valley of Almost True Things by The Hawrot Siblings"
+          width="90"
+          height="135"
+          loading="eager"
+        >
+        <div class="new-release-text">
+          <span class="new-release-badge">New Release</span>
+          <h2 class="new-release-title">The Valley of Almost True Things</h2>
+          <p class="new-release-tagline">Our newest adventure just landed. Follow the paw prints into the valley and find out what's true.</p>
+        </div>
+        <div class="new-release-actions">
+          <a href="https://dub.sh/the-valley" target="_blank" rel="noopener" class="new-release-buy">Get Your Copy</a>
+          <a href="/works/the-valley-of-almost-true-things" class="new-release-learn">Learn More</a>
+        </div>
+      </div>
+    </section>
+
     <!-- Background Animation Container -->
     <div class="bg-animation">
       <div id="stars"></div>
@@ -203,6 +226,137 @@ const getAuthorsDisplay = (authorRefs) => {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Limelight&family=Playwrite+HU:wght@100..400&display=swap');
+
+/* New Release Banner */
+.new-release-banner {
+  max-width: 1200px;
+  margin: 1.5em auto 0;
+  padding: 0 2em;
+  position: relative;
+  z-index: 2;
+}
+
+.new-release-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5em;
+  padding: 1.25em 1.5em;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(79, 172, 254, 0.1) 100%);
+  border: 2px solid rgba(124, 58, 237, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.12);
+}
+
+.new-release-cover {
+  flex-shrink: 0;
+  width: 90px;
+  height: 135px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.new-release-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.new-release-badge {
+  display: inline-block;
+  font-family: var(--font-family-sans);
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: white;
+  background: var(--primary-gradient);
+  padding: 0.3em 0.8em;
+  border-radius: 999px;
+  margin-bottom: 0.5em;
+}
+
+.new-release-title {
+  font-family: var(--font-family-display, 'Cormorant Garamond', serif);
+  font-size: 1.6em;
+  margin: 0 0 0.25em 0;
+  color: var(--text-main, #2d2d3f);
+}
+
+.new-release-tagline {
+  font-size: 1em;
+  margin: 0;
+  color: #555;
+}
+
+.new-release-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  flex-shrink: 0;
+}
+
+.new-release-buy,
+.new-release-learn {
+  display: inline-block;
+  text-align: center;
+  padding: 0.7em 1.4em;
+  border-radius: 10px;
+  font-weight: bold;
+  font-family: var(--font-family-sans);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.new-release-buy {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+}
+
+.new-release-buy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+}
+
+.new-release-learn {
+  color: var(--primary-color, #548e9b);
+  border: 2px solid rgba(84, 142, 155, 0.3);
+}
+
+.new-release-learn:hover {
+  background: rgba(84, 142, 155, 0.08);
+}
+
+@media (max-width: 700px) {
+  .new-release-banner {
+    padding: 0 1em;
+  }
+
+  .new-release-content {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    padding: 1.5em;
+  }
+
+  .new-release-text {
+    flex-basis: 100%;
+    order: 2;
+  }
+
+  .new-release-actions {
+    flex-direction: row;
+    flex-basis: 100%;
+    order: 3;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .new-release-cover {
+    order: 1;
+  }
+}
 
 /* Background Stars Animation */
 .bg-animation {
