@@ -22,7 +22,16 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
       .shelf-scroll      → horizontal scroll only
     -->
     <div class="shelf-back-panel">
-      <div class="shelf-scroll">
+      <button
+        type="button"
+        class="shelf-nav shelf-nav--prev"
+        data-shelf-prev
+        aria-label="Scroll the shelf to earlier books"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 4 L7 12 L15 20" /></svg>
+      </button>
+
+      <div class="shelf-scroll" data-shelf-scroll>
         <div class="books-row" role="tablist" aria-label={heading} data-shelf>
           {books.map((book) => (
             <button
@@ -47,6 +56,15 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
           ))}
         </div>
       </div>
+
+      <button
+        type="button"
+        class="shelf-nav shelf-nav--next"
+        data-shelf-next
+        aria-label="Scroll the shelf to later books"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 4 L17 12 L9 20" /></svg>
+      </button>
     </div>
 
     <!-- Wooden shelf plank -->
@@ -82,6 +100,7 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
     clip the vertical dimension and cut off book bottoms.
   */
   .shelf-back-panel {
+    position: relative;
     background: linear-gradient(180deg, #120a04 0%, #1e1008 45%, #2a1a0c 100%);
     border-radius: 10px 10px 0 0;
     box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
@@ -92,7 +111,15 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    scroll-behavior: smooth;
+    scroll-padding-inline: 40px;
     padding: 40px 40px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shelf-scroll {
+      scroll-behavior: auto;
+    }
   }
 
   .shelf-scroll::-webkit-scrollbar {
@@ -102,12 +129,12 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
   /* ─── Books row ────────────────────────────────────────────────── */
   .books-row {
     display: flex;
-    justify-content: center;
     align-items: flex-end;
     gap: 28px;
-    list-style: none;
-    margin: 0;
+    width: max-content;
+    margin: 0 auto;
     padding: 0;
+    list-style: none;
   }
 
   /* ─── Book card ────────────────────────────────────────────────── */
@@ -194,6 +221,77 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
     object-position: center top;
   }
 
+  /* ─── Shelf arrows ─────────────────────────────────────────────── */
+  /*
+    Hidden unless the shelf can actually scroll that way, so they never
+    appear at widths where every book already fits.
+  */
+  .shelf-nav {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 52px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    border: 0;
+    cursor: pointer;
+    color: #f0d4a0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 400ms ease, visibility 400ms;
+  }
+
+  .shelf-nav--prev {
+    left: 0;
+    justify-content: flex-start;
+    background: linear-gradient(
+      90deg,
+      rgba(12, 7, 2, 0.95) 8%,
+      rgba(12, 7, 2, 0.7) 48%,
+      rgba(12, 7, 2, 0) 100%
+    );
+  }
+
+  .shelf-nav--next {
+    right: 0;
+    justify-content: flex-end;
+    background: linear-gradient(
+      270deg,
+      rgba(12, 7, 2, 0.95) 8%,
+      rgba(12, 7, 2, 0.7) 48%,
+      rgba(12, 7, 2, 0) 100%
+    );
+  }
+
+  .shelf-nav.is-available {
+    opacity: 0.68;
+    visibility: visible;
+  }
+
+  .shelf-nav.is-available:hover,
+  .shelf-nav.is-available:focus-visible {
+    opacity: 1;
+  }
+
+  .shelf-nav:focus-visible {
+    outline: 3px solid rgba(255, 236, 196, 0.85);
+    outline-offset: -4px;
+    border-radius: 4px;
+  }
+
+  .shelf-nav svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 1px 5px rgba(0, 0, 0, 0.8));
+  }
+
   /* ─── Wooden shelf board ───────────────────────────────────────── */
   .shelf-board {
     height: 28px;
@@ -260,35 +358,57 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
   }
 
   /* ─── Mobile ───────────────────────────────────────────────────── */
-  @media (max-width: 700px) {
+  /* Tablet: trim the covers so all four still fit rather than scroll */
+  @media (max-width: 1024px) {
     .shelf-scroll {
-      padding: 28px 24px 0;
-      scroll-snap-type: x mandatory;
+      padding: 32px 28px 0;
+      scroll-padding-inline: 28px;
     }
 
     .books-row {
-      justify-content: flex-start;
-      gap: 20px;
+      gap: 22px;
+    }
+
+    .book-cover-img {
+      width: 144px;
+      height: 216px;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .shelf-scroll {
+      padding: 28px 20px 0;
+      scroll-padding-inline: 20px;
+      scroll-snap-type: x proximity;
+    }
+
+    .books-row {
+      gap: 18px;
     }
 
     .book-card {
-      scroll-snap-align: center;
+      scroll-snap-align: start;
     }
 
     .book-cover-img {
       width: 140px;
       height: 210px;
     }
+
+    .shelf-nav {
+      width: 44px;
+    }
   }
 
   @media (max-width: 440px) {
     .shelf-scroll {
       padding: 24px 16px 0;
+      scroll-padding-inline: 16px;
     }
 
     .book-cover-img {
-      width: 124px;
-      height: 186px;
+      width: 132px;
+      height: 198px;
     }
   }
 </style>

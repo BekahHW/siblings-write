@@ -269,6 +269,11 @@ const structuredData = {
       window.__worksRoom = true;
 
       var watcher = null;
+      var refreshShelf = null;
+
+      window.addEventListener('resize', function () {
+        if (refreshShelf) refreshShelf();
+      });
 
       function pauseOffscreen() {
         if (watcher) watcher.disconnect();
@@ -284,6 +289,52 @@ const structuredData = {
         document.querySelectorAll('[data-animated]').forEach(function (el) {
           watcher.observe(el);
         });
+      }
+
+      /*
+       * The shelf scrolls when the books do not all fit. The arrows only
+       * appear when there is somewhere to go, so they stay out of the way on
+       * a wide screen and do the explaining on a narrow one.
+       */
+      function wireShelfScroll() {
+        var scroller = document.querySelector('[data-shelf-scroll]');
+        var prev = document.querySelector('[data-shelf-prev]');
+        var next = document.querySelector('[data-shelf-next]');
+        refreshShelf = null;
+        if (!scroller || !prev || !next) return null;
+
+        function step() {
+          var card = scroller.querySelector('.book-card');
+          var gap = parseFloat(getComputedStyle(scroller.querySelector('.books-row')).gap) || 20;
+          return card ? Math.round(card.getBoundingClientRect().width + gap) : 160;
+        }
+
+        function update() {
+          var room = scroller.scrollWidth - scroller.clientWidth;
+          var scrollable = room > 12;
+          prev.classList.toggle('is-available', scrollable && scroller.scrollLeft > 4);
+          next.classList.toggle('is-available', scrollable && scroller.scrollLeft < room - 4);
+        }
+
+        if (!scroller.dataset.bound) {
+          scroller.dataset.bound = '1';
+          prev.addEventListener('click', function () {
+            scroller.scrollBy({ left: -step(), behavior: 'smooth' });
+          });
+          next.addEventListener('click', function () {
+            scroller.scrollBy({ left: step(), behavior: 'smooth' });
+          });
+          scroller.addEventListener('scroll', update, { passive: true });
+        }
+
+        refreshShelf = update;
+        update();
+        // Cover images settle the scroll width, so check again once loaded.
+        // After a view transition the page is already complete.
+        if (document.readyState !== 'complete') {
+          window.addEventListener('load', update, { once: true });
+        }
+        return update;
       }
 
       function wireShelf() {
@@ -307,7 +358,12 @@ const structuredData = {
             var on = tab.dataset.book === id;
             tab.setAttribute('aria-selected', on ? 'true' : 'false');
             tab.tabIndex = on ? 0 : -1;
-            if (on && focusTab) tab.focus();
+            if (!on) return;
+            if (focusTab) {
+              tab.focus();
+              // Arrowing along the shelf can reach a book that is off screen.
+              tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
           });
         }
 
@@ -441,6 +497,7 @@ const structuredData = {
           return;
         }
         pauseOffscreen();
+        wireShelfScroll();
         wireShelf();
       }
 
