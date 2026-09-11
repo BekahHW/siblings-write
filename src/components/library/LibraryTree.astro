@@ -1,0 +1,289 @@
+---
+/**
+ * The reading tree: a canopy that spreads across the top of the library room,
+ * strung with hanging, twinkling lights. Decorative only.
+ */
+export interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+
+// Deterministic pseudo-random so the canopy is identical on every build.
+let seed = 20260911;
+const rnd = () => {
+  seed = (seed * 1103515245 + 12345) % 2147483648;
+  return seed / 2147483648;
+};
+const between = (min: number, max: number) => min + rnd() * (max - min);
+
+const branches = [
+  { d: 'M182,660 C176,560 150,410 160,300', w: 40 },
+  { d: 'M160,300 C126,266 78,250 22,246', w: 17 },
+  { d: 'M160,300 C206,262 262,248 322,244', w: 20 },
+  { d: 'M160,300 C162,244 186,196 206,156', w: 15 },
+  { d: 'M322,244 C430,230 528,224 636,224', w: 14 },
+  { d: 'M636,224 C744,224 842,212 946,192', w: 11 },
+  { d: 'M946,192 C1036,178 1108,160 1188,136', w: 8 },
+  { d: 'M206,156 C232,120 280,96 332,88', w: 9 },
+  { d: 'M322,244 C356,206 390,186 430,176', w: 8 },
+  { d: 'M636,224 C680,194 716,178 760,170', w: 7 },
+  { d: 'M946,192 C980,162 1014,148 1054,140', w: 6 },
+  { d: 'M430,176 C452,150 486,136 520,132', w: 5 },
+  { d: 'M760,170 C790,148 822,140 856,138', w: 5 },
+  { d: 'M262,248 C272,276 268,300 252,318', w: 4 },
+  { d: 'M540,228 C552,256 548,282 532,300', w: 4 },
+  { d: 'M868,202 C880,230 876,256 860,274', w: 4 },
+];
+
+const canopyAnchors = [
+  [26, 240], [84, 224], [146, 284], [200, 146], [258, 126], [330, 80],
+  [396, 156], [468, 176], [544, 196], [634, 216], [714, 168], [792, 186],
+  [870, 174], [944, 184], [1022, 142], [1102, 124], [1178, 128], [262, 242],
+  [330, 236], [518, 124], [854, 130], [428, 168], [60, 176], [140, 190],
+  [216, 204], [366, 210], [592, 158], [676, 196], [760, 132], [930, 126],
+  [1064, 176], [1148, 186], [486, 206], [806, 220],
+];
+
+// Leaf masses drawn as lobed "cloud" outlines rather than plain circles,
+// so the canopy reads as foliage instead of bubbles.
+const cluster = (cx: number, cy: number, r: number, lobes: number, phase: number) => {
+  const step = (Math.PI * 2) / lobes;
+  const chord = 2 * r * Math.sin(step / 2);
+  const rl = chord * 0.62;
+  let d = '';
+  for (let i = 0; i <= lobes; i += 1) {
+    const a = phase + i * step;
+    const x = cx + r * Math.cos(a);
+    const y = cy + r * Math.sin(a);
+    d += i === 0
+      ? `M${x.toFixed(1)},${y.toFixed(1)}`
+      : ` A${rl.toFixed(1)},${rl.toFixed(1)} 0 0 1 ${x.toFixed(1)},${y.toFixed(1)}`;
+  }
+  return `${d} Z`;
+};
+
+const shadeGreens = ['#17301f', '#1b3924', '#142b1c'];
+const midGreens = ['#254a2f', '#2c5636', '#22422b', '#32603c'];
+const litGreens = ['#4a7a45', '#5c8a4a', '#77964a'];
+
+const makeLayer = (
+  count: number,
+  radius: [number, number],
+  colors: string[],
+  offset: [number, number],
+  opacity: [number, number]
+) =>
+  canopyAnchors.flatMap(([ax, ay]) =>
+    Array.from({ length: count }, () => ({
+      d: cluster(
+        ax + offset[0] + between(-30, 30),
+        ay + offset[1] + between(-22, 20),
+        between(radius[0], radius[1]),
+        Math.round(between(7, 11)),
+        between(0, Math.PI * 2)
+      ),
+      fill: colors[Math.floor(rnd() * colors.length)],
+      opacity: between(opacity[0], opacity[1]).toFixed(2),
+    }))
+  );
+
+const canopyShade = makeLayer(2, [36, 58], shadeGreens, [8, 12], [0.9, 1]);
+const canopyMid = makeLayer(3, [24, 46], midGreens, [0, 0], [0.85, 1]);
+const canopyLit = makeLayer(1, [13, 26], litGreens, [-12, -14], [0.5, 0.8]);
+
+const bulbColors = ['#ffe6a8', '#ffd27a', '#f7b4c6', '#c9aef2', '#a8e0d6', '#fff4d4'];
+
+const strands: [number, number][][] = [
+  [[40, 242], [150, 336], [266, 250]],
+  [[266, 250], [402, 344], [542, 250]],
+  [[542, 250], [684, 338], [832, 236]],
+  [[832, 236], [962, 322], [1098, 216]],
+  [[1098, 216], [1156, 262], [1196, 206]],
+  [[212, 158], [332, 224], [452, 168]],
+  [[452, 168], [600, 238], [744, 176]],
+  [[744, 176], [882, 230], [1012, 156]],
+];
+
+const qpoint = (p0: number[], p1: number[], p2: number[], t: number) => {
+  const u = 1 - t;
+  return {
+    x: u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0],
+    y: u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1],
+  };
+};
+
+const wires = strands.map((s) => `M${s[0][0]},${s[0][1]} Q${s[1][0]},${s[1][1]} ${s[2][0]},${s[2][1]}`);
+
+const strandBulbs = strands.flatMap((s) => {
+  const count = 9;
+  return Array.from({ length: count }, (_, i) => {
+    const t = (i + 0.5) / count;
+    const { x, y } = qpoint(s[0], s[1], s[2], t);
+    const ci = Math.floor(rnd() * bulbColors.length);
+    return {
+      x: Math.round(x * 10) / 10,
+      y: Math.round(y * 10) / 10,
+      r: between(4.4, 6.2),
+      ci,
+      delay: between(0, 6),
+      dur: between(2.6, 5.4),
+    };
+  });
+});
+
+// Lights that hang straight down on their own wire.
+const hangers = [
+  [96, 238], [188, 296], [246, 246], [312, 240], [372, 232], [446, 176],
+  [498, 226], [570, 226], [646, 220], [712, 172], [788, 194], [860, 182],
+  [926, 190], [1000, 168], [1072, 140], [1148, 132], [222, 154], [534, 130],
+].map(([x, y]) => {
+  const drop = between(34, 96);
+  const ci = Math.floor(rnd() * bulbColors.length);
+  return {
+    x,
+    y,
+    ty: Math.round((y + drop) * 10) / 10,
+    r: between(5, 7.4),
+    ci,
+    delay: between(0, 6),
+    dur: between(2.8, 6),
+  };
+});
+---
+
+<svg
+  class={`tree ${className}`}
+  viewBox="0 0 1200 640"
+  preserveAspectRatio="xMinYMin meet"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <linearGradient id="tree-bark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#31200f" />
+      <stop offset="42%" stop-color="#5a3c1d" />
+      <stop offset="78%" stop-color="#452c14" />
+      <stop offset="100%" stop-color="#2a1b0c" />
+    </linearGradient>
+
+    {bulbColors.map((c, i) => (
+      <radialGradient id={`bulb-halo-${i}`}>
+        <stop offset="0%" stop-color={c} stop-opacity="0.9" />
+        <stop offset="38%" stop-color={c} stop-opacity="0.3" />
+        <stop offset="100%" stop-color={c} stop-opacity="0" />
+      </radialGradient>
+    ))}
+  </defs>
+
+  <!-- Deep shade sits behind the branches -->
+  <g class="tree-canopy tree-canopy--shade">
+    {canopyShade.map((f) => <path d={f.d} fill={f.fill} opacity={f.opacity} />)}
+  </g>
+
+  <!-- Branches -->
+  <g fill="none" stroke-linecap="round">
+    {branches.map((b) => (
+      <path d={b.d} stroke="url(#tree-bark)" stroke-width={b.w} />
+    ))}
+    {branches.map((b) => (
+      <path d={b.d} stroke="rgba(255,220,170,0.13)" stroke-width={Math.max(1, b.w * 0.22)} />
+    ))}
+  </g>
+
+  <!-- Leaf mass, then the leaves the lights catch -->
+  <g class="tree-canopy">
+    {canopyMid.map((f) => <path d={f.d} fill={f.fill} opacity={f.opacity} />)}
+    {canopyLit.map((f) => <path d={f.d} fill={f.fill} opacity={f.opacity} />)}
+  </g>
+
+  <!-- Foreground limbs read in front of the leaves -->
+  <g fill="none" stroke-linecap="round">
+    {branches.filter((b) => b.w <= 7 || b.w >= 20).map((b) => (
+      <path d={b.d} stroke="url(#tree-bark)" stroke-width={b.w} />
+    ))}
+    {branches.filter((b) => b.w <= 7 || b.w >= 20).map((b) => (
+      <path d={b.d} stroke="rgba(255,220,170,0.15)" stroke-width={Math.max(1, b.w * 0.22)} />
+    ))}
+  </g>
+
+  <!-- Light strands -->
+  <g fill="none" stroke="#33261a" stroke-width="1.8" opacity="0.85">
+    {wires.map((d) => <path d={d} />)}
+  </g>
+
+  {strandBulbs.map((b) => (
+    <g class="bulb" style={`--bd:${b.delay.toFixed(2)}s;--bt:${b.dur.toFixed(2)}s`}>
+      <circle class="bulb-halo" cx={b.x} cy={b.y} r={b.r * 4.2} fill={`url(#bulb-halo-${b.ci})`} />
+      <circle class="bulb-core" cx={b.x} cy={b.y} r={b.r} fill={bulbColors[b.ci]} />
+      <circle cx={b.x - b.r * 0.3} cy={b.y - b.r * 0.34} r={b.r * 0.3} fill="#fffdf3" opacity="0.9" />
+    </g>
+  ))}
+
+  <!-- Hanging lights -->
+  {hangers.map((h) => (
+    <g class="bulb" style={`--bd:${h.delay.toFixed(2)}s;--bt:${h.dur.toFixed(2)}s`}>
+      <line x1={h.x} y1={h.y} x2={h.x} y2={h.ty - h.r} stroke="#33261a" stroke-width="1.6" opacity="0.8" />
+      <circle class="bulb-halo" cx={h.x} cy={h.ty} r={h.r * 4.6} fill={`url(#bulb-halo-${h.ci})`} />
+      <rect x={h.x - 2.6} y={h.ty - h.r - 4} width="5.2" height="5" rx="1.4" fill="#8a6a35" />
+      <ellipse class="bulb-core" cx={h.x} cy={h.ty} rx={h.r} ry={h.r * 1.24} fill={bulbColors[h.ci]} />
+      <ellipse cx={h.x - h.r * 0.3} cy={h.ty - h.r * 0.4} rx={h.r * 0.26} ry={h.r * 0.34} fill="#fffdf3" opacity="0.9" />
+    </g>
+  ))}
+</svg>
+
+<style>
+  .tree {
+    display: block;
+    width: 100%;
+    min-width: 1000px;
+    height: auto;
+  }
+
+  /* On a phone the canopy is scaled down rather than cropped, so the
+     branches and the owl still compose with the heading below. */
+  @media (max-width: 700px) {
+    .tree {
+      min-width: 680px;
+    }
+  }
+
+  .tree-canopy {
+    transform-box: fill-box;
+    transform-origin: 14% 100%;
+    animation: canopy-sway 18s ease-in-out infinite;
+  }
+
+  .bulb {
+    animation: twinkle var(--bt, 4s) ease-in-out var(--bd, 0s) infinite;
+  }
+
+  .bulb-halo {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: halo-pulse var(--bt, 4s) ease-in-out var(--bd, 0s) infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.62; }
+    45% { opacity: 1; }
+  }
+
+  @keyframes halo-pulse {
+    0%, 100% { transform: scale(0.72); opacity: 0.5; }
+    45% { transform: scale(1.12); opacity: 1; }
+  }
+
+  @keyframes canopy-sway {
+    0%, 100% { transform: rotate(-0.45deg); }
+    50% { transform: rotate(0.5deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tree-canopy,
+    .bulb,
+    .bulb-halo {
+      animation: none;
+    }
+  }
+</style>

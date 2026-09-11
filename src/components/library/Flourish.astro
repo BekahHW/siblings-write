@@ -1,0 +1,72 @@
+---
+/**
+ * Gilt filigree: a section divider and a card corner ornament.
+ */
+export interface Props {
+  type?: 'divider' | 'corner';
+  class?: string;
+}
+
+const { type = 'divider', class: className = '' } = Astro.props;
+const gold = '#b98327';
+const goldLight = '#e6c173';
+---
+
+{type === 'divider' ? (
+  <svg
+    class={`flourish flourish--divider ${className}`}
+    viewBox="0 0 320 42"
+    role="presentation"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <g fill="none" stroke={gold} stroke-width="1.8" stroke-linecap="round">
+      <g>
+        <path d="M6,21 H104" />
+        <path d="M104,21 C114,21 118,12 127,12 C136,12 138,21 129,23 C122,24.5 118,18 123,14" />
+        <path d="M138,21 C132,14 122,14 117,21 C122,28 132,28 138,21 Z" fill={gold} fill-opacity="0.2" />
+      </g>
+      <g transform="translate(320,0) scale(-1,1)">
+        <path d="M6,21 H104" />
+        <path d="M104,21 C114,21 118,12 127,12 C136,12 138,21 129,23 C122,24.5 118,18 123,14" />
+        <path d="M138,21 C132,14 122,14 117,21 C122,28 132,28 138,21 Z" fill={gold} fill-opacity="0.2" />
+      </g>
+    </g>
+    <path d="M160,4 L169,21 L160,38 L151,21 Z" fill={gold} />
+    <path d="M160,10 L165,21 L160,32 L155,21 Z" fill={goldLight} />
+    <circle cx="160" cy="21" r="3" fill="#fdf3dd" />
+  </svg>
+) : (
+  <svg
+    class={`flourish flourish--corner ${className}`}
+    viewBox="0 0 64 64"
+    role="presentation"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <g fill="none" stroke={gold} stroke-linecap="round">
+      <path d="M4,60 L4,22 C4,11 11,4 22,4 L60,4" stroke-width="2" />
+      <path d="M11,48 C11,28 28,11 48,11" stroke-width="1.1" opacity="0.65" />
+      <path d="M4,24 C13,25 18,19 16,11 C23,13 28,8 27,4" stroke-width="1.5" />
+    </g>
+    <path d="M22,22 C16,16 16,8 22,4 C28,8 28,16 22,22 Z" fill={gold} fill-opacity="0.28" />
+    <circle cx="22" cy="22" r="2.6" fill={goldLight} />
+  </svg>
+)}
+
+<style>
+  .flourish {
+    display: block;
+    height: auto;
+  }
+
+  .flourish--divider {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .flourish--corner {
+    width: 100%;
+  }
+</style>

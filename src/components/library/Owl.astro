@@ -1,0 +1,165 @@
+---
+/**
+ * A small resident of the reading tree. Blinks, tilts, keeps an eye on the books.
+ */
+export interface Props {
+  variant?: 'warm' | 'cool';
+  delay?: number;
+  class?: string;
+}
+
+const { variant = 'warm', delay = 0, class: className = '' } = Astro.props;
+
+const skins = {
+  warm: {
+    body: '#7d5230',
+    belly: '#dcbd92',
+    face: '#c9a476',
+    wing: '#5d3c21',
+    beak: '#f0bd54',
+    pupil: '#2a1a0e',
+    tuft: '#5d3c21',
+  },
+  cool: {
+    body: '#5d4675',
+    belly: '#cdc2e2',
+    face: '#a695c2',
+    wing: '#46335f',
+    beak: '#f2a8c0',
+    pupil: '#231834',
+    tuft: '#46335f',
+  },
+};
+
+const s = skins[variant];
+const uid = `owl-${variant}-${delay}`;
+---
+
+<svg
+  class={`owl ${className}`}
+  viewBox="0 0 130 156"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+  style={`--owl-delay:${delay}s`}
+>
+  <defs>
+    <linearGradient id={`${uid}-body`} x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color={s.body} />
+      <stop offset="100%" stop-color={s.wing} />
+    </linearGradient>
+  </defs>
+
+  <!-- Perch -->
+  <path d="M8,144 C42,138 88,138 122,144" stroke="#4a331b" stroke-width="7" fill="none" stroke-linecap="round" />
+
+  <!-- Feet -->
+  <g stroke={s.beak} stroke-width="3.2" stroke-linecap="round" fill="none">
+    <path d="M52,130 L48,142 M52,130 L56,142 M52,136 L45,143" />
+    <path d="M78,130 L74,142 M78,130 L82,142 M78,136 L85,143" />
+  </g>
+
+  <!-- Tail -->
+  <path d="M52,120 L46,146 L65,134 L84,146 L78,120 Z" fill={s.wing} />
+
+  <!-- Body -->
+  <path
+    d="M65,22 C97,22 113,50 113,84 C113,118 92,138 65,138 C38,138 17,118 17,84 C17,50 33,22 65,22 Z"
+    fill={`url(#${uid}-body)`}
+  />
+
+  <!-- Belly -->
+  <ellipse cx="65" cy="98" rx="27" ry="33" fill={s.belly} opacity="0.92" />
+  <g stroke={s.body} stroke-width="1.8" fill="none" opacity="0.4">
+    <path d="M50,86 C57,92 73,92 80,86" />
+    <path d="M48,100 C56,107 74,107 82,100" />
+    <path d="M50,114 C57,120 73,120 80,114" />
+  </g>
+
+  <!-- Wings -->
+  <g class="owl-wings">
+    <path d="M27,56 C13,76 13,112 33,134 C21,108 19,80 31,58 Z" fill={s.wing} />
+    <path d="M103,56 C117,76 117,112 97,134 C109,108 111,80 99,58 Z" fill={s.wing} />
+  </g>
+
+  <g class="owl-head">
+    <!-- Ear tufts -->
+    <path d="M31,34 L21,8 L48,26 Z" fill={s.tuft} />
+    <path d="M99,34 L109,8 L82,26 Z" fill={s.tuft} />
+
+    <!-- Facial discs -->
+    <circle cx="50" cy="60" r="25" fill={s.face} />
+    <circle cx="80" cy="60" r="25" fill={s.face} />
+
+    <!-- Eyes -->
+    <circle cx="50" cy="60" r="15" fill="#fdf8ee" />
+    <circle cx="80" cy="60" r="15" fill="#fdf8ee" />
+    <circle class="owl-pupil" cx="50" cy="60" r="8" fill={s.pupil} />
+    <circle class="owl-pupil" cx="80" cy="60" r="8" fill={s.pupil} />
+    <circle cx="47.5" cy="57" r="3" fill="#fff" opacity="0.95" />
+    <circle cx="77.5" cy="57" r="3" fill="#fff" opacity="0.95" />
+
+    <!-- Eyelids -->
+    <ellipse class="owl-lid" cx="50" cy="60" rx="15.5" ry="15.5" fill={s.face} />
+    <ellipse class="owl-lid" cx="80" cy="60" rx="15.5" ry="15.5" fill={s.face} />
+
+    <!-- Beak -->
+    <path d="M65,66 L74,79 L65,91 L56,79 Z" fill={s.beak} />
+    <path d="M65,66 L74,79 L65,79 Z" fill="#fff" opacity="0.22" />
+  </g>
+</svg>
+
+<style>
+  .owl {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 8px 14px rgba(30, 16, 6, 0.4));
+  }
+
+  .owl-head {
+    transform-box: fill-box;
+    transform-origin: 50% 92%;
+    animation: owl-tilt 11s ease-in-out var(--owl-delay, 0s) infinite;
+  }
+
+  .owl-lid {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scaleY(0);
+    animation: owl-blink 7s ease-in-out var(--owl-delay, 0s) infinite;
+  }
+
+  .owl-wings {
+    transform-box: fill-box;
+    transform-origin: center top;
+    animation: owl-settle 9s ease-in-out var(--owl-delay, 0s) infinite;
+  }
+
+  @keyframes owl-blink {
+    0%, 92%, 100% { transform: scaleY(0); }
+    94%, 97% { transform: scaleY(1); }
+  }
+
+  @keyframes owl-tilt {
+    0%, 100% { transform: rotate(-4deg); }
+    45% { transform: rotate(5deg); }
+  }
+
+  @keyframes owl-settle {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.04); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .owl-head,
+    .owl-wings {
+      animation: none;
+    }
+
+    .owl-lid {
+      animation: none;
+      transform: scaleY(0);
+    }
+  }
+</style>

@@ -1,0 +1,134 @@
+---
+/**
+ * A trailing ivy vine. Leaves and tendrils are generated along a sine stem so
+ * the growth looks hand-drawn rather than tiled.
+ */
+export interface Props {
+  width?: number;
+  amplitude?: number;
+  wavelength?: number;
+  tone?: 'deep' | 'bright';
+  class?: string;
+}
+
+const {
+  width = 1200,
+  amplitude = 26,
+  wavelength = 300,
+  tone = 'deep',
+  class: className = '',
+} = Astro.props;
+
+let seed = 777 + width + Math.round(amplitude);
+const rnd = () => {
+  seed = (seed * 1103515245 + 12345) % 2147483648;
+  return seed / 2147483648;
+};
+
+const tones = {
+  deep: { stem: '#3d5c33', leaves: ['#2f5533', '#3b6b3c', '#476f3f', '#27482c'], vein: '#8fb173' },
+  bright: { stem: '#587c43', leaves: ['#4a7c46', '#5c9150', '#6fa25a', '#3f6b3e'], vein: '#cbe2ab' },
+};
+const t = tones[tone];
+
+const samples = 240;
+const points = Array.from({ length: samples + 1 }, (_, i) => {
+  const x = (i / samples) * width;
+  const y = amplitude + amplitude * Math.sin((x / wavelength) * Math.PI * 2);
+  return [x, y];
+});
+
+const stemPath = `M${points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L')}`;
+
+const leafShape =
+  'M0,0 L0.5,-5 C-5,-4 -11,-7 -9.5,-12 C-14,-13.5 -14,-20 -8.5,-21 C-7.5,-27 -1.5,-28 0,-23 C1.5,-28 7.5,-27 8.5,-21 C14,-20 14,-13.5 9.5,-12 C11,-7 5,-4 -0.5,-5 Z';
+
+const decorations: {
+  kind: 'leaf' | 'tendril';
+  x: number;
+  y: number;
+  rot: number;
+  scale: number;
+  fill: string;
+  delay: number;
+}[] = [];
+
+for (let i = 6; i < samples; i += 7) {
+  const [x, y] = points[i];
+  const [px, py] = points[i - 2];
+  const [nx, ny] = points[i + 2] ?? points[i];
+  const angle = (Math.atan2(ny - py, nx - px) * 180) / Math.PI;
+  const side = (i / 7) % 2 === 0 ? -1 : 1;
+  const isTendril = rnd() > 0.82;
+
+  decorations.push({
+    kind: isTendril ? 'tendril' : 'leaf',
+    x,
+    y,
+    rot: angle + side * (62 + rnd() * 26),
+    scale: 0.72 + rnd() * 0.62,
+    fill: t.leaves[Math.floor(rnd() * t.leaves.length)],
+    delay: rnd() * 5,
+  });
+}
+---
+
+<svg
+  class={`ivy ${className}`}
+  viewBox={`0 -34 ${width} 122`}
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={stemPath} fill="none" stroke={t.stem} stroke-width="4.5" stroke-linecap="round" />
+  <path d={stemPath} fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="1.4" />
+
+  {decorations.map((d) => (
+    <g
+      class="ivy-leaf"
+      transform={`translate(${d.x.toFixed(1)} ${d.y.toFixed(1)}) rotate(${d.rot.toFixed(1)}) scale(${d.scale.toFixed(2)})`}
+      style={`--leaf-delay:${d.delay.toFixed(2)}s`}
+    >
+      {d.kind === 'leaf' ? (
+        <>
+          <path d={leafShape} fill={d.fill} />
+          <path d="M0,-4 L0,-22" stroke={t.vein} stroke-width="1.1" opacity="0.55" fill="none" />
+          <path d="M0,-12 L-5,-17 M0,-12 L5,-17" stroke={t.vein} stroke-width="0.9" opacity="0.4" fill="none" />
+        </>
+      ) : (
+        <path
+          d="M0,0 C5,-5 12,-2 10,4 C8.6,8.4 2,8 0.6,3.6"
+          fill="none"
+          stroke={t.stem}
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      )}
+    </g>
+  ))}
+</svg>
+
+<style>
+  .ivy {
+    display: block;
+    width: 100%;
+    min-width: 760px;
+    height: auto;
+  }
+
+  .ivy-leaf {
+    transform-box: fill-box;
+    animation: leaf-stir 7s ease-in-out var(--leaf-delay, 0s) infinite;
+  }
+
+  @keyframes leaf-stir {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ivy-leaf {
+      animation: none;
+    }
+  }
+</style>

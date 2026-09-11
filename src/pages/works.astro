@@ -1,6 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Bookshelf from '../components/Bookshelf.astro';
+import StainedGlassWindow from '../components/library/StainedGlassWindow.astro';
+import LibraryTree from '../components/library/LibraryTree.astro';
+import Owl from '../components/library/Owl.astro';
+import IvyVine from '../components/library/IvyVine.astro';
+import CoffeeMug from '../components/library/CoffeeMug.astro';
+import Flourish from '../components/library/Flourish.astro';
 import { getCollection, getEntry } from 'astro:content';
 
 // Get all works and sort by order
@@ -18,6 +24,37 @@ const permalink = `${Astro.site.href}work`;
 const intro = worksSettings?.data.intro || "We're passionate about creating adventurous stories, that spark your imagination and bring joy to our readers. Here's a look at some of the work we've done and what we're currently working on.";
 const featuredTitle = worksSettings?.data.featuredTitle || 'Featured Work';
 const otherProjectsTitle = worksSettings?.data.otherProjectsTitle || 'Other Projects';
+
+const testimonials = [
+  {
+    quote: 'Great story. I love the descriptions of the store and the people. It was heart warming.♥️',
+    source: 'Reader of our Short Stories',
+  },
+  {
+    quote: "Escape from Brown's Island bursts off the page like a star running back on a Saturday-night breakaway—fast, thrilling, and impossible to stop. The Hawrot siblings cut, juke, and power through danger with the perfect mix of grit and finesse, turning every chapter into a game-winning drive. A true end-zone celebration of adventure worthy of the record books.",
+    source: "Reader of Escape from Brown's Island",
+  },
+  {
+    quote: "I decided to give this book a try over the holiday season and I'm so glad I did! This was a huge break from the normal self-help / non-fiction books I like to read, so I wasn't sure what to expect. The authors do a wonderful job of building a world based on their own lives while pushing into fantasy and adventure in so many creative ways! I couldn't put the book down after the halfway point where the story keeps you guessing while filling you with an undeniable Christmas cheer. I'm a grown adult who felt like a kid again while enjoying this story. I've since passed it along to my own son with the same joy shared by the characters in this book! I hope you enjoy it as much as we do!",
+    source: 'Reader of Battle for Christmas: Reign of the Nutcrackers',
+  },
+];
+
+// Dust motes drifting through the lamplight. Seeded so builds stay identical.
+let moteSeed = 424242;
+const moteRnd = () => {
+  moteSeed = (moteSeed * 1103515245 + 12345) % 2147483648;
+  return moteSeed / 2147483648;
+};
+const motes = Array.from({ length: 18 }, () => ({
+  left: (moteRnd() * 100).toFixed(2),
+  top: (18 + moteRnd() * 72).toFixed(2),
+  size: (2 + moteRnd() * 4).toFixed(1),
+  drift: (moteRnd() * 60 - 30).toFixed(0),
+  delay: (moteRnd() * 18).toFixed(2),
+  duration: (16 + moteRnd() * 16).toFixed(2),
+  opacity: (0.28 + moteRnd() * 0.5).toFixed(2),
+}));
 
 // Generate structured data for all works
 const structuredData = {
@@ -54,393 +91,1243 @@ const structuredData = {
 };
 ---
 
+<BaseLayout title={title} description={description} permalink={permalink} current="work">
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-  <BaseLayout title={title} description={description} permalink={permalink} current="work">
-    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
-    <div class="container-new">
-      <h1>{title}</h1>
-      <p>{intro}</p>
+  <div class="library">
+    <!-- ─── The room itself ──────────────────────────────────────── -->
+    <div class="room" aria-hidden="true">
+      <div class="room-lintel">
+        <div class="room-lintel-ivy"><IvyVine width={1200} amplitude={22} tone="deep" /></div>
+      </div>
+
+      <div class="room-tree">
+        <LibraryTree />
+        <div class="perch perch--one"><Owl variant="warm" delay={0} /></div>
+        <div class="perch perch--two"><Owl variant="cool" delay={2.4} /></div>
+      </div>
+
+      <div class="room-ivy room-ivy--left"><IvyVine width={900} amplitude={30} tone="bright" /></div>
+      <div class="room-ivy room-ivy--right"><IvyVine width={900} amplitude={30} tone="bright" /></div>
+
+      <div class="room-motes">
+        {motes.map((m) => (
+          <span
+            class="mote"
+            style={`left:${m.left}%;top:${m.top}%;width:${m.size}px;height:${m.size}px;--mote-drift:${m.drift}px;--mote-delay:${m.delay}s;--mote-duration:${m.duration}s;--mote-opacity:${m.opacity}`}
+          ></span>
+        ))}
+      </div>
+
+      <div class="room-floor"></div>
+    </div>
+
+    <!-- ─── Content ──────────────────────────────────────────────── -->
+    <div class="room-inner">
+      <header class="threshold">
+        <div class="threshold-crown">
+          <p class="threshold-eyebrow">Mind the ivy &middot; the lights are always on</p>
+          <h1 class="threshold-title">{title}</h1>
+          <Flourish type="divider" class="threshold-rule" />
+        </div>
+        <div class="plaque">
+          <span class="plaque-corner plaque-corner--tl"><Flourish type="corner" /></span>
+          <span class="plaque-corner plaque-corner--tr"><Flourish type="corner" /></span>
+          <span class="plaque-corner plaque-corner--bl"><Flourish type="corner" /></span>
+          <span class="plaque-corner plaque-corner--br"><Flourish type="corner" /></span>
+          <p class="threshold-intro">{intro}</p>
+        </div>
+      </header>
 
       <!-- Interactive Bookshelf -->
-      <Bookshelf />
-
-      <!-- Fallback card grid (accessibility + SEO) -->
-      {featuredWorks.length > 0 && (
-        <div class="fallback-grid-wrapper">
-          <details class="fallback-details">
-            <summary class="fallback-summary">Browse all books</summary>
-            <div class="fallback-grid">
-              {featuredWorks.map((work) => (
-                <article class="book-section" itemscope itemtype="https://schema.org/Book">
-                  <a href={`/works/${work.id}`} class="book-cover-link">
-                    <img
-                      src={work.data.image}
-                      alt={`Book cover for ${work.data.title}`}
-                      width="200"
-                      itemprop="image"
-                      loading="lazy"
-                    >
-                  </a>
-                  <div>
-                    <p>
-                      <strong itemprop="name">
-                        <a href={`/works/${work.id}`} class="work-title-link">{work.data.title}</a>
-                      </strong><br/>
-                      <span itemprop="description">{work.data.description}</span>
-                    </p>
-                    <div class="button-group">
-                      <a href={`/works/${work.id}`} class="learn-more-button">
-                        Learn More
-                      </a>
-                      <a
-                        href={work.data.link}
-                        target="_blank"
-                        rel="noopener"
-                        class="buy-button"
-                        itemprop="url"
-                      >
-                        Buy Now on Amazon
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </details>
+      <section class="alcove" aria-labelledby="alcove-heading">
+        <div class="lamp" aria-hidden="true"></div>
+        <h2 id="alcove-heading" class="engraved">{featuredTitle}</h2>
+        <p class="section-lead">Run your finger along the spines. Tug one loose and it opens.</p>
+        <div class="alcove-stage">
+          <div class="alcove-window alcove-window--left">
+            <StainedGlassWindow variant="dawn" />
+          </div>
+          <div class="alcove-frame">
+            <Bookshelf />
+          </div>
+          <div class="alcove-window alcove-window--right">
+            <StainedGlassWindow variant="dusk" />
+          </div>
         </div>
+      </section>
+
+      <!-- Every book, up close -->
+      {featuredWorks.length > 0 && (
+        <section class="catalog" aria-labelledby="catalog-heading">
+          <h2 id="catalog-heading" class="engraved">The Card Catalog</h2>
+          <p class="section-lead">Every book on the shelf, lit up and waiting in its own little alcove.</p>
+
+          <div class="tomes">
+            {featuredWorks.map((work) => (
+              <article class="tome" itemscope itemtype="https://schema.org/Book">
+                <span class="tome-corner tome-corner--tl" aria-hidden="true"><Flourish type="corner" /></span>
+                <span class="tome-corner tome-corner--tr" aria-hidden="true"><Flourish type="corner" /></span>
+                <span class="tome-corner tome-corner--bl" aria-hidden="true"><Flourish type="corner" /></span>
+                <span class="tome-corner tome-corner--br" aria-hidden="true"><Flourish type="corner" /></span>
+
+                <a href={`/works/${work.id}`} class="tome-niche" tabindex="-1" aria-hidden="true">
+                  <span class="tome-niche-light"></span>
+                  <img
+                    src={work.data.image}
+                    alt=""
+                    width="168"
+                    height="252"
+                    itemprop="image"
+                    loading="lazy"
+                  />
+                </a>
+
+                <div class="tome-text">
+                  <h3 class="tome-title" itemprop="name">
+                    <a href={`/works/${work.id}`}>{work.data.title}</a>
+                  </h3>
+                  <p class="tome-desc" itemprop="description">{work.data.description}</p>
+                  {work.data.inspiredBy && (
+                    <p class="tome-whisper">
+                      <span class="tome-whisper-label">Where it came from</span>
+                      {work.data.inspiredBy}
+                    </p>
+                  )}
+                  <div class="tome-actions">
+                    <a href={`/works/${work.id}`} class="btn btn--brass">
+                      Learn More
+                      <span class="sr-only"> about {work.data.title}</span>
+                    </a>
+                    <a
+                      href={work.data.link}
+                      target="_blank"
+                      rel="noopener"
+                      class="btn btn--seal"
+                      itemprop="url"
+                    >
+                      Buy on Amazon
+                      <span class="sr-only"> — {work.data.title}</span>
+                    </a>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {otherWorks.length > 0 && (
+        <section class="catalog catalog--other" aria-labelledby="other-heading">
+          <h2 id="other-heading" class="engraved">{otherProjectsTitle}</h2>
+          <p class="section-lead">Still drying on the desk.</p>
+          <div class="tomes tomes--compact">
+            {otherWorks.map((work) => (
+              <article class="tome tome--compact">
+                <a href={`/works/${work.id}`} class="tome-niche" tabindex="-1" aria-hidden="true">
+                  <span class="tome-niche-light"></span>
+                  <img src={work.data.image} alt="" width="140" height="210" loading="lazy" />
+                </a>
+                <div class="tome-text">
+                  <h3 class="tome-title"><a href={`/works/${work.id}`}>{work.data.title}</a></h3>
+                  <p class="tome-desc">{work.data.description}</p>
+                  <div class="tome-actions">
+                    <a href={`/works/${work.id}`} class="btn btn--brass">Learn More</a>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
       )}
 
       <!-- Reader Testimonials -->
-      <h2>What Readers Are Saying</h2>
-      <div class="testimonials-section">
-        <blockquote class="testimonial">
-          <p>"Great story. I love the descriptions of the store and the people. It was heart warming.♥️"</p>
-          <cite>— Reader of our Short Stories</cite>
-        </blockquote>
+      <section class="nook" aria-labelledby="nook-heading">
+        <div class="nook-mug" aria-hidden="true"><CoffeeMug /></div>
+        <h2 id="nook-heading" class="engraved">What Readers Are Saying</h2>
+        <p class="section-lead">Take the good chair by the window. These notes were left by readers.</p>
 
-        <blockquote class="testimonial">
-          <p>"Escape from Brown's Island bursts off the page like a star running back on a Saturday-night breakaway—fast, thrilling, and impossible to stop. The Hawrot siblings cut, juke, and power through danger with the perfect mix of grit and finesse, turning every chapter into a game-winning drive. A true end-zone celebration of adventure worthy of the record books."</p>
-          <cite>— Reader of Escape from Brown's Island</cite>
-        </blockquote>
+        <div class="nook-vine" aria-hidden="true"><IvyVine width={1500} amplitude={16} tone="deep" /></div>
 
-        <blockquote class="testimonial">
-          <p>"I decided to give this book a try over the holiday season and I'm so glad I did! This was a huge break from the normal self-help / non-fiction books I like to read, so I wasn't sure what to expect. The authors do a wonderful job of building a world based on their own lives while pushing into fantasy and adventure in so many creative ways! I couldn't put the book down after the halfway point where the story keeps you guessing while filling you with an undeniable Christmas cheer. I'm a grown adult who felt like a kid again while enjoying this story. I've since passed it along to my own son with the same joy shared by the characters in this book! I hope you enjoy it as much as we do!"</p>
-          <cite>— Reader of Battle for Christmas: Reign of the Nutcrackers</cite>
-        </blockquote>
-      </div>
+        <div class="quotes">
+          {testimonials.map((t) => (
+            <figure class="quote">
+              <span class="quote-corner quote-corner--tl" aria-hidden="true"><Flourish type="corner" /></span>
+              <span class="quote-corner quote-corner--tr" aria-hidden="true"><Flourish type="corner" /></span>
+              <span class="quote-corner quote-corner--bl" aria-hidden="true"><Flourish type="corner" /></span>
+              <span class="quote-corner quote-corner--br" aria-hidden="true"><Flourish type="corner" /></span>
+              <span class="quote-medallion" aria-hidden="true">&#10078;</span>
+              <blockquote class="quote-body"><p>{t.quote}</p></blockquote>
+              <figcaption class="quote-source">{t.source}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
     </div>
-  </BaseLayout>
-
+  </div>
+</BaseLayout>
 
 <style>
-  .container-new {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2em;
-  }
+  /* ═══════════════════════════════════════════════════════════════
+     THE LIBRARY
+     A warmer, dimmer room built from the site's own violets, roses
+     and teals so it reads as a doorway rather than a different site.
+     ═══════════════════════════════════════════════════════════════ */
 
-  .work-image {
-    float: right;
-    margin: -3em -7em 2em 2em;
-    max-width: 300px;
-  }
+  .library {
+    --ink: #33223f;
+    --ink-soft: #5d4a5c;
+    --parchment: #fdf6e9;
+    --parchment-2: #f7ead4;
+    --parchment-3: #edd9bb;
+    --gold: #b98327;
+    --gold-light: #e6c173;
+    --gold-deep: #8a5f18;
+    --plum: #43305a;
+    --plum-deep: #281a3b;
+    --violet: #7c3aed;
+    --rose: #e4738f;
+    --teal: #4f9a92;
+    --ivy: #3b6b3c;
+    --wood: #6b4a22;
+    --lamp: #ffd88a;
 
-  .work-image img {
-    border-radius: 8px;
-    margin-bottom: 1.5em;
-  }
-
-  .book-section {
-    display: flex;
-    align-items: center;
-    gap: 2em;
-    margin: 3em 0;
-    padding: 2em;
-    background: linear-gradient(135deg, rgba(249, 168, 212, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
-    border-radius: 20px;
-    transition: all 0.4s ease;
-    border: 2px solid rgba(124, 58, 237, 0.1);
-  }
-
-  .book-section > div {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .book-section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(124, 58, 237, 0.2);
-    border-color: rgba(124, 58, 237, 0.3);
-  }
-
-  .book-section img {
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    margin: 0;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-    width: 200px;
-    height: auto;
-  }
-
-  .book-section:hover img {
-    transform: scale(1.05) rotate(-2deg);
-    box-shadow: 0 15px 35px rgba(124, 58, 237, 0.3);
-  }
-
-  .book-cover-link {
-    display: block;
-    text-decoration: none;
-  }
-
-  .work-title-link {
-    color: var(--text-main);
-    text-decoration: none;
-    background: linear-gradient(to right, var(--primary-color), #c084fc);
-    background-size: 0% 2px;
-    background-repeat: no-repeat;
-    background-position: left bottom;
-    transition: background-size 0.3s ease, color 0.3s ease;
-  }
-
-  .work-title-link:hover {
-    background-size: 100% 2px;
-    color: var(--primary-color);
-  }
-
-  .button-group {
-    display: flex;
-    gap: 1em;
-    margin-top: 1em;
-    flex-wrap: wrap;
-  }
-
-  .buy-button,
-  .learn-more-button {
-    display: inline-block;
-    padding: 1em 2em;
-    text-decoration: none;
-    border-radius: 12px;
-    font-weight: bold;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
-    transition: all 0.3s ease;
     position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-top: -1em;
+    padding: 0 0 4rem;
     overflow: hidden;
-    font-family: var(--font-family-sans);
+    isolation: isolate;
+    color: var(--ink);
+    font-family: var(--font-family-serif);
+
+    background:
+      radial-gradient(140% 64% at 50% -6%, rgba(28, 17, 44, 0.98) 0%, rgba(41, 26, 60, 0.88) 20%, rgba(60, 41, 80, 0.42) 44%, rgba(60, 41, 80, 0) 64%),
+      radial-gradient(80% 44% at 50% 30%, rgba(255, 205, 130, 0.46), transparent 76%),
+      radial-gradient(50% 34% at 3% 62%, rgba(198, 124, 92, 0.18), transparent 74%),
+      radial-gradient(50% 34% at 97% 62%, rgba(124, 58, 237, 0.14), transparent 74%),
+      linear-gradient(180deg, #e2d2b8 0%, #efe1c6 28%, #f5e9d3 50%, #efdec2 72%, #e2cba7 88%, #d0b58f 100%);
   }
 
-  .buy-button {
-    background: var(--primary-gradient);
-    color: white;
-  }
-
-  .learn-more-button {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
-  }
-
-  .buy-button::before,
-  .learn-more-button::before {
+  /* Panelled wall and a brass threshold where the room ends */
+  .library::after {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 14px;
+    background: linear-gradient(180deg, #d4a93a 0%, #a87c22 30%, #7a5510 68%, #3d2508 100%);
+    box-shadow: 0 -8px 22px rgba(26, 14, 4, 0.5), inset 0 1px 0 rgba(255, 240, 200, 0.45);
+    z-index: 2;
   }
 
-  .buy-button:hover::before {
-    width: 300px;
-    height: 300px;
+  .room::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0 156px,
+      rgba(88, 58, 28, 0.055) 156px 158px,
+      transparent 158px 162px
+    );
+    opacity: 0.75;
   }
 
-  .buy-button:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.5);
+  /* Corners of the room fall into shadow */
+  .room::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(46, 28, 62, 0.4) 0%,
+      rgba(46, 28, 62, 0.1) 12%,
+      rgba(46, 28, 62, 0) 24%,
+      rgba(46, 28, 62, 0) 76%,
+      rgba(46, 28, 62, 0.1) 88%,
+      rgba(46, 28, 62, 0.4) 100%
+    );
   }
 
-  .learn-more-button:hover::before {
-    width: 300px;
-    height: 300px;
+  /* ─── Ambience layers ──────────────────────────────────────────── */
+  .room {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
   }
 
-  .learn-more-button:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 10px 30px rgba(79, 172, 254, 0.5);
+  /* Doorway beam you step under */
+  .room-lintel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 54px;
+    background:
+      linear-gradient(180deg, #4d3317 0%, #6b4a22 34%, #56391a 72%, #33200c 100%);
+    box-shadow:
+      0 10px 28px rgba(20, 10, 2, 0.6),
+      inset 0 2px 0 rgba(255, 225, 175, 0.22),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.45);
   }
 
-  /* ─── Fallback grid ─────────────────────────────────────────────── */
-  .fallback-grid-wrapper {
-    margin: 3em 0 1em;
+  .room-lintel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0 70px,
+      rgba(255, 232, 190, 0.05) 70px 72px,
+      transparent 72px 158px,
+      rgba(0, 0, 0, 0.08) 158px 161px
+    );
   }
 
-  .fallback-details {
-    border: 1px solid rgba(124, 58, 237, 0.14);
-    border-radius: 12px;
+  .room-lintel-ivy {
+    position: absolute;
+    top: 22px;
+    left: 0;
+    right: 0;
     overflow: hidden;
   }
 
-  .fallback-summary {
-    padding: 1em 1.5em;
-    font-family: var(--font-family-sans);
-    font-weight: 700;
-    font-size: 0.95em;
-    color: var(--primary-color);
-    cursor: pointer;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    background: rgba(124, 58, 237, 0.04);
-    transition: background 0.2s ease;
+  /* Reading tree */
+  .room-tree {
+    position: absolute;
+    top: 34px;
+    left: -70px;
+    width: calc(100% + 140px);
+    min-width: 1080px;
+    opacity: 0.98;
   }
 
-  .fallback-summary::-webkit-details-marker {
-    display: none;
+  .perch {
+    position: absolute;
   }
 
-  .fallback-summary::before {
-    content: '▶';
-    font-size: 0.7em;
-    transition: transform 0.25s ease;
-    display: inline-block;
+  .perch--one {
+    left: 15.5%;
+    top: 19.8%;
+    width: 9.5%;
   }
 
-  details[open] .fallback-summary::before {
+  .perch--two {
+    left: 64.6%;
+    top: 18%;
+    width: 7.5%;
+  }
+
+  /* Ivy climbing the side walls */
+  .room-ivy {
+    position: absolute;
+    top: 54%;
+    width: 920px;
+    height: 94px;
+    margin-top: -47px;
+    opacity: 0.85;
+  }
+
+  .room-ivy--left {
+    left: -404px;
+    transform: rotate(-90deg);
+  }
+
+  .room-ivy--right {
+    right: -404px;
     transform: rotate(90deg);
   }
 
-  .fallback-summary:hover {
-    background: rgba(124, 58, 237, 0.08);
+  /* Dust in the lamplight */
+  .room-motes {
+    position: absolute;
+    inset: 0;
   }
 
-  .fallback-grid {
-    padding: 0 1.5em 1.5em;
+  .mote {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff3d4;
+    opacity: var(--mote-opacity, 0.4);
+    box-shadow: 0 0 8px 2px rgba(255, 226, 166, 0.5);
+    animation: mote-drift var(--mote-duration, 22s) ease-in-out var(--mote-delay, 0s) infinite;
   }
 
-  .testimonials-section {
-    margin-top: 4em;
-    padding: 3em 2em;
+  @keyframes mote-drift {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(var(--mote-drift, 20px), -46px); }
+  }
+
+  /* Floorboards */
+  .room-floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 210px;
+    background:
+      linear-gradient(180deg, rgba(122, 82, 44, 0) 0%, rgba(122, 82, 44, 0.18) 20%, rgba(96, 62, 30, 0.44) 62%, rgba(62, 38, 16, 0.7) 100%),
+      repeating-linear-gradient(90deg, rgba(60, 36, 14, 0.11) 0 2px, transparent 2px 108px);
+  }
+
+  /* Baseboard where the wall meets the floor */
+  .room-floor::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 26px;
+    height: 16px;
+    background: linear-gradient(180deg, #7a5a30 0%, #5d4222 55%, #3c2812 100%);
+    box-shadow: 0 6px 16px rgba(30, 16, 4, 0.35), inset 0 1px 0 rgba(255, 228, 178, 0.28);
+  }
+
+  /* ─── Content column ──────────────────────────────────────────── */
+  .room-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 2.5rem);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ─── Threshold (page header) ──────────────────────────────────── */
+  .threshold {
+    /* Enough headroom that the heading always clears the canopy and the
+       owl sitting in it, at every width. */
+    padding-top: clamp(5.5rem, 24vw, 13rem);
+    text-align: center;
+  }
+
+  /* A pool of shade behind the heading so it stays readable wherever the
+     lights happen to fall in the canopy. */
+  .threshold-crown {
+    position: relative;
+    padding: 1.2rem 1rem 0.2rem;
+  }
+
+  .threshold-crown::before {
+    content: '';
+    position: absolute;
+    inset: -14% -8%;
+    background: radial-gradient(
+      56% 62% at 50% 46%,
+      rgba(26, 15, 40, 0.8) 0%,
+      rgba(26, 15, 40, 0.52) 46%,
+      rgba(26, 15, 40, 0) 78%
+    );
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .threshold-eyebrow {
+    font-family: var(--font-family-storybook);
+    font-size: clamp(0.66rem, 1.5vw, 0.82rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #f2d9a4;
+    margin: 0 0 0.9rem;
+    text-shadow: 0 0 18px rgba(255, 206, 130, 0.6);
+  }
+
+  .threshold-title {
+    font-family: var(--font-family-storybook);
+    font-size: clamp(2.3rem, 7vw, 4.4rem);
+    line-height: 1.05;
+    margin: 0;
+    color: #fdf3df;
+    text-shadow:
+      0 0 28px rgba(255, 205, 128, 0.5),
+      0 3px 0 rgba(70, 44, 12, 0.5),
+      0 14px 30px rgba(24, 12, 32, 0.55);
+  }
+
+  .threshold-rule {
+    margin: 1.4rem auto 2rem;
+    filter: drop-shadow(0 0 10px rgba(255, 206, 130, 0.4));
+  }
+
+  /* Parchment plaque */
+  .plaque {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: clamp(1.6rem, 4vw, 2.4rem) clamp(1.5rem, 4vw, 3rem);
+    background:
+      linear-gradient(180deg, rgba(255, 252, 243, 0.97) 0%, rgba(247, 234, 212, 0.97) 100%);
+    border: 1px solid rgba(185, 131, 39, 0.55);
+    border-radius: 4px;
+    box-shadow:
+      0 26px 50px rgba(38, 22, 12, 0.3),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+      inset 0 0 40px rgba(185, 131, 39, 0.08);
+  }
+
+  .plaque::after {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    border: 1px solid rgba(185, 131, 39, 0.35);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .plaque-corner {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
+  .plaque-corner--tl { top: 5px; left: 5px; }
+  .plaque-corner--tr { top: 5px; right: 5px; transform: scaleX(-1); }
+  .plaque-corner--bl { bottom: 5px; left: 5px; transform: scaleY(-1); }
+  .plaque-corner--br { bottom: 5px; right: 5px; transform: scale(-1); }
+
+  .threshold-intro {
+    position: relative;
+    margin: 0;
+    font-size: clamp(1rem, 2.2vw, 1.16rem);
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  .threshold-intro::first-letter {
+    font-family: var(--font-family-storybook);
+    font-size: 3.1em;
+    float: left;
+    line-height: 0.82;
+    padding: 0.08em 0.12em 0 0;
+    color: var(--gold-deep);
+    text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  /* ─── Engraved section headings ───────────────────────────────── */
+  .engraved {
+    font-family: var(--font-family-storybook);
+    font-size: clamp(1.3rem, 3.4vw, 1.95rem);
+    text-align: center;
+    color: #f6e4bd;
+    margin: 0;
+    letter-spacing: 0.03em;
+    text-shadow:
+      0 0 22px rgba(255, 206, 130, 0.35),
+      0 2px 0 rgba(60, 38, 10, 0.45);
+  }
+
+  .section-lead {
+    text-align: center;
+    font-size: clamp(0.95rem, 2vw, 1.05rem);
+    font-style: italic;
+    color: #e8d3ae;
+    margin: 0.6rem auto 2rem;
+    max-width: 44ch;
+  }
+
+  /* Lower sections sit on parchment, so their type darkens */
+  .catalog .engraved,
+  .nook .engraved {
+    color: #46306a;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .catalog .section-lead,
+  .nook .section-lead {
+    color: var(--ink-soft);
+  }
+
+  /* ─── Bookshelf alcove ────────────────────────────────────────── */
+  .alcove {
+    position: relative;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .lamp {
+    position: absolute;
+    top: -90px;
+    left: 50%;
+    width: min(760px, 86%);
+    height: 260px;
+    transform: translateX(-50%);
+    background: radial-gradient(50% 50% at 50% 40%, rgba(255, 216, 138, 0.5) 0%, rgba(255, 216, 138, 0.14) 52%, transparent 78%);
+    pointer-events: none;
+    filter: blur(6px);
+  }
+
+  .alcove-stage {
+    display: grid;
+    grid-template-areas: 'left shelf right';
+    grid-template-columns: minmax(110px, 186px) minmax(0, 1fr) minmax(110px, 186px);
+    gap: clamp(0.75rem, 2.4vw, 2rem);
+    align-items: end;
+  }
+
+  .alcove-window {
+    position: relative;
+  }
+
+  .alcove-window--left { grid-area: left; }
+  .alcove-window--right { grid-area: right; }
+
+  /* Coloured light the glass throws onto the floor */
+  .alcove-window::after {
+    content: '';
+    position: absolute;
+    left: -28%;
+    right: -28%;
+    bottom: -46px;
+    height: 92px;
+    border-radius: 50%;
+    filter: blur(22px);
+    pointer-events: none;
+  }
+
+  .alcove-window--left::after {
+    background: radial-gradient(50% 50% at 50% 50%, rgba(255, 196, 110, 0.55), rgba(228, 115, 143, 0.22) 58%, transparent 80%);
+  }
+
+  .alcove-window--right::after {
+    background: radial-gradient(50% 50% at 50% 50%, rgba(160, 128, 235, 0.5), rgba(79, 154, 146, 0.22) 58%, transparent 80%);
+  }
+
+  .alcove-frame {
+    grid-area: shelf;
+    position: relative;
+    padding: 0 clamp(0.5rem, 2vw, 1.5rem);
+    border-radius: 16px 16px 6px 6px;
+    background: linear-gradient(180deg, rgba(58, 36, 14, 0.55) 0%, rgba(44, 27, 10, 0.3) 100%);
+    box-shadow:
+      0 30px 60px rgba(26, 14, 4, 0.45),
+      inset 0 0 0 1px rgba(255, 224, 172, 0.16);
+  }
+
+  /* Pilasters framing the shelf */
+  .alcove-frame::before,
+  .alcove-frame::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    width: 10px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #2f1e0b, #6b4a22 45%, #3a2510);
+    box-shadow: inset 0 1px 0 rgba(255, 228, 178, 0.3);
+  }
+
+  .alcove-frame::before { left: 0; }
+  .alcove-frame::after { right: 0; }
+
+  /* ─── The card catalog ────────────────────────────────────────── */
+  .catalog {
+    margin-top: clamp(4rem, 9vw, 6.5rem);
+  }
+
+  .tomes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    gap: clamp(1.6rem, 3.4vw, 2.6rem);
+  }
+
+  .tome {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 2em;
-    background: rgba(249, 250, 251, 0.8);
-    border-radius: 16px;
-    border-top: 3px solid var(--primary-color, #548e9b);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+    align-items: center;
+    padding: clamp(1.4rem, 3vw, 2.1rem) clamp(1.2rem, 3vw, 2rem) clamp(1.6rem, 3vw, 2.1rem);
+    background:
+      linear-gradient(180deg, rgba(255, 253, 245, 0.98) 0%, rgba(248, 236, 214, 0.98) 58%, rgba(240, 224, 197, 0.98) 100%);
+    border: 1px solid rgba(185, 131, 39, 0.5);
+    border-radius: 6px;
+    box-shadow:
+      0 24px 46px rgba(40, 24, 12, 0.26),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.4s ease;
   }
 
-  .testimonial {
-    background: linear-gradient(135deg, rgba(167, 139, 250, 0.08) 0%, rgba(249, 168, 212, 0.08) 100%);
-    padding: 2em;
-    border-radius: 16px;
-    border-left: 5px solid transparent;
-    border-image: var(--magic-gradient) 1;
-    margin: 0;
-    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.1);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  .tome::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(185, 131, 39, 0.32);
+    border-radius: 3px;
+    pointer-events: none;
+  }
+
+  /* Faint laid-paper texture */
+  .tome::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(146, 104, 44, 0.05) 0 1px,
+      transparent 1px 5px
+    );
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .tome:hover,
+  .tome:focus-within {
+    transform: translateY(-8px);
+    box-shadow:
+      0 36px 64px rgba(40, 24, 12, 0.32),
+      0 0 46px rgba(255, 206, 130, 0.4),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  }
+
+  .tome-corner {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .tome-corner--tl { top: 6px; left: 6px; }
+  .tome-corner--tr { top: 6px; right: 6px; transform: scaleX(-1); }
+  .tome-corner--bl { bottom: 6px; left: 6px; transform: scaleY(-1); }
+  .tome-corner--br { bottom: 6px; right: 6px; transform: scale(-1); }
+
+  /* Arched alcove the cover sits in */
+  .tome-niche {
     position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: min(250px, 100%);
+    padding: 54px 24px 20px;
+    margin-bottom: 1.4rem;
+    border-radius: 125px 125px 8px 8px;
+    background:
+      radial-gradient(70% 46% at 50% 24%, rgba(255, 216, 138, 0.55), transparent 72%),
+      linear-gradient(180deg, #4b3358 0%, #3a2846 44%, #2c1d36 100%);
+    box-shadow:
+      inset 0 3px 14px rgba(0, 0, 0, 0.55),
+      inset 0 0 0 1px rgba(255, 224, 172, 0.22),
+      0 10px 22px rgba(32, 18, 8, 0.24);
+    text-decoration: none;
     overflow: hidden;
   }
 
-  .testimonial::before {
-    content: '"';
+  /* Radiating tracery inside the arch */
+  .tome-niche-light {
     position: absolute;
-    top: -10px;
-    left: 20px;
-    font-size: 6em;
-    color: rgba(124, 58, 237, 0.1);
-    font-family: Georgia, serif;
-    line-height: 1;
+    top: -34px;
+    left: 50%;
+    width: 210px;
+    height: 210px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background:
+      repeating-conic-gradient(
+        from 0deg at 50% 50%,
+        rgba(255, 222, 160, 0.16) 0deg 9deg,
+        transparent 9deg 22deg
+      );
+    opacity: 0.75;
+    pointer-events: none;
   }
 
-  .testimonial:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 40px rgba(124, 58, 237, 0.2);
-  }
-
-  .testimonial p {
-    font-size: 0.95em;
-    line-height: 1.7;
-    color: #333;
-    font-style: italic;
-    margin: 0 0 1em 0;
-  }
-
-  .testimonial cite {
-    font-size: 0.95em;
-    color: #666;
-    font-style: normal;
-    font-weight: 600;
+  .tome-niche img {
+    position: relative;
     display: block;
+    width: 168px;
+    height: auto;
+    border-radius: 3px 7px 7px 3px;
+    box-shadow:
+      5px 7px 18px rgba(0, 0, 0, 0.6),
+      -2px 0 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.42s cubic-bezier(0.34, 1.5, 0.64, 1), box-shadow 0.4s ease;
   }
 
-  @media (max-width: 1020px) {
-    .container-new {
-      padding: 1.5em;
-      max-width: 100%;
+  .tome:hover .tome-niche img,
+  .tome:focus-within .tome-niche img {
+    transform: translateY(-10px) rotate(-2deg) scale(1.04);
+    box-shadow:
+      8px 18px 34px rgba(0, 0, 0, 0.62),
+      0 0 34px rgba(255, 206, 130, 0.45);
+  }
+
+  .tome-text {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+  }
+
+  .tome-title {
+    font-family: var(--font-family-storybook);
+    font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+    line-height: 1.3;
+    margin: 0 0 0.7rem;
+    color: #3c2858;
+  }
+
+  .tome-title a {
+    color: inherit;
+    text-decoration: none;
+    background: linear-gradient(to right, var(--gold), var(--violet));
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    transition: background-size 0.32s ease, color 0.32s ease;
+  }
+
+  .tome-title a:hover,
+  .tome-title a:focus-visible {
+    background-size: 100% 2px;
+    color: var(--violet);
+  }
+
+  .tome-desc {
+    font-size: 0.97rem;
+    line-height: 1.72;
+    margin: 0 0 1.1rem;
+    color: #4a3a4c;
+  }
+
+  .tome-whisper {
+    position: relative;
+    font-size: 0.88rem;
+    font-style: italic;
+    line-height: 1.65;
+    margin: 0 0 1.4rem;
+    padding: 0.9rem 1rem 0.9rem 1.1rem;
+    text-align: left;
+    color: #5b4838;
+    background: linear-gradient(90deg, rgba(185, 131, 39, 0.12), rgba(185, 131, 39, 0.02));
+    border-left: 3px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .tome-whisper-label {
+    display: block;
+    font-family: var(--font-family-storybook);
+    font-style: normal;
+    font-size: 0.63rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    margin-bottom: 0.35rem;
+  }
+
+  .tome-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-top: auto;
+  }
+
+  /* ─── Buttons: brass plate and wax seal ───────────────────────── */
+  .btn {
+    position: relative;
+    display: inline-block;
+    padding: 0.78em 1.5em;
+    font-family: var(--font-family-sans);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: transform 0.28s ease, box-shadow 0.28s ease, filter 0.28s ease;
+  }
+
+  .btn--brass {
+    color: #2f2008;
+    background: linear-gradient(180deg, #f0d79a 0%, #d8b264 42%, #b98327 100%);
+    border: 1px solid #8a5f18;
+    box-shadow:
+      0 5px 14px rgba(60, 38, 10, 0.34),
+      inset 0 1px 0 rgba(255, 252, 233, 0.8);
+    text-shadow: 0 1px 0 rgba(255, 246, 220, 0.6);
+  }
+
+  .btn--seal {
+    color: #fff4f7;
+    background: linear-gradient(180deg, #8a49e8 0%, #7c3aed 45%, #5c25b8 100%);
+    border: 1px solid #4a1a9a;
+    box-shadow:
+      0 5px 14px rgba(64, 24, 128, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .btn:hover,
+  .btn:focus-visible {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+  }
+
+  .btn--brass:hover,
+  .btn--brass:focus-visible {
+    box-shadow:
+      0 9px 22px rgba(60, 38, 10, 0.4),
+      0 0 22px rgba(255, 206, 130, 0.55),
+      inset 0 1px 0 rgba(255, 252, 233, 0.85);
+  }
+
+  .btn--seal:hover,
+  .btn--seal:focus-visible {
+    box-shadow:
+      0 9px 22px rgba(64, 24, 128, 0.46),
+      0 0 22px rgba(160, 110, 245, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid rgba(255, 246, 220, 0.9);
+    outline-offset: 3px;
+  }
+
+  /* Compact cards for unfeatured work */
+  .tomes--compact {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+
+  .tome--compact .tome-niche {
+    width: min(200px, 100%);
+    padding: 42px 18px 16px;
+    border-radius: 100px 100px 8px 8px;
+  }
+
+  .tome--compact .tome-niche img {
+    width: 140px;
+  }
+
+  /* ─── The reading nook ────────────────────────────────────────── */
+  .nook {
+    position: relative;
+    margin-top: clamp(4rem, 9vw, 6.5rem);
+    padding: clamp(2.2rem, 5vw, 3.4rem) clamp(1.2rem, 4vw, 3rem) clamp(2.6rem, 5vw, 3.6rem);
+    border-radius: 10px;
+    background:
+      radial-gradient(80% 52% at 50% 0%, rgba(255, 200, 118, 0.4), transparent 72%),
+      linear-gradient(180deg, rgba(238, 221, 192, 0.97) 0%, rgba(222, 199, 165, 0.97) 100%);
+    border: 1px solid rgba(185, 131, 39, 0.5);
+    box-shadow:
+      0 30px 56px rgba(38, 22, 12, 0.26),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+      inset 0 0 60px rgba(185, 131, 39, 0.1);
+  }
+
+  .nook::before {
+    content: '';
+    position: absolute;
+    inset: 9px;
+    border: 1px solid rgba(185, 131, 39, 0.3);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+
+  .nook-mug {
+    position: absolute;
+    top: -74px;
+    right: clamp(1rem, 5vw, 3.5rem);
+    width: clamp(112px, 15vw, 168px);
+    z-index: 2;
+  }
+
+  .quotes {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 3.5vw, 2.4rem);
+  }
+
+  .quote {
+    position: relative;
+    margin: 0;
+    padding: clamp(2.1rem, 4vw, 2.7rem) clamp(1.6rem, 3.8vw, 2.6rem) clamp(1.6rem, 3vw, 2rem);
+    background:
+      linear-gradient(180deg, #fffcf1 0%, #f7ead0 62%, #f0dfbf 100%);
+    border: 1px solid rgba(185, 131, 39, 0.55);
+    border-radius: 4px;
+    box-shadow:
+      0 18px 36px rgba(40, 24, 12, 0.2),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+    transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.4s ease;
+  }
+
+  .quote::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(185, 131, 39, 0.28);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .quote:nth-child(odd) { transform: rotate(-0.35deg); }
+  .quote:nth-child(even) { transform: rotate(0.4deg); }
+
+  .quote:hover {
+    transform: rotate(0deg) translateY(-5px);
+    box-shadow:
+      0 26px 48px rgba(40, 24, 12, 0.24),
+      0 0 34px rgba(255, 206, 130, 0.35);
+  }
+
+  /* Little glass medallion holding the quote mark */
+  .quote-medallion {
+    position: absolute;
+    top: -26px;
+    right: clamp(1.4rem, 4vw, 2.6rem);
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: #fffaf0;
+    border: 3px solid var(--gold);
+    box-shadow:
+      0 8px 18px rgba(40, 24, 12, 0.34),
+      0 0 0 1px rgba(138, 95, 24, 0.5),
+      inset 0 0 14px rgba(255, 255, 255, 0.4);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    z-index: 3;
+  }
+
+  /* Leaded spokes across the medallion, like a tiny rose window */
+  .quote-medallion::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(44, 33, 23, 0.5) 0deg 2deg,
+      transparent 2deg 45deg
+    );
+    pointer-events: none;
+  }
+
+  .quote-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
+  .quote-corner--tl { top: 5px; left: 5px; }
+  .quote-corner--tr { top: 5px; right: 5px; transform: scaleX(-1); }
+  .quote-corner--bl { bottom: 5px; left: 5px; transform: scaleY(-1); }
+  .quote-corner--br { bottom: 5px; right: 5px; transform: scale(-1); }
+
+  .nook-vine {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: -24px;
+    height: 84px;
+    overflow: hidden;
+    opacity: 0.92;
+    pointer-events: none;
+  }
+
+  .quote:nth-child(3n + 1) .quote-medallion {
+    background: conic-gradient(from 210deg, #e8a13a, #e4738f, #d9b23f, #e8a13a);
+  }
+
+  .quote:nth-child(3n + 2) .quote-medallion {
+    background: conic-gradient(from 40deg, #7c5cc4, #4f9a92, #6285cb, #7c5cc4);
+  }
+
+  .quote:nth-child(3n + 3) .quote-medallion {
+    background: conic-gradient(from 130deg, #4f9a92, #d59b3c, #e0708e, #4f9a92);
+  }
+
+  /* Reset the site-wide blockquote treatment inside the nook */
+  .quote-body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-image: none;
+    background: none;
+    border-radius: 0;
+    font-size: 1rem;
+    font-style: normal;
+    transition: none;
+  }
+
+  .quote-body:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .quote-body p {
+    margin: 0;
+    font-size: clamp(0.98rem, 2.1vw, 1.08rem);
+    font-style: italic;
+    line-height: 1.82;
+    color: #43354a;
+    padding: 0;
+  }
+
+  .quote-source {
+    display: inline-block;
+    margin-top: 1.2rem;
+    padding: 0.42em 1em;
+    font-family: var(--font-family-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #2f2008;
+    background: linear-gradient(180deg, #f0d79a, #d3ab5c);
+    border: 1px solid #8a5f18;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255, 252, 233, 0.75);
+  }
+
+  .quote-source::before {
+    content: '— ';
+  }
+
+  /* ─── Responsive ──────────────────────────────────────────────── */
+  @media (max-width: 1080px) {
+    .alcove-stage {
+      grid-template-areas:
+        'left right'
+        'shelf shelf';
+      grid-template-columns: 1fr 1fr;
+      justify-items: center;
+      gap: clamp(1rem, 3vw, 2rem);
     }
 
-    .work-image {
-      float: none;
-      margin: 0 auto 2em;
+    .alcove-window {
+      width: min(150px, 100%);
+      margin-bottom: 1.2rem;
     }
 
-    .book-section {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 1.5em;
-      margin: 2em 0;
-    }
-
-    .book-section img {
-      width: 100%;
-      max-width: 200px;
-      margin: 0 0 1.5em 0;
-    }
-
-    .testimonials-section {
-      padding: 2em 1.5em;
-      margin-top: 3em;
-    }
-
-    .testimonial {
-      padding: 1.5em;
-    }
-
-    .testimonial::before {
-      font-size: 4em;
+    .alcove-window::after {
+      bottom: -34px;
+      height: 64px;
     }
   }
 
-  @media (max-width: 600px) {
-    .container-new {
-      padding: 1em;
+  @media (max-width: 900px) {
+    .perch--two {
+      display: none;
     }
 
-    .book-section {
-      padding: 1em;
-      gap: 1em;
+    .room-ivy {
+      width: 620px;
+      opacity: 0.7;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .library {
+      margin-top: -1em;
+      padding-bottom: 3rem;
     }
 
-    .button-group {
-      flex-direction: column;
+    /* Scale the tree down so the whole canopy fits, then start the
+       heading below the branch the owl is sitting on. */
+    .room-tree {
+      min-width: 700px;
+      left: -40px;
+      width: calc(100% + 80px);
     }
 
-    .buy-button,
-    .learn-more-button {
-      width: 100%;
+    .threshold {
+      padding-top: 13rem;
+    }
+
+    .room-lintel {
+      height: 40px;
+    }
+
+    .room-lintel-ivy {
+      top: 14px;
+    }
+
+    .nook-mug {
+      position: relative;
+      top: 0;
+      right: auto;
+      margin: -2.6rem auto 0.6rem;
+    }
+
+    .quote:nth-child(odd),
+    .quote:nth-child(even) {
+      transform: none;
+    }
+
+    .tome-niche {
+      width: min(210px, 100%);
+      padding: 44px 18px 16px;
+      border-radius: 105px 105px 8px 8px;
+    }
+
+    .tome-niche img {
+      width: 150px;
+    }
+
+    .tome-actions .btn {
+      flex: 1 1 100%;
       text-align: center;
     }
+  }
 
-    .testimonials-section {
-      padding: 1.5em 1em;
+  @media (max-width: 480px) {
+    .plaque {
+      padding: 1.4rem 1.1rem;
+    }
+
+    .threshold-intro::first-letter {
+      font-size: 2.6em;
+    }
+
+    .room-floor {
+      height: 130px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mote {
+      animation: none;
+    }
+
+    .tome,
+    .tome-niche img,
+    .quote,
+    .btn {
+      transition: none;
+    }
+
+    .tome:hover,
+    .tome:focus-within {
+      transform: none;
+    }
+
+    .quote:hover {
+      transform: none;
     }
   }
 </style>
