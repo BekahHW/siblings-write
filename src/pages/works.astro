@@ -88,8 +88,6 @@ const structuredData = {
 <BaseLayout title={title} description={description} permalink={permalink} current="work">
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-  <script is:inline>document.body.classList.add('works-room');</script>
-
   <div class="library">
     <!-- ─── The room itself ──────────────────────────────────────── -->
     <div class="room" aria-hidden="true">
@@ -158,6 +156,10 @@ const structuredData = {
             // Without a summary the logline is all we have, so it runs on the
             // story page rather than appearing twice.
             const hasSummary = Boolean(work.data.summary);
+            const storyParagraphs = (work.data.summary || work.data.description)
+              .split(/\n\n+/)
+              .map((para) => para.trim())
+              .filter(Boolean);
             return (
             <article
               class="spread"
@@ -189,15 +191,15 @@ const structuredData = {
 
               <div class="spread-page spread-page--right">
                 <h3 class="spread-label">The story</h3>
-                {hasSummary ? (
-                  <p class="spread-body">{work.data.summary}</p>
-                ) : (
-                  <p class="spread-body" itemprop="description">{work.data.description}</p>
-                )}
+                <div class="spread-prose">
+                  {storyParagraphs.map((para) => (
+                    <p itemprop={hasSummary ? undefined : 'description'}>{para}</p>
+                  ))}
+                </div>
 
                 {work.data.inspiredBy && (
                   <>
-                    <h3 class="spread-label">What sparked it</h3>
+                    <h3 class="spread-label">What inspired it</h3>
                     <p class="spread-body spread-body--aside">{work.data.inspiredBy}</p>
                   </>
                 )}
@@ -250,64 +252,99 @@ const structuredData = {
   </div>
 
   <script is:inline>
-    // Animations only run while their element is on screen.
+    /*
+     * The site uses view transitions, so a navigation swaps the document body
+     * and this script does not run again. Everything below re-binds on
+     * astro:page-load, which fires on first load and after every swap, and is
+     * idempotent so a double fire cannot double-bind.
+     */
     (function () {
-      if (!('IntersectionObserver' in window)) return;
-      var watcher = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            entry.target.classList.toggle('is-offscreen', !entry.isIntersecting);
-          });
-        },
-        { rootMargin: '120px' }
-      );
-      document.querySelectorAll('[data-animated]').forEach(function (el) {
-        watcher.observe(el);
-      });
-    })();
+      if (window.__worksRoom) return;
+      window.__worksRoom = true;
 
-    (function () {
-      var shelf = document.querySelector('[data-shelf]');
-      var reader = document.querySelector('[data-reader]');
-      if (!shelf || !reader) return;
+      var watcher = null;
 
-      var tabs = Array.prototype.slice.call(shelf.querySelectorAll('[role="tab"]'));
-
-      function open(id, focusTab) {
-        tabs.forEach(function (tab) {
-          var on = tab.dataset.book === id;
-          tab.setAttribute('aria-selected', on ? 'true' : 'false');
-          tab.tabIndex = on ? 0 : -1;
-          if (on && focusTab) tab.focus();
+      function pauseOffscreen() {
+        if (watcher) watcher.disconnect();
+        if (!('IntersectionObserver' in window)) return;
+        watcher = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              entry.target.classList.toggle('is-offscreen', !entry.isIntersecting);
+            });
+          },
+          { rootMargin: '120px' }
+        );
+        document.querySelectorAll('[data-animated]').forEach(function (el) {
+          watcher.observe(el);
         });
-        Array.prototype.forEach.call(reader.children, function (panel) {
-          panel.hidden = panel.id !== 'spread-' + id;
-        });
-        var shown = document.getElementById('spread-' + id);
-        if (shown) {
-          shown.classList.remove('is-turning');
-          void shown.offsetWidth;
-          shown.classList.add('is-turning');
-        }
       }
 
-      shelf.addEventListener('click', function (event) {
-        var tab = event.target.closest('[role="tab"]');
-        if (tab) open(tab.dataset.book, false);
-      });
+      function wireShelf() {
+        var shelf = document.querySelector('[data-shelf]');
+        var reader = document.querySelector('[data-reader]');
+        if (!shelf || !reader || shelf.dataset.bound) return;
+        shelf.dataset.bound = '1';
 
-      shelf.addEventListener('keydown', function (event) {
-        var index = tabs.indexOf(document.activeElement);
-        if (index < 0) return;
-        var next = null;
-        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + tabs.length) % tabs.length;
-        if (event.key === 'Home') next = 0;
-        if (event.key === 'End') next = tabs.length - 1;
-        if (next === null) return;
-        event.preventDefault();
-        open(tabs[next].dataset.book, true);
-      });
+        var tabs = Array.prototype.slice.call(shelf.querySelectorAll('[role="tab"]'));
+
+        function open(id, focusTab) {
+          tabs.forEach(function (tab) {
+            var on = tab.dataset.book === id;
+            tab.setAttribute('aria-selected', on ? 'true' : 'false');
+            tab.tabIndex = on ? 0 : -1;
+            if (on && focusTab) tab.focus();
+          });
+          Array.prototype.forEach.call(reader.children, function (panel) {
+            panel.hidden = panel.id !== 'spread-' + id;
+          });
+          var shown = document.getElementById('spread-' + id);
+          if (shown) {
+            shown.classList.remove('is-turning');
+            void shown.offsetWidth;
+            shown.classList.add('is-turning');
+          }
+        }
+
+        shelf.addEventListener('click', function (event) {
+          var tab = event.target.closest('[role="tab"]');
+          if (tab) open(tab.dataset.book, false);
+        });
+
+        shelf.addEventListener('keydown', function (event) {
+          var index = tabs.indexOf(document.activeElement);
+          if (index < 0) return;
+          var next = null;
+          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + tabs.length) % tabs.length;
+          if (event.key === 'Home') next = 0;
+          if (event.key === 'End') next = tabs.length - 1;
+          if (next === null) return;
+          event.preventDefault();
+          open(tabs[next].dataset.book, true);
+        });
+      }
+
+      function setup() {
+        var inRoom = Boolean(document.querySelector('.library'));
+        document.body.classList.toggle('works-room', inRoom);
+        if (!inRoom) {
+          if (watcher) {
+            watcher.disconnect();
+            watcher = null;
+          }
+          return;
+        }
+        pauseOffscreen();
+        wireShelf();
+      }
+
+      document.addEventListener('astro:page-load', setup);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setup);
+      } else {
+        setup();
+      }
     })();
   </script>
 </BaseLayout>
@@ -835,6 +872,9 @@ const structuredData = {
   .spread-page--left {
     border-radius: 3px 0 0 3px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     box-shadow:
       -5px 0 0 -1px #d6c5a3,
       -9px 0 0 -3px #c9b691,
@@ -925,11 +965,24 @@ const structuredData = {
     margin-top: 0;
   }
 
-  .spread-body {
+  .spread-body,
+  .spread-prose p {
     font-size: clamp(0.93rem, 1.9vw, 1.01rem);
     line-height: 1.8;
     margin: 0 0 1.6rem;
     color: #3b2f3c;
+  }
+
+  .spread-prose {
+    margin-bottom: 1.6rem;
+  }
+
+  .spread-prose p {
+    margin-bottom: 0.95rem;
+  }
+
+  .spread-prose p:last-child {
+    margin-bottom: 0;
   }
 
   .spread-body--aside {
