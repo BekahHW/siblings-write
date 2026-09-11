@@ -119,6 +119,7 @@ const structuredData = {
         ))}
       </div>
 
+      <div class="room-grain"></div>
       <div class="room-floor"></div>
     </div>
 
@@ -126,7 +127,7 @@ const structuredData = {
     <div class="room-inner">
       <header class="threshold">
         <div class="threshold-crown">
-          <p class="threshold-eyebrow">Mind the ivy &middot; the lights are always on</p>
+          <p class="threshold-eyebrow">The lights are always on</p>
           <h1 class="threshold-title">{title}</h1>
           <Flourish type="divider" class="threshold-rule" />
         </div>
@@ -144,16 +145,15 @@ const structuredData = {
         <div class="lamp" aria-hidden="true"></div>
         <h2 id="alcove-heading" class="engraved">{featuredTitle}</h2>
         <p class="section-lead">Run your finger along the spines. Tug one loose and it opens.</p>
-        <div class="alcove-stage">
-          <div class="alcove-window alcove-window--left">
-            <StainedGlassWindow variant="dawn" />
-          </div>
-          <div class="alcove-frame">
-            <Bookshelf />
-          </div>
-          <div class="alcove-window alcove-window--right">
-            <StainedGlassWindow variant="dusk" />
-          </div>
+        <div class="room-window room-window--left" aria-hidden="true">
+          <StainedGlassWindow variant="dawn" />
+        </div>
+        <div class="room-window room-window--right" aria-hidden="true">
+          <StainedGlassWindow variant="dusk" />
+        </div>
+
+        <div class="alcove-frame">
+          <Bookshelf />
         </div>
       </section>
 
@@ -161,7 +161,7 @@ const structuredData = {
       {featuredWorks.length > 0 && (
         <section class="catalog" aria-labelledby="catalog-heading">
           <h2 id="catalog-heading" class="engraved">The Card Catalog</h2>
-          <p class="section-lead">Every book on the shelf, lit up and waiting in its own little alcove.</p>
+          <p class="section-lead">Every book on the shelf, up close.</p>
 
           <div class="tomes">
             {featuredWorks.map((work) => (
@@ -245,7 +245,7 @@ const structuredData = {
       <section class="nook" aria-labelledby="nook-heading">
         <div class="nook-mug" aria-hidden="true"><CoffeeMug /></div>
         <h2 id="nook-heading" class="engraved">What Readers Are Saying</h2>
-        <p class="section-lead">Take the good chair by the window. These notes were left by readers.</p>
+        <p class="section-lead">Pull up the chair by the window. These came from readers.</p>
 
         <div class="nook-vine" aria-hidden="true"><IvyVine width={1500} amplitude={16} tone="deep" /></div>
 
@@ -303,11 +303,11 @@ const structuredData = {
     font-family: var(--font-family-serif);
 
     background:
-      radial-gradient(140% 64% at 50% -6%, rgba(28, 17, 44, 0.98) 0%, rgba(41, 26, 60, 0.88) 20%, rgba(60, 41, 80, 0.42) 44%, rgba(60, 41, 80, 0) 64%),
-      radial-gradient(80% 44% at 50% 30%, rgba(255, 205, 130, 0.46), transparent 76%),
-      radial-gradient(50% 34% at 3% 62%, rgba(198, 124, 92, 0.18), transparent 74%),
-      radial-gradient(50% 34% at 97% 62%, rgba(124, 58, 237, 0.14), transparent 74%),
-      linear-gradient(180deg, #e2d2b8 0%, #efe1c6 28%, #f5e9d3 50%, #efdec2 72%, #e2cba7 88%, #d0b58f 100%);
+      radial-gradient(150% 70% at 50% -8%, rgba(36, 24, 52, 0.97) 0%, rgba(40, 26, 58, 0.93) 16%, rgba(48, 32, 68, 0.64) 36%, rgba(54, 37, 74, 0.2) 56%, rgba(54, 37, 74, 0) 70%),
+      radial-gradient(72% 40% at 50% 32%, rgba(255, 196, 116, 0.4), transparent 76%),
+      radial-gradient(46% 32% at 2% 64%, rgba(176, 104, 74, 0.2), transparent 74%),
+      radial-gradient(46% 32% at 98% 64%, rgba(92, 60, 166, 0.18), transparent 74%),
+      linear-gradient(180deg, #b9a488 0%, #cdb896 24%, #ddc9a7 44%, #d4bf9c 68%, #bda482 86%, #9d8460 100%);
   }
 
   /* Panelled wall and a brass threshold where the room ends */
@@ -329,11 +329,12 @@ const structuredData = {
     inset: 0;
     background: repeating-linear-gradient(
       90deg,
-      transparent 0 156px,
-      rgba(88, 58, 28, 0.055) 156px 158px,
-      transparent 158px 162px
+      transparent 0 208px,
+      rgba(30, 18, 8, 0.07) 208px 211px,
+      rgba(255, 236, 198, 0.035) 211px 213px,
+      transparent 213px 220px
     );
-    opacity: 0.75;
+    opacity: 0.7;
   }
 
   /* Corners of the room fall into shadow */
@@ -343,12 +344,12 @@ const structuredData = {
     inset: 0;
     background: linear-gradient(
       90deg,
-      rgba(46, 28, 62, 0.4) 0%,
-      rgba(46, 28, 62, 0.1) 12%,
-      rgba(46, 28, 62, 0) 24%,
-      rgba(46, 28, 62, 0) 76%,
-      rgba(46, 28, 62, 0.1) 88%,
-      rgba(46, 28, 62, 0.4) 100%
+      rgba(24, 14, 34, 0.52) 0%,
+      rgba(24, 14, 34, 0.18) 12%,
+      rgba(24, 14, 34, 0) 26%,
+      rgba(24, 14, 34, 0) 74%,
+      rgba(24, 14, 34, 0.18) 88%,
+      rgba(24, 14, 34, 0.52) 100%
     );
   }
 
@@ -462,6 +463,16 @@ const structuredData = {
     50% { transform: translate(var(--mote-drift, 20px), -46px); }
   }
 
+  /* Plaster grain. Flat colour is the thing that reads as a drawing. */
+  .room-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.09;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
   /* Floorboards */
   .room-floor {
     position: absolute;
@@ -470,8 +481,8 @@ const structuredData = {
     bottom: 0;
     height: 210px;
     background:
-      linear-gradient(180deg, rgba(122, 82, 44, 0) 0%, rgba(122, 82, 44, 0.18) 20%, rgba(96, 62, 30, 0.44) 62%, rgba(62, 38, 16, 0.7) 100%),
-      repeating-linear-gradient(90deg, rgba(60, 36, 14, 0.11) 0 2px, transparent 2px 108px);
+      linear-gradient(180deg, rgba(74, 46, 22, 0) 0%, rgba(74, 46, 22, 0.24) 18%, rgba(56, 34, 15, 0.56) 58%, rgba(32, 19, 8, 0.82) 100%),
+      repeating-linear-gradient(90deg, rgba(24, 14, 5, 0.16) 0 2px, transparent 2px 106px);
   }
 
   /* Baseboard where the wall meets the floor */
@@ -490,9 +501,9 @@ const structuredData = {
   .room-inner {
     position: relative;
     z-index: 1;
-    max-width: 1180px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 clamp(1rem, 4vw, 2.5rem);
+    padding: 0 clamp(1rem, 4vw, 2rem);
   }
 
   .sr-only {
@@ -525,12 +536,12 @@ const structuredData = {
   .threshold-crown::before {
     content: '';
     position: absolute;
-    inset: -14% -8%;
+    inset: -22% -16%;
     background: radial-gradient(
       56% 62% at 50% 46%,
-      rgba(26, 15, 40, 0.8) 0%,
-      rgba(26, 15, 40, 0.52) 46%,
-      rgba(26, 15, 40, 0) 78%
+      rgba(22, 13, 34, 0.62) 0%,
+      rgba(22, 13, 34, 0.34) 50%,
+      rgba(22, 13, 34, 0) 82%
     );
     z-index: -1;
     pointer-events: none;
@@ -570,7 +581,7 @@ const structuredData = {
     margin: 0 auto;
     padding: clamp(1.6rem, 4vw, 2.4rem) clamp(1.5rem, 4vw, 3rem);
     background:
-      linear-gradient(180deg, rgba(255, 252, 243, 0.97) 0%, rgba(247, 234, 212, 0.97) 100%);
+      linear-gradient(180deg, rgba(246, 236, 216, 0.98) 0%, rgba(228, 211, 181, 0.98) 100%);
     border: 1px solid rgba(185, 131, 39, 0.55);
     border-radius: 4px;
     box-shadow:
@@ -644,8 +655,8 @@ const structuredData = {
   /* Lower sections sit on parchment, so their type darkens */
   .catalog .engraved,
   .nook .engraved {
-    color: #46306a;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    color: #33214d;
+    text-shadow: 0 1px 0 rgba(255, 248, 228, 0.6);
   }
 
   .catalog .section-lead,
@@ -671,68 +682,50 @@ const structuredData = {
     filter: blur(6px);
   }
 
-  .alcove-stage {
-    display: grid;
-    grid-template-areas: 'left shelf right';
-    grid-template-columns: minmax(110px, 186px) minmax(0, 1fr) minmax(110px, 186px);
-    gap: clamp(0.75rem, 2.4vw, 2rem);
-    align-items: end;
-  }
-
-  .alcove-window {
-    position: relative;
-  }
-
-  .alcove-window--left { grid-area: left; }
-  .alcove-window--right { grid-area: right; }
-
-  /* Coloured light the glass throws onto the floor */
-  .alcove-window::after {
-    content: '';
+  /* Glass set into the far wall, either side of the bookcase. It sits
+     behind the shelf and is softened, so it reads as depth, not decoration. */
+  .room-window {
     position: absolute;
-    left: -28%;
-    right: -28%;
-    bottom: -46px;
-    height: 92px;
-    border-radius: 50%;
-    filter: blur(22px);
+    bottom: 0;
+    width: clamp(150px, 13.5vw, 226px);
+    opacity: 0.42;
+    filter: blur(1.8px) saturate(0.72) brightness(0.8);
+    z-index: -1;
     pointer-events: none;
   }
 
-  .alcove-window--left::after {
-    background: radial-gradient(50% 50% at 50% 50%, rgba(255, 196, 110, 0.55), rgba(228, 115, 143, 0.22) 58%, transparent 80%);
+  .room-window--left {
+    left: calc(50% - 50vw + clamp(4px, 1.8vw, 42px));
   }
 
-  .alcove-window--right::after {
-    background: radial-gradient(50% 50% at 50% 50%, rgba(160, 128, 235, 0.5), rgba(79, 154, 146, 0.22) 58%, transparent 80%);
+  .room-window--right {
+    right: calc(50% - 50vw + clamp(4px, 1.8vw, 42px));
+  }
+
+  /* The light each window throws across the floor */
+  .room-window::after {
+    content: '';
+    position: absolute;
+    left: -60%;
+    right: -60%;
+    bottom: -40px;
+    height: 130px;
+    border-radius: 50%;
+    filter: blur(28px);
+    pointer-events: none;
+  }
+
+  .room-window--left::after {
+    background: radial-gradient(50% 50% at 50% 50%, rgba(255, 186, 96, 0.34), rgba(198, 96, 118, 0.12) 58%, transparent 82%);
+  }
+
+  .room-window--right::after {
+    background: radial-gradient(50% 50% at 50% 50%, rgba(136, 106, 214, 0.3), rgba(63, 132, 126, 0.12) 58%, transparent 82%);
   }
 
   .alcove-frame {
-    grid-area: shelf;
     position: relative;
-    padding: 0 clamp(0.5rem, 2vw, 1.5rem);
-    border-radius: 16px 16px 6px 6px;
-    background: linear-gradient(180deg, rgba(58, 36, 14, 0.55) 0%, rgba(44, 27, 10, 0.3) 100%);
-    box-shadow:
-      0 30px 60px rgba(26, 14, 4, 0.45),
-      inset 0 0 0 1px rgba(255, 224, 172, 0.16);
   }
-
-  /* Pilasters framing the shelf */
-  .alcove-frame::before,
-  .alcove-frame::after {
-    content: '';
-    position: absolute;
-    top: 6px;
-    bottom: 6px;
-    width: 10px;
-    border-radius: 6px;
-    background: linear-gradient(90deg, #2f1e0b, #6b4a22 45%, #3a2510);
-    box-shadow: inset 0 1px 0 rgba(255, 228, 178, 0.3);
-  }
-
-  .alcove-frame::before { left: 0; }
-  .alcove-frame::after { right: 0; }
 
   /* ─── The card catalog ────────────────────────────────────────── */
   .catalog {
@@ -752,7 +745,7 @@ const structuredData = {
     align-items: center;
     padding: clamp(1.4rem, 3vw, 2.1rem) clamp(1.2rem, 3vw, 2rem) clamp(1.6rem, 3vw, 2.1rem);
     background:
-      linear-gradient(180deg, rgba(255, 253, 245, 0.98) 0%, rgba(248, 236, 214, 0.98) 58%, rgba(240, 224, 197, 0.98) 100%);
+      linear-gradient(180deg, rgba(245, 235, 215, 0.99) 0%, rgba(232, 217, 190, 0.99) 58%, rgba(218, 199, 168, 0.99) 100%);
     border: 1px solid rgba(185, 131, 39, 0.5);
     border-radius: 6px;
     box-shadow:
@@ -819,12 +812,12 @@ const structuredData = {
     margin-bottom: 1.4rem;
     border-radius: 125px 125px 8px 8px;
     background:
-      radial-gradient(70% 46% at 50% 24%, rgba(255, 216, 138, 0.55), transparent 72%),
-      linear-gradient(180deg, #4b3358 0%, #3a2846 44%, #2c1d36 100%);
+      radial-gradient(62% 40% at 50% 12%, rgba(255, 206, 132, 0.4), transparent 72%),
+      linear-gradient(180deg, #3b2d22 0%, #261b14 46%, #150f0b 100%);
     box-shadow:
-      inset 0 3px 14px rgba(0, 0, 0, 0.55),
-      inset 0 0 0 1px rgba(255, 224, 172, 0.22),
-      0 10px 22px rgba(32, 18, 8, 0.24);
+      inset 0 4px 20px rgba(0, 0, 0, 0.72),
+      inset 0 0 0 1px rgba(255, 224, 172, 0.14),
+      0 10px 22px rgba(20, 12, 6, 0.3);
     text-decoration: none;
     overflow: hidden;
   }
@@ -838,13 +831,8 @@ const structuredData = {
     height: 210px;
     transform: translateX(-50%);
     border-radius: 50%;
-    background:
-      repeating-conic-gradient(
-        from 0deg at 50% 50%,
-        rgba(255, 222, 160, 0.16) 0deg 9deg,
-        transparent 9deg 22deg
-      );
-    opacity: 0.75;
+    background: radial-gradient(56% 48% at 50% 0%, rgba(255, 212, 146, 0.34), transparent 76%);
+    opacity: 0.9;
     pointer-events: none;
   }
 
@@ -906,7 +894,7 @@ const structuredData = {
     font-size: 0.97rem;
     line-height: 1.72;
     margin: 0 0 1.1rem;
-    color: #4a3a4c;
+    color: #3f3140;
   }
 
   .tome-whisper {
@@ -1024,8 +1012,8 @@ const structuredData = {
     padding: clamp(2.2rem, 5vw, 3.4rem) clamp(1.2rem, 4vw, 3rem) clamp(2.6rem, 5vw, 3.6rem);
     border-radius: 10px;
     background:
-      radial-gradient(80% 52% at 50% 0%, rgba(255, 200, 118, 0.4), transparent 72%),
-      linear-gradient(180deg, rgba(238, 221, 192, 0.97) 0%, rgba(222, 199, 165, 0.97) 100%);
+      radial-gradient(80% 52% at 50% 0%, rgba(255, 190, 104, 0.34), transparent 72%),
+      linear-gradient(180deg, rgba(222, 203, 172, 0.97) 0%, rgba(202, 180, 146, 0.97) 100%);
     border: 1px solid rgba(185, 131, 39, 0.5);
     box-shadow:
       0 30px 56px rgba(38, 22, 12, 0.26),
@@ -1061,7 +1049,7 @@ const structuredData = {
     margin: 0;
     padding: clamp(2.1rem, 4vw, 2.7rem) clamp(1.6rem, 3.8vw, 2.6rem) clamp(1.6rem, 3vw, 2rem);
     background:
-      linear-gradient(180deg, #fffcf1 0%, #f7ead0 62%, #f0dfbf 100%);
+      linear-gradient(180deg, #f6ecd7 0%, #ead9bb 62%, #ddc9a6 100%);
     border: 1px solid rgba(185, 131, 39, 0.55);
     border-radius: 4px;
     box-shadow:
@@ -1102,13 +1090,13 @@ const structuredData = {
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 1.6rem;
     line-height: 1;
-    color: #fffaf0;
-    border: 3px solid var(--gold);
+    color: #f2ddb0;
+    border: 2px solid #7c5615;
     box-shadow:
-      0 8px 18px rgba(40, 24, 12, 0.34),
-      0 0 0 1px rgba(138, 95, 24, 0.5),
-      inset 0 0 14px rgba(255, 255, 255, 0.4);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+      0 8px 18px rgba(24, 14, 6, 0.5),
+      0 0 16px rgba(255, 198, 118, 0.28),
+      inset 0 0 14px rgba(0, 0, 0, 0.55);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
     z-index: 3;
   }
 
@@ -1120,8 +1108,8 @@ const structuredData = {
     border-radius: 50%;
     background: repeating-conic-gradient(
       from 0deg at 50% 50%,
-      rgba(44, 33, 23, 0.5) 0deg 2deg,
-      transparent 2deg 45deg
+      rgba(12, 8, 5, 0.7) 0deg 2.4deg,
+      transparent 2.4deg 45deg
     );
     pointer-events: none;
   }
@@ -1151,15 +1139,15 @@ const structuredData = {
   }
 
   .quote:nth-child(3n + 1) .quote-medallion {
-    background: conic-gradient(from 210deg, #e8a13a, #e4738f, #d9b23f, #e8a13a);
+    background: conic-gradient(from 210deg, #7d4a17, #76304a, #6f5418, #7d4a17);
   }
 
   .quote:nth-child(3n + 2) .quote-medallion {
-    background: conic-gradient(from 40deg, #7c5cc4, #4f9a92, #6285cb, #7c5cc4);
+    background: conic-gradient(from 40deg, #3a2a6d, #1f4a47, #2d3a6a, #3a2a6d);
   }
 
   .quote:nth-child(3n + 3) .quote-medallion {
-    background: conic-gradient(from 130deg, #4f9a92, #d59b3c, #e0708e, #4f9a92);
+    background: conic-gradient(from 130deg, #1f4a47, #6d4a18, #6d3049, #1f4a47);
   }
 
   /* Reset the site-wide blockquote treatment inside the nook */
@@ -1185,7 +1173,7 @@ const structuredData = {
     font-size: clamp(0.98rem, 2.1vw, 1.08rem);
     font-style: italic;
     line-height: 1.82;
-    color: #43354a;
+    color: #372b3c;
     padding: 0;
   }
 
@@ -1210,23 +1198,9 @@ const structuredData = {
 
   /* ─── Responsive ──────────────────────────────────────────────── */
   @media (max-width: 1080px) {
-    .alcove-stage {
-      grid-template-areas:
-        'left right'
-        'shelf shelf';
-      grid-template-columns: 1fr 1fr;
-      justify-items: center;
-      gap: clamp(1rem, 3vw, 2rem);
-    }
-
-    .alcove-window {
-      width: min(150px, 100%);
-      margin-bottom: 1.2rem;
-    }
-
-    .alcove-window::after {
-      bottom: -34px;
-      height: 64px;
+    /* No wall left to show glass against once the shelf fills the width. */
+    .room-window {
+      display: none;
     }
   }
 
