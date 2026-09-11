@@ -1,0 +1,123 @@
+---
+/**
+ * An owl in the reading tree, drawn as a silhouette with a little rim light
+ * off the string bulbs and a glint in one eye. Seen, not cartooned.
+ */
+export interface Props {
+  variant?: 'warm' | 'cool';
+  delay?: number;
+  class?: string;
+}
+
+const { variant = 'warm', delay = 0, class: className = '' } = Astro.props;
+
+const skins = {
+  warm: { dark: '#130d09', mid: '#241a12', rim: 'rgba(255,214,152,0.55)', eye: '#f6c264' },
+  cool: { dark: '#0f0d15', mid: '#1d1a26', rim: 'rgba(206,196,255,0.45)', eye: '#e7d08a' },
+};
+
+const s = skins[variant];
+const uid = `owl-${variant}-${delay}`;
+---
+
+<svg
+  class={`owl ${className}`}
+  viewBox="0 0 120 152"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+  style={`--owl-delay:${delay}s`}
+>
+  <defs>
+    <linearGradient id={`${uid}-body`} x1="0.1" y1="0" x2="1" y2="0.6">
+      <stop offset="0%" stop-color={s.mid} />
+      <stop offset="46%" stop-color={s.dark} />
+      <stop offset="100%" stop-color="#080608" />
+    </linearGradient>
+  </defs>
+
+  <!-- Shadow it casts on its own branch -->
+  <ellipse cx="62" cy="141" rx="34" ry="6" fill="#080504" opacity="0.55" />
+
+  <!-- Branch the bird is standing on -->
+  <path d="M2,140 C34,133 82,133 118,141" stroke="#1b1209" stroke-width="7" fill="none" stroke-linecap="round" />
+
+  <g class="owl-body">
+    <!-- Talons -->
+    <g stroke={s.dark} stroke-width="3" stroke-linecap="round" fill="none">
+      <path d="M48,122 L44,137 M48,122 L52,137 M48,130 L40,138" />
+      <path d="M72,122 L68,137 M72,122 L76,137 M72,130 L80,138" />
+    </g>
+
+    <!-- Tail -->
+    <path d="M50,112 L44,144 L60,132 L76,144 L70,112 Z" fill="#0b0809" />
+
+    <!--
+      One continuous silhouette: tufted head running into the shoulders and
+      down to a folded wing, the way a perched owl actually reads at distance.
+    -->
+    <path
+      d="M60,16
+         C64,10 70,6 76,3
+         C75,10 73,16 70,21
+         C82,26 92,38 95,54
+         C99,72 100,96 92,116
+         C86,130 74,136 60,136
+         C46,136 34,130 28,116
+         C20,96 21,72 25,54
+         C28,38 38,26 50,21
+         C47,16 45,10 44,3
+         C50,6 56,10 60,16 Z"
+      fill={`url(#${uid}-body)`}
+    />
+
+    <!-- Folded wing edge -->
+    <path d="M88,58 C95,78 94,104 84,122 C89,100 89,78 84,60 Z" fill="#0a0708" opacity="0.85" />
+    <path d="M32,58 C25,78 26,104 36,122 C31,100 31,78 36,60 Z" fill="#0a0708" opacity="0.7" />
+
+    <!-- Rim light from the bulbs on the right -->
+    <path
+      d="M76,3 C75,10 73,16 70,21 C82,26 92,38 95,54 C99,72 100,96 92,116 C88,126 81,132 72,135
+         C81,128 87,118 90,106 C95,84 94,64 90,52 C86,38 78,28 68,23 C72,17 75,10 76,3 Z"
+      fill={s.rim}
+    />
+
+    <!-- Breast, barely lit -->
+    <path d="M60,54 C72,54 80,72 80,92 C80,112 71,126 60,126 C49,126 40,112 40,92 C40,72 48,54 60,54 Z" fill="#17110e" opacity="0.55" />
+
+    <!-- Eyes: two glints, one catching more light than the other -->
+    <g class="owl-eyes">
+      <ellipse cx="51" cy="46" rx="5.4" ry="5" fill={s.eye} opacity="0.8" />
+      <ellipse cx="70" cy="46" rx="5.4" ry="5" fill={s.eye} />
+      <circle cx="52.4" cy="44.6" r="1.5" fill="#fffbe9" opacity="0.9" />
+      <circle cx="71.4" cy="44.6" r="1.5" fill="#fffbe9" />
+    </g>
+
+    <!-- Beak -->
+    <path d="M60,52 L64,60 L60,67 L56,60 Z" fill="#241a10" />
+  </g>
+</svg>
+
+<style>
+  .owl {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* A blink is the eyes going dark for a beat, not a lid sliding down. */
+  .owl-eyes {
+    animation: owl-blink 9s steps(1, end) var(--owl-delay, 0s) infinite;
+  }
+
+  @keyframes owl-blink {
+    0%, 95%, 100% { opacity: 1; }
+    96%, 98% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .owl-eyes {
+      animation: none;
+    }
+  }
+</style>

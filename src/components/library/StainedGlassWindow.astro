@@ -1,0 +1,195 @@
+---
+/**
+ * Ornate leaded-glass window for the /works library room.
+ * Purely decorative: the room reads fine without it.
+ */
+export interface Props {
+  variant?: 'dawn' | 'dusk';
+  class?: string;
+}
+
+const { variant = 'dawn', class: className = '' } = Astro.props;
+
+const palettes = {
+  dawn: {
+    field: '#e0a845',
+    halo: '#c9662c',
+    ring: '#a86a1c',
+    heart: '#f6cf7f',
+    motif: '#fae3ab',
+    glass: ['#d97f1e', '#cf4f72', '#c4942a', '#3f8f83', '#8f4fb0', '#c1652c'],
+  },
+  dusk: {
+    field: '#9f8ad0',
+    halo: '#4a3390',
+    ring: '#57399b',
+    heart: '#cdb2f5',
+    motif: '#e6d9fb',
+    glass: ['#5b3fa8', '#2f7c74', '#c74d72', '#bf8323', '#3f63b0', '#8a45ad'],
+  },
+};
+
+const p = palettes[variant];
+const uid = `glass-${variant}`;
+
+const cols: [number, number][] = [[20, 80], [80, 140], [140, 200]];
+const rows: [number, number][] = [[200, 278], [278, 344], [344, 402]];
+const shift = variant === 'dusk' ? 2 : 0;
+
+const panes = rows.flatMap(([y0, y1], r) =>
+  cols.map(([x0, x1], c) => ({
+    x: x0,
+    y: y0,
+    w: x1 - x0,
+    h: y1 - y0,
+    cx: (x0 + x1) / 2,
+    cy: (y0 + y1) / 2,
+    motif: r,
+    fill: p.glass[(r * 3 + c + shift) % p.glass.length],
+  }))
+);
+
+const petals = [0, 45, 90, 135, 180, 225, 270, 315];
+const lead = '#241a10';
+
+const innerShape = 'M20,402 L20,156 C20,92 54,34 110,20 C166,34 200,92 200,156 L200,402 Z';
+---
+
+<svg
+  class={`glass ${className}`}
+  viewBox="0 0 220 420"
+  width="220"
+  height="420"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <linearGradient id={`${uid}-stone`} x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6a5238" />
+      <stop offset="45%" stop-color="#483522" />
+      <stop offset="100%" stop-color="#2a1f14" />
+    </linearGradient>
+
+    <linearGradient id={`${uid}-sheen`} x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.4" />
+      <stop offset="38%" stop-color="#fff" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#fff" stop-opacity="0.18" />
+    </linearGradient>
+
+    <linearGradient id={`${uid}-depth`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.26" />
+      <stop offset="46%" stop-color="#000" stop-opacity="0" />
+      <stop offset="100%" stop-color="#1a0d05" stop-opacity="0.34" />
+    </linearGradient>
+
+    <radialGradient id={`${uid}-backlight`} cx="50%" cy="34%" r="62%">
+      <stop offset="0%" stop-color="#fff6dd" stop-opacity="0.6" />
+      <stop offset="55%" stop-color={p.heart} stop-opacity="0.22" />
+      <stop offset="100%" stop-color={p.halo} stop-opacity="0" />
+    </radialGradient>
+
+    <clipPath id={`${uid}-clip`}>
+      <path d={innerShape} />
+    </clipPath>
+  </defs>
+
+  <!-- Stone surround -->
+  <path
+    d="M6,414 L6,150 C6,80 44,20 110,4 C176,20 214,80 214,150 L214,414 Z"
+    fill={`url(#${uid}-stone)`}
+    stroke="#1e150d"
+    stroke-width="2"
+  />
+  <path
+    d="M14,408 L14,153 C14,86 50,28 110,13 C170,28 206,86 206,153 L206,408 Z"
+    fill="none"
+    stroke="rgba(255,232,186,0.2)"
+    stroke-width="2"
+  />
+
+  <g clip-path={`url(#${uid}-clip)`}>
+    <!-- Base glass field -->
+    <rect x="14" y="0" width="192" height="410" fill={p.field} />
+    <circle cx="110" cy="118" r="78" fill={p.halo} opacity="0.55" />
+
+    <!-- Rose window -->
+    <g>
+      {petals.map((deg, i) => (
+        <path
+          d="M0,-13 C11,-24 14,-40 0,-50 C-14,-40 -11,-24 0,-13 Z"
+          transform={`translate(110 118) rotate(${deg})`}
+          fill={p.glass[i % p.glass.length]}
+          stroke={lead}
+          stroke-width="3"
+        />
+      ))}
+      <circle cx="110" cy="118" r="54" fill="none" stroke={lead} stroke-width="3.4" />
+      <circle cx="110" cy="118" r="14" fill={p.heart} stroke={lead} stroke-width="2.6" />
+      <circle cx="110" cy="118" r="5" fill={p.motif} />
+    </g>
+
+    <!-- Trefoils in the shoulders of the arch -->
+    {[[42, 168], [178, 168]].map(([tx, ty], i) => (
+      <g transform={`translate(${tx} ${ty})`}>
+        <circle cx="0" cy="-7" r="8" fill={p.glass[(i + 1) % p.glass.length]} stroke={lead} stroke-width="2.4" />
+        <circle cx="-7" cy="5" r="8" fill={p.glass[(i + 3) % p.glass.length]} stroke={lead} stroke-width="2.4" />
+        <circle cx="7" cy="5" r="8" fill={p.glass[(i + 5) % p.glass.length]} stroke={lead} stroke-width="2.4" />
+      </g>
+    ))}
+
+    <!-- Leaded panes -->
+    {panes.map((pane) => (
+      <g>
+        <rect x={pane.x} y={pane.y} width={pane.w} height={pane.h} fill={pane.fill} />
+        {pane.motif === 0 && (
+          <path
+            d={`M${pane.cx},${pane.y + 12} L${pane.x + pane.w - 12},${pane.cy} L${pane.cx},${pane.y + pane.h - 12} L${pane.x + 12},${pane.cy} Z`}
+            fill={p.motif}
+            opacity="0.6"
+            stroke={lead}
+            stroke-width="2.2"
+          />
+        )}
+        {pane.motif === 1 && (
+          <path
+            d={`M${pane.x + 10},${pane.y + pane.h - 10} C${pane.x + 10},${pane.y + 14} ${pane.x + pane.w - 10},${pane.y + 14} ${pane.x + pane.w - 10},${pane.y + pane.h - 10} Z`}
+            fill={p.motif}
+            opacity="0.5"
+            stroke={lead}
+            stroke-width="2.2"
+          />
+        )}
+        {pane.motif === 2 && (
+          <circle cx={pane.cx} cy={pane.cy} r="15" fill={p.motif} opacity="0.55" stroke={lead} stroke-width="2.2" />
+        )}
+        <rect x={pane.x} y={pane.y} width={pane.w} height={pane.h} fill={`url(#${uid}-depth)`} />
+        <rect x={pane.x} y={pane.y} width={pane.w} height={pane.h} fill="none" stroke={lead} stroke-width="3.4" />
+      </g>
+    ))}
+
+    <!-- Mullions and transoms -->
+    <rect x="76.5" y="20" width="7" height="384" fill={lead} />
+    <rect x="136.5" y="20" width="7" height="384" fill={lead} />
+    <rect x="14" y="174" width="192" height="7" fill={lead} />
+
+    <!-- Light behind the glass, then light across it -->
+    <rect x="14" y="0" width="192" height="410" fill={`url(#${uid}-backlight)`} />
+    <path d="M-40,420 L120,-20 L190,-20 L30,420 Z" fill={`url(#${uid}-sheen)`} />
+  </g>
+
+  <!-- Sill -->
+  <rect x="0" y="404" width="220" height="17" rx="4" fill="#4e3a26" />
+  <rect x="0" y="404" width="220" height="4" fill="rgba(255,230,186,0.26)" />
+</svg>
+
+<style>
+  .glass {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 0 38px rgba(255, 204, 132, 0.4))
+      drop-shadow(0 18px 30px rgba(40, 24, 12, 0.4));
+  }
+
+</style>

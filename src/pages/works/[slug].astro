@@ -14,6 +14,12 @@ export async function getStaticPaths() {
 const { work } = Astro.props;
 const { title, description, image, headerImage, link, inspiredBy, summary, inspirationStory, spotifyPlaylist, trailerVideoId } = work.data;
 
+// Summaries may carry paragraph breaks.
+const summaryParagraphs = (summary || '')
+  .split(/\n\n+/)
+  .map((para) => para.trim())
+  .filter(Boolean);
+
 const pageTitle = `${title} | Siblings Write`;
 const permalink = `${Astro.site?.href}works/${work.id}`;
 
@@ -188,7 +194,7 @@ const structuredData = {
               <span class="title-decoration">✨</span>
             </h2>
             <div class="summary-content">
-              <p>{summary}</p>
+              {summaryParagraphs.map((para) => <p>{para}</p>)}
             </div>
           </section>
         )}
