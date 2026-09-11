@@ -152,6 +152,12 @@ const structuredData = {
         <p class="shelf-hint">Take one down. It opens below.</p>
 
         <div class="reader" data-reader>
+          <div class="page-leaf" aria-hidden="true" inert>
+            <div class="page-leaf-face"></div>
+            <div class="page-leaf-back"></div>
+          </div>
+          <div class="page-shade" aria-hidden="true"></div>
+
           {sortedWorks.map((work) => {
             // Without a summary the logline is all we have, so it runs on the
             // story page rather than appearing twice.
@@ -286,24 +292,123 @@ const structuredData = {
         if (!shelf || !reader || shelf.dataset.bound) return;
         shelf.dataset.bound = '1';
 
+        var TURN = 540;
         var tabs = Array.prototype.slice.call(shelf.querySelectorAll('[role="tab"]'));
+        var spreads = Array.prototype.slice.call(reader.querySelectorAll('.spread'));
+        var leaf = reader.querySelector('.page-leaf');
+        var face = leaf && leaf.querySelector('.page-leaf-face');
+        var back = leaf && leaf.querySelector('.page-leaf-back');
+        var timers = [];
+        var inflight = null;
+        var still = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-        function open(id, focusTab) {
+        function markTabs(id, focusTab) {
           tabs.forEach(function (tab) {
             var on = tab.dataset.book === id;
             tab.setAttribute('aria-selected', on ? 'true' : 'false');
             tab.tabIndex = on ? 0 : -1;
             if (on && focusTab) tab.focus();
           });
-          Array.prototype.forEach.call(reader.children, function (panel) {
-            panel.hidden = panel.id !== 'spread-' + id;
-          });
-          var shown = document.getElementById('spread-' + id);
-          if (shown) {
-            shown.classList.remove('is-turning');
-            void shown.offsetWidth;
-            shown.classList.add('is-turning');
+        }
+
+        function settle() {
+          timers.forEach(clearTimeout);
+          timers = [];
+          // Commit any turn cut short, so exactly one spread is ever open.
+          if (inflight) {
+            inflight.current.hidden = true;
+            inflight.next.hidden = false;
+            inflight = null;
           }
+          reader.classList.remove('is-stacking', 'is-turning', 'is-resizing');
+          reader.style.height = '';
+          spreads.forEach(function (spread) {
+            spread.classList.remove('is-outgoing', 'is-incoming', 'clip-right', 'clip-left');
+          });
+          if (face) face.replaceChildren();
+          if (back) back.replaceChildren();
+        }
+
+        function open(id, focusTab) {
+          markTabs(id, focusTab);
+          // Settle first: a turn still running owns the visible spread.
+          settle();
+
+          var next = document.getElementById('spread-' + id);
+          var current = spreads.filter(function (s) { return !s.hidden; })[0];
+          if (!next || next === current) return;
+
+          if (still.matches || !leaf || !face || !back || !current) {
+            if (current) current.hidden = true;
+            next.hidden = false;
+            return;
+          }
+
+          /*
+           * A leaf carries the page you are leaving on its front and the page
+           * you are arriving at on its back, which is what a real one does.
+           * Turning forward lifts the right page; turning back lifts the left.
+           */
+          var forward = spreads.indexOf(next) > spreads.indexOf(current);
+          var lifted = forward ? '.spread-page--right' : '.spread-page--left';
+          var landed = forward ? '.spread-page--left' : '.spread-page--right';
+
+          face.replaceChildren(current.querySelector(lifted).cloneNode(true));
+          back.replaceChildren(next.querySelector(landed).cloneNode(true));
+          leaf.className = 'page-leaf page-leaf--' + (forward ? 'forward' : 'back');
+
+          /*
+           * Both spreads stack for the turn. The incoming one is clipped to the
+           * half the leaf has lifted off, so the new page is revealed from
+           * under it rather than cutting in.
+           */
+          reader.classList.add('is-stacking');
+          next.hidden = false;
+          inflight = { current: current, next: next };
+          current.classList.add('is-outgoing');
+          next.classList.add('is-incoming', forward ? 'clip-right' : 'clip-left');
+
+          // Measure only once the spread is rendered: a hidden element is 0
+          // tall. Holding the taller height stops any reflow mid-turn.
+          var tall = Math.max(current.offsetHeight, next.offsetHeight);
+          reader.style.height = tall + 'px';
+
+          // Start the leaf on the next frame, so the first layout and paint of
+          // the incoming spread is already paid for and cannot stall it.
+          requestAnimationFrame(function () {
+            reader.classList.add('is-turning');
+
+            // Swap the far half late, once the leaf is lying across it. By the
+            // end the leaf's back and the page beneath it are the same thing,
+            // so taking the leaf away is invisible.
+            timers.push(
+              setTimeout(function () {
+                next.classList.remove('clip-right', 'clip-left');
+                current.hidden = true;
+                current.classList.remove('is-outgoing');
+                inflight = null;
+              }, TURN * 0.75)
+            );
+
+            timers.push(
+              setTimeout(function () {
+                reader.classList.remove('is-turning', 'is-stacking');
+                next.classList.remove('is-incoming');
+                face.replaceChildren();
+                back.replaceChildren();
+                // Ease to the new height only once the leaf has finished, so
+                // the turn never competes with a layout animation.
+                reader.classList.add('is-resizing');
+                reader.style.height = next.offsetHeight + 'px';
+                timers.push(
+                  setTimeout(function () {
+                    reader.classList.remove('is-resizing');
+                    reader.style.height = '';
+                  }, 280)
+                );
+              }, TURN)
+            );
+          });
         }
 
         shelf.addEventListener('click', function (event) {
@@ -836,6 +941,160 @@ const structuredData = {
   .reader {
     position: relative;
     margin-bottom: 1rem;
+    perspective: 2200px;
+  }
+
+  /* Held at a fixed height for the length of the turn so nothing reflows
+     under the leaf, then eased to the new spread once it has finished. */
+  .reader.is-stacking,
+  .reader.is-resizing {
+    overflow: hidden;
+  }
+
+  .reader.is-resizing {
+    transition: height 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Both spreads stack for the turn. The incoming one is clipped to the
+     half the leaf has already lifted off, so a page only ever changes
+     while the leaf is covering it. */
+  .reader.is-stacking .spread {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .reader.is-stacking .is-outgoing {
+    z-index: 1;
+  }
+
+  .reader.is-stacking .is-incoming {
+    z-index: 2;
+  }
+
+  .reader.is-stacking .clip-right {
+    clip-path: inset(0 0 0 50%);
+  }
+
+  .reader.is-stacking .clip-left {
+    clip-path: inset(0 50% 0 0);
+  }
+
+  /* The leaf itself, hinged on the gutter and carrying a page on each side */
+  .page-leaf {
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    width: calc(50% - 12px);
+    z-index: 5;
+    visibility: hidden;
+    pointer-events: none;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .reader.is-turning .page-leaf {
+    visibility: visible;
+  }
+
+  .page-leaf-face,
+  .page-leaf-back {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    backface-visibility: hidden;
+    box-shadow: 0 0 34px rgba(28, 16, 6, 0.5);
+    background: linear-gradient(90deg, #d9c9a8 0%, #f1e5cd 26%, #f4ead5 74%, #ece0c4 100%);
+  }
+
+  .page-leaf-back {
+    transform: rotateY(180deg);
+  }
+
+  /* Paper turned on edge catches less light, which is what sells it */
+  .page-leaf-face::after,
+  .page-leaf-back::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #190e05;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .reader.is-turning .page-leaf-face::after,
+  .reader.is-turning .page-leaf-back::after {
+    animation: leaf-shading 540ms cubic-bezier(0.42, 0, 0.58, 1) forwards;
+  }
+
+  /* The cloned page fills its face */
+  .page-leaf-face > :global(*),
+  .page-leaf-back > :global(*) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .page-leaf--forward {
+    left: 50%;
+    transform-origin: left center;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .page-leaf--back {
+    left: 12px;
+    transform-origin: right center;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .reader.is-turning .page-leaf--forward {
+    animation: leaf-forward 540ms cubic-bezier(0.42, 0, 0.58, 1) forwards;
+  }
+
+  .reader.is-turning .page-leaf--back {
+    animation: leaf-back 540ms cubic-bezier(0.42, 0, 0.58, 1) forwards;
+  }
+
+  /* Paper turned on edge catches less light, which is what sells it */
+  @keyframes leaf-forward {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(-180deg); }
+  }
+
+  @keyframes leaf-back {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(180deg); }
+  }
+
+  @keyframes leaf-shading {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.3; }
+  }
+
+  /* A turning leaf shades the spread as it passes. It also covers the
+     moment the pages change. */
+  .page-shade {
+    position: absolute;
+    inset: 12px;
+    z-index: 4;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 3px;
+    background: linear-gradient(
+      90deg,
+      rgba(26, 15, 6, 0.1) 0%,
+      rgba(26, 15, 6, 0.42) 50%,
+      rgba(26, 15, 6, 0.1) 100%
+    );
+  }
+
+  .reader.is-turning .page-shade {
+    animation: leaf-shade 540ms ease-in-out forwards;
+  }
+
+  @keyframes leaf-shade {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
   }
 
   /* Boards of the book, showing past the pages */
@@ -995,16 +1254,6 @@ const structuredData = {
     gap: 0.7rem;
     margin-top: auto;
     padding-top: 0.4rem;
-  }
-
-  /* One element animates, only when a book is opened */
-  .spread.is-turning {
-    animation: page-settle 0.28s ease-out;
-  }
-
-  @keyframes page-settle {
-    from { opacity: 0; transform: translateY(7px); }
-    to { opacity: 1; transform: none; }
   }
 
   /* ─── Buttons: brass plate and wax seal ───────────────────────── */
@@ -1316,6 +1565,27 @@ const structuredData = {
       display: none;
     }
 
+    .page-leaf {
+      width: calc(100% - 24px);
+      left: 12px;
+    }
+
+    .page-leaf--forward {
+      transform-origin: left center;
+    }
+
+    .page-leaf--back {
+      transform-origin: right center;
+    }
+
+    /* One page wide: there is no far half to reveal, so the incoming
+       spread simply waits behind the leaf. */
+    .reader.is-stacking .clip-right,
+    .reader.is-stacking .clip-left {
+      clip-path: none;
+      opacity: 0;
+    }
+
     .spread-actions .btn {
       flex: 1 1 100%;
       text-align: center;
@@ -1344,10 +1614,6 @@ const structuredData = {
     .quote,
     .btn {
       transition: none;
-    }
-
-    .spread.is-turning {
-      animation: none;
     }
 
     .quote:hover {
