@@ -12,8 +12,12 @@ import { getCollection, getEntry } from 'astro:content';
 // Get all works and sort by order
 const allWorks = await getCollection('works');
 const sortedWorks = allWorks.sort((a, b) => a.data.order - b.data.order);
-const featuredWorks = sortedWorks.filter(work => work.data.featured);
-const otherWorks = sortedWorks.filter(work => !work.data.featured);
+const shelfBooks = sortedWorks.map((work) => ({
+  id: work.id,
+  title: work.data.title,
+  image: work.data.image,
+}));
+const activeId = shelfBooks[0]?.id;
 
 // Get page settings
 const worksSettings = await getEntry('pages', 'works');
@@ -23,21 +27,11 @@ const description = worksSettings?.data.description || 'Discover our young adult
 const permalink = `${Astro.site.href}work`;
 const intro = worksSettings?.data.intro || "We're passionate about creating adventurous stories, that spark your imagination and bring joy to our readers. Here's a look at some of the work we've done and what we're currently working on.";
 const featuredTitle = worksSettings?.data.featuredTitle || 'Featured Work';
-const otherProjectsTitle = worksSettings?.data.otherProjectsTitle || 'Other Projects';
 
 const testimonials = [
-  {
-    quote: 'Great story. I love the descriptions of the store and the people. It was heart warming.♥️',
-    source: 'Reader of our Short Stories',
-  },
-  {
-    quote: "Escape from Brown's Island bursts off the page like a star running back on a Saturday-night breakaway—fast, thrilling, and impossible to stop. The Hawrot siblings cut, juke, and power through danger with the perfect mix of grit and finesse, turning every chapter into a game-winning drive. A true end-zone celebration of adventure worthy of the record books.",
-    source: "Reader of Escape from Brown's Island",
-  },
-  {
-    quote: "I decided to give this book a try over the holiday season and I'm so glad I did! This was a huge break from the normal self-help / non-fiction books I like to read, so I wasn't sure what to expect. The authors do a wonderful job of building a world based on their own lives while pushing into fantasy and adventure in so many creative ways! I couldn't put the book down after the halfway point where the story keeps you guessing while filling you with an undeniable Christmas cheer. I'm a grown adult who felt like a kid again while enjoying this story. I've since passed it along to my own son with the same joy shared by the characters in this book! I hope you enjoy it as much as we do!",
-    source: 'Reader of Battle for Christmas: Reign of the Nutcrackers',
-  },
+  'Great story. I love the descriptions of the store and the people. It was heart warming.♥️',
+  "Escape from Brown's Island bursts off the page like a star running back on a Saturday-night breakaway—fast, thrilling, and impossible to stop. The Hawrot siblings cut, juke, and power through danger with the perfect mix of grit and finesse, turning every chapter into a game-winning drive. A true end-zone celebration of adventure worthy of the record books.",
+  "I decided to give this book a try over the holiday season and I'm so glad I did! This was a huge break from the normal self-help / non-fiction books I like to read, so I wasn't sure what to expect. The authors do a wonderful job of building a world based on their own lives while pushing into fantasy and adventure in so many creative ways! I couldn't put the book down after the halfway point where the story keeps you guessing while filling you with an undeniable Christmas cheer. I'm a grown adult who felt like a kid again while enjoying this story. I've since passed it along to my own son with the same joy shared by the characters in this book! I hope you enjoy it as much as we do!",
 ];
 
 // Dust motes drifting through the lamplight. Seeded so builds stay identical.
@@ -46,7 +40,7 @@ const moteRnd = () => {
   moteSeed = (moteSeed * 1103515245 + 12345) % 2147483648;
   return moteSeed / 2147483648;
 };
-const motes = Array.from({ length: 18 }, () => ({
+const motes = Array.from({ length: 10 }, () => ({
   left: (moteRnd() * 100).toFixed(2),
   top: (18 + moteRnd() * 72).toFixed(2),
   size: (2 + moteRnd() * 4).toFixed(1),
@@ -78,7 +72,7 @@ const structuredData = {
         }
       ]
     },
-    ...featuredWorks.map(work => ({
+    ...sortedWorks.map(work => ({
       "@type": "Book",
       "@id": `https://www.siblingswrite.com/work#${work.id}`,
       "name": work.data.title,
@@ -94,6 +88,8 @@ const structuredData = {
 <BaseLayout title={title} description={description} permalink={permalink} current="work">
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
+  <script is:inline>document.body.classList.add('works-room');</script>
+
   <div class="library">
     <!-- ─── The room itself ──────────────────────────────────────── -->
     <div class="room" aria-hidden="true">
@@ -101,7 +97,7 @@ const structuredData = {
         <div class="room-lintel-ivy"><IvyVine width={1200} amplitude={22} tone="deep" /></div>
       </div>
 
-      <div class="room-tree">
+      <div class="room-tree" data-animated>
         <LibraryTree />
         <div class="perch perch--one"><Owl variant="warm" delay={0} /></div>
         <div class="perch perch--two"><Owl variant="cool" delay={2.4} /></div>
@@ -110,7 +106,7 @@ const structuredData = {
       <div class="room-ivy room-ivy--left"><IvyVine width={900} amplitude={30} tone="bright" /></div>
       <div class="room-ivy room-ivy--right"><IvyVine width={900} amplitude={30} tone="bright" /></div>
 
-      <div class="room-motes">
+      <div class="room-motes" data-animated>
         {motes.map((m) => (
           <span
             class="mote"
@@ -140,11 +136,10 @@ const structuredData = {
         </div>
       </header>
 
-      <!-- Interactive Bookshelf -->
-      <section class="alcove" aria-labelledby="alcove-heading">
+      <!-- The shelf, and the book it opens -->
+      <section class="alcove" aria-labelledby="bookshelf-heading">
         <div class="lamp" aria-hidden="true"></div>
-        <h2 id="alcove-heading" class="engraved">{featuredTitle}</h2>
-        <p class="section-lead">Run your finger along the spines. Tug one loose and it opens.</p>
+
         <div class="room-window room-window--left" aria-hidden="true">
           <StainedGlassWindow variant="dawn" />
         </div>
@@ -153,118 +148,168 @@ const structuredData = {
         </div>
 
         <div class="alcove-frame">
-          <Bookshelf />
+          <Bookshelf books={shelfBooks} activeId={activeId} heading={featuredTitle} />
+        </div>
+
+        <p class="shelf-hint">Take one down. It opens below.</p>
+
+        <div class="reader" data-reader>
+          {sortedWorks.map((work) => {
+            // Without a summary the logline is all we have, so it runs on the
+            // story page rather than appearing twice.
+            const hasSummary = Boolean(work.data.summary);
+            return (
+            <article
+              class="spread"
+              id={`spread-${work.id}`}
+              role="tabpanel"
+              aria-labelledby={`shelf-tab-${work.id}`}
+              tabindex="0"
+              hidden={work.id !== activeId}
+              itemscope
+              itemtype="https://schema.org/Book"
+            >
+              <span class="spread-ribbon" aria-hidden="true"></span>
+
+              <div class="spread-page spread-page--left">
+                <img
+                  class="spread-cover"
+                  src={work.data.image}
+                  alt=""
+                  width="150"
+                  height="225"
+                  itemprop="image"
+                  loading="lazy"
+                />
+                <h2 class="spread-title" itemprop="name">{work.data.title}</h2>
+                {hasSummary && (
+                  <p class="spread-logline" itemprop="description">{work.data.description}</p>
+                )}
+              </div>
+
+              <div class="spread-page spread-page--right">
+                <h3 class="spread-label">The story</h3>
+                {hasSummary ? (
+                  <p class="spread-body">{work.data.summary}</p>
+                ) : (
+                  <p class="spread-body" itemprop="description">{work.data.description}</p>
+                )}
+
+                {work.data.inspiredBy && (
+                  <>
+                    <h3 class="spread-label">What sparked it</h3>
+                    <p class="spread-body spread-body--aside">{work.data.inspiredBy}</p>
+                  </>
+                )}
+
+                <div class="spread-actions">
+                  <a href={`/works/${work.id}`} class="btn btn--brass">
+                    Read more
+                    <span class="sr-only"> about {work.data.title}</span>
+                  </a>
+                  <a
+                    href={work.data.link}
+                    target="_blank"
+                    rel="noopener"
+                    class="btn btn--seal"
+                    itemprop="url"
+                  >
+                    Buy on Amazon
+                    <span class="sr-only"> — {work.data.title}</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+            );
+          })}
         </div>
       </section>
 
-      <!-- Every book, up close -->
-      {featuredWorks.length > 0 && (
-        <section class="catalog" aria-labelledby="catalog-heading">
-          <h2 id="catalog-heading" class="engraved">The Card Catalog</h2>
-          <p class="section-lead">Every book on the shelf, up close.</p>
-
-          <div class="tomes">
-            {featuredWorks.map((work) => (
-              <article class="tome" itemscope itemtype="https://schema.org/Book">
-                <span class="tome-corner tome-corner--tl" aria-hidden="true"><Flourish type="corner" /></span>
-                <span class="tome-corner tome-corner--tr" aria-hidden="true"><Flourish type="corner" /></span>
-                <span class="tome-corner tome-corner--bl" aria-hidden="true"><Flourish type="corner" /></span>
-                <span class="tome-corner tome-corner--br" aria-hidden="true"><Flourish type="corner" /></span>
-
-                <a href={`/works/${work.id}`} class="tome-niche" tabindex="-1" aria-hidden="true">
-                  <span class="tome-niche-light"></span>
-                  <img
-                    src={work.data.image}
-                    alt=""
-                    width="168"
-                    height="252"
-                    itemprop="image"
-                    loading="lazy"
-                  />
-                </a>
-
-                <div class="tome-text">
-                  <h3 class="tome-title" itemprop="name">
-                    <a href={`/works/${work.id}`}>{work.data.title}</a>
-                  </h3>
-                  <p class="tome-desc" itemprop="description">{work.data.description}</p>
-                  {work.data.inspiredBy && (
-                    <p class="tome-whisper">
-                      <span class="tome-whisper-label">Where it came from</span>
-                      {work.data.inspiredBy}
-                    </p>
-                  )}
-                  <div class="tome-actions">
-                    <a href={`/works/${work.id}`} class="btn btn--brass">
-                      Learn More
-                      <span class="sr-only"> about {work.data.title}</span>
-                    </a>
-                    <a
-                      href={work.data.link}
-                      target="_blank"
-                      rel="noopener"
-                      class="btn btn--seal"
-                      itemprop="url"
-                    >
-                      Buy on Amazon
-                      <span class="sr-only"> — {work.data.title}</span>
-                    </a>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {otherWorks.length > 0 && (
-        <section class="catalog catalog--other" aria-labelledby="other-heading">
-          <h2 id="other-heading" class="engraved">{otherProjectsTitle}</h2>
-          <p class="section-lead">Still drying on the desk.</p>
-          <div class="tomes tomes--compact">
-            {otherWorks.map((work) => (
-              <article class="tome tome--compact">
-                <a href={`/works/${work.id}`} class="tome-niche" tabindex="-1" aria-hidden="true">
-                  <span class="tome-niche-light"></span>
-                  <img src={work.data.image} alt="" width="140" height="210" loading="lazy" />
-                </a>
-                <div class="tome-text">
-                  <h3 class="tome-title"><a href={`/works/${work.id}`}>{work.data.title}</a></h3>
-                  <p class="tome-desc">{work.data.description}</p>
-                  <div class="tome-actions">
-                    <a href={`/works/${work.id}`} class="btn btn--brass">Learn More</a>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
       <!-- Reader Testimonials -->
       <section class="nook" aria-labelledby="nook-heading">
-        <div class="nook-mug" aria-hidden="true"><CoffeeMug /></div>
+        <div class="nook-mug" aria-hidden="true" data-animated><CoffeeMug /></div>
         <h2 id="nook-heading" class="engraved">What Readers Are Saying</h2>
         <p class="section-lead">Pull up the chair by the window. These came from readers.</p>
 
-        <div class="nook-vine" aria-hidden="true"><IvyVine width={1500} amplitude={16} tone="deep" /></div>
+        <div class="nook-vine" aria-hidden="true"><IvyVine width={1100} amplitude={16} tone="deep" /></div>
 
         <div class="quotes">
           {testimonials.map((t) => (
-            <figure class="quote">
+            <blockquote class="quote">
               <span class="quote-corner quote-corner--tl" aria-hidden="true"><Flourish type="corner" /></span>
               <span class="quote-corner quote-corner--tr" aria-hidden="true"><Flourish type="corner" /></span>
               <span class="quote-corner quote-corner--bl" aria-hidden="true"><Flourish type="corner" /></span>
               <span class="quote-corner quote-corner--br" aria-hidden="true"><Flourish type="corner" /></span>
               <span class="quote-medallion" aria-hidden="true">&#10078;</span>
-              <blockquote class="quote-body"><p>{t.quote}</p></blockquote>
-              <figcaption class="quote-source">{t.source}</figcaption>
-            </figure>
+              <p>{t}</p>
+            </blockquote>
           ))}
         </div>
       </section>
     </div>
   </div>
+
+  <script is:inline>
+    // Animations only run while their element is on screen.
+    (function () {
+      if (!('IntersectionObserver' in window)) return;
+      var watcher = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            entry.target.classList.toggle('is-offscreen', !entry.isIntersecting);
+          });
+        },
+        { rootMargin: '120px' }
+      );
+      document.querySelectorAll('[data-animated]').forEach(function (el) {
+        watcher.observe(el);
+      });
+    })();
+
+    (function () {
+      var shelf = document.querySelector('[data-shelf]');
+      var reader = document.querySelector('[data-reader]');
+      if (!shelf || !reader) return;
+
+      var tabs = Array.prototype.slice.call(shelf.querySelectorAll('[role="tab"]'));
+
+      function open(id, focusTab) {
+        tabs.forEach(function (tab) {
+          var on = tab.dataset.book === id;
+          tab.setAttribute('aria-selected', on ? 'true' : 'false');
+          tab.tabIndex = on ? 0 : -1;
+          if (on && focusTab) tab.focus();
+        });
+        Array.prototype.forEach.call(reader.children, function (panel) {
+          panel.hidden = panel.id !== 'spread-' + id;
+        });
+        var shown = document.getElementById('spread-' + id);
+        if (shown) {
+          shown.classList.remove('is-turning');
+          void shown.offsetWidth;
+          shown.classList.add('is-turning');
+        }
+      }
+
+      shelf.addEventListener('click', function (event) {
+        var tab = event.target.closest('[role="tab"]');
+        if (tab) open(tab.dataset.book, false);
+      });
+
+      shelf.addEventListener('keydown', function (event) {
+        var index = tabs.indexOf(document.activeElement);
+        if (index < 0) return;
+        var next = null;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + tabs.length) % tabs.length;
+        if (event.key === 'Home') next = 0;
+        if (event.key === 'End') next = tabs.length - 1;
+        if (next === null) return;
+        event.preventDefault();
+        open(tabs[next].dataset.book, true);
+      });
+    })();
+  </script>
 </BaseLayout>
 
 <style>
@@ -273,6 +318,16 @@ const structuredData = {
      A warmer, dimmer room built from the site's own violets, roses
      and teals so it reads as a doorway rather than a different site.
      ═══════════════════════════════════════════════════════════════ */
+
+  /* The room covers the viewport here, so the site's fixed blurred orb
+     layer and fixed background attachment are pure scroll cost. */
+  :global(body.works-room) {
+    background-attachment: scroll;
+  }
+
+  :global(body.works-room)::before {
+    display: none;
+  }
 
   .library {
     --ink: #33223f;
@@ -353,6 +408,11 @@ const structuredData = {
     );
   }
 
+  .is-offscreen,
+  .is-offscreen :global(*) {
+    animation-play-state: paused !important;
+  }
+
   /* ─── Ambience layers ──────────────────────────────────────────── */
   .room {
     position: absolute;
@@ -399,6 +459,7 @@ const structuredData = {
 
   /* Reading tree */
   .room-tree {
+    contain: paint;
     position: absolute;
     top: 34px;
     left: -70px;
@@ -455,6 +516,7 @@ const structuredData = {
     background: #fff3d4;
     opacity: var(--mote-opacity, 0.4);
     box-shadow: 0 0 8px 2px rgba(255, 226, 166, 0.5);
+    will-change: transform;
     animation: mote-drift var(--mote-duration, 22s) ease-in-out var(--mote-delay, 0s) infinite;
   }
 
@@ -467,8 +529,7 @@ const structuredData = {
   .room-grain {
     position: absolute;
     inset: 0;
-    opacity: 0.09;
-    mix-blend-mode: overlay;
+    opacity: 0.055;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
     pointer-events: none;
   }
@@ -653,13 +714,11 @@ const structuredData = {
   }
 
   /* Lower sections sit on parchment, so their type darkens */
-  .catalog .engraved,
   .nook .engraved {
     color: #33214d;
     text-shadow: 0 1px 0 rgba(255, 248, 228, 0.6);
   }
 
-  .catalog .section-lead,
   .nook .section-lead {
     color: var(--ink-soft);
   }
@@ -727,207 +786,175 @@ const structuredData = {
     position: relative;
   }
 
-  /* ─── The card catalog ────────────────────────────────────────── */
-  .catalog {
-    margin-top: clamp(4rem, 9vw, 6.5rem);
-  }
-
-  .tomes {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
-    gap: clamp(1.6rem, 3.4vw, 2.6rem);
-  }
-
-  .tome {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: clamp(1.4rem, 3vw, 2.1rem) clamp(1.2rem, 3vw, 2rem) clamp(1.6rem, 3vw, 2.1rem);
-    background:
-      linear-gradient(180deg, rgba(245, 235, 215, 0.99) 0%, rgba(232, 217, 190, 0.99) 58%, rgba(218, 199, 168, 0.99) 100%);
-    border: 1px solid rgba(185, 131, 39, 0.5);
-    border-radius: 6px;
-    box-shadow:
-      0 24px 46px rgba(40, 24, 12, 0.26),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.6);
-    transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.4s ease;
-  }
-
-  .tome::before {
-    content: '';
-    position: absolute;
-    inset: 8px;
-    border: 1px solid rgba(185, 131, 39, 0.32);
-    border-radius: 3px;
-    pointer-events: none;
-  }
-
-  /* Faint laid-paper texture */
-  .tome::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 6px;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(146, 104, 44, 0.05) 0 1px,
-      transparent 1px 5px
-    );
-    opacity: 0.55;
-    pointer-events: none;
-  }
-
-  .tome:hover,
-  .tome:focus-within {
-    transform: translateY(-8px);
-    box-shadow:
-      0 36px 64px rgba(40, 24, 12, 0.32),
-      0 0 46px rgba(255, 206, 130, 0.4),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.7);
-  }
-
-  .tome-corner {
-    position: absolute;
-    width: 32px;
-    height: 32px;
-    opacity: 0.8;
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .tome-corner--tl { top: 6px; left: 6px; }
-  .tome-corner--tr { top: 6px; right: 6px; transform: scaleX(-1); }
-  .tome-corner--bl { bottom: 6px; left: 6px; transform: scaleY(-1); }
-  .tome-corner--br { bottom: 6px; right: 6px; transform: scale(-1); }
-
-  /* Arched alcove the cover sits in */
-  .tome-niche {
-    position: relative;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    width: min(250px, 100%);
-    padding: 54px 24px 20px;
-    margin-bottom: 1.4rem;
-    border-radius: 125px 125px 8px 8px;
-    background:
-      radial-gradient(62% 40% at 50% 12%, rgba(255, 206, 132, 0.4), transparent 72%),
-      linear-gradient(180deg, #3b2d22 0%, #261b14 46%, #150f0b 100%);
-    box-shadow:
-      inset 0 4px 20px rgba(0, 0, 0, 0.72),
-      inset 0 0 0 1px rgba(255, 224, 172, 0.14),
-      0 10px 22px rgba(20, 12, 6, 0.3);
-    text-decoration: none;
-    overflow: hidden;
-  }
-
-  /* Radiating tracery inside the arch */
-  .tome-niche-light {
-    position: absolute;
-    top: -34px;
-    left: 50%;
-    width: 210px;
-    height: 210px;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    background: radial-gradient(56% 48% at 50% 0%, rgba(255, 212, 146, 0.34), transparent 76%);
-    opacity: 0.9;
-    pointer-events: none;
-  }
-
-  .tome-niche img {
-    position: relative;
-    display: block;
-    width: 168px;
-    height: auto;
-    border-radius: 3px 7px 7px 3px;
-    box-shadow:
-      5px 7px 18px rgba(0, 0, 0, 0.6),
-      -2px 0 6px rgba(0, 0, 0, 0.4);
-    transition: transform 0.42s cubic-bezier(0.34, 1.5, 0.64, 1), box-shadow 0.4s ease;
-  }
-
-  .tome:hover .tome-niche img,
-  .tome:focus-within .tome-niche img {
-    transform: translateY(-10px) rotate(-2deg) scale(1.04);
-    box-shadow:
-      8px 18px 34px rgba(0, 0, 0, 0.62),
-      0 0 34px rgba(255, 206, 130, 0.45);
-  }
-
-  .tome-text {
-    position: relative;
-    z-index: 1;
+  /* ─── The reader: an open book under the shelf ────────────────── */
+  .shelf-hint {
     text-align: center;
+    font-size: clamp(0.92rem, 2vw, 1.02rem);
+    font-style: italic;
+    color: #f0d8ac;
+    margin: 1.6rem auto 1.8rem;
+    text-shadow: 0 1px 6px rgba(24, 14, 6, 0.7);
+  }
+
+  .reader {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  /* Boards of the book, showing past the pages */
+  .spread {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    min-height: 430px;
+    padding: 12px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #3c2716 0%, #2a1a0d 52%, #1b1007 100%);
+    box-shadow:
+      0 34px 68px rgba(12, 7, 3, 0.55),
+      inset 0 1px 0 rgba(255, 214, 158, 0.18);
+  }
+
+  .spread[hidden] {
+    display: none;
+  }
+
+  .spread:focus-visible {
+    outline: 3px solid rgba(255, 214, 158, 0.8);
+    outline-offset: 4px;
+  }
+
+  /* Paper, darkening into the gutter, with the block of pages either side */
+  .spread-page {
+    position: relative;
+    padding: clamp(1.6rem, 3.4vw, 2.6rem) clamp(1.4rem, 3vw, 2.4rem);
+    background: linear-gradient(90deg, #ece0c4 0%, #f4ead5 26%, #f1e5cd 74%, #d9c9a8 100%);
+  }
+
+  .spread-page--left {
+    border-radius: 3px 0 0 3px;
+    text-align: center;
+    box-shadow:
+      -5px 0 0 -1px #d6c5a3,
+      -9px 0 0 -3px #c9b691,
+      -13px 0 0 -5px #bca87f;
+  }
+
+  .spread-page--right {
+    background: linear-gradient(90deg, #d9c9a8 0%, #f1e5cd 26%, #f4ead5 74%, #ece0c4 100%);
+    border-radius: 0 3px 3px 0;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    width: 100%;
+    box-shadow:
+      5px 0 0 -1px #d6c5a3,
+      9px 0 0 -3px #c9b691,
+      13px 0 0 -5px #bca87f;
   }
 
-  .tome-title {
-    font-family: var(--font-family-storybook);
-    font-size: clamp(1.05rem, 2.4vw, 1.3rem);
-    line-height: 1.3;
-    margin: 0 0 0.7rem;
-    color: #3c2858;
+  /* The fold */
+  .reader .spread::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 50%;
+    width: 74px;
+    transform: translateX(-50%);
+    background: linear-gradient(
+      90deg,
+      rgba(78, 52, 22, 0) 0%,
+      rgba(78, 52, 22, 0.22) 34%,
+      rgba(44, 27, 10, 0.42) 50%,
+      rgba(78, 52, 22, 0.22) 66%,
+      rgba(78, 52, 22, 0) 100%
+    );
+    pointer-events: none;
   }
 
-  .tome-title a {
-    color: inherit;
-    text-decoration: none;
-    background: linear-gradient(to right, var(--gold), var(--violet));
-    background-size: 0% 2px;
-    background-repeat: no-repeat;
-    background-position: left bottom;
-    transition: background-size 0.32s ease, color 0.32s ease;
+  .spread-ribbon {
+    position: absolute;
+    top: -2px;
+    left: calc(50% + 20px);
+    width: 12px;
+    height: 78px;
+    border-radius: 0 0 2px 2px;
+    background: linear-gradient(180deg, #8d2f3f 0%, #6f2231 70%, #4d1622 100%);
+    box-shadow: 0 4px 10px rgba(10, 4, 2, 0.5);
+    z-index: 3;
   }
 
-  .tome-title a:hover,
-  .tome-title a:focus-visible {
-    background-size: 100% 2px;
-    color: var(--violet);
-  }
-
-  .tome-desc {
-    font-size: 0.97rem;
-    line-height: 1.72;
-    margin: 0 0 1.1rem;
-    color: #3f3140;
-  }
-
-  .tome-whisper {
-    position: relative;
-    font-size: 0.88rem;
-    font-style: italic;
-    line-height: 1.65;
-    margin: 0 0 1.4rem;
-    padding: 0.9rem 1rem 0.9rem 1.1rem;
-    text-align: left;
-    color: #5b4838;
-    background: linear-gradient(90deg, rgba(185, 131, 39, 0.12), rgba(185, 131, 39, 0.02));
-    border-left: 3px solid var(--gold);
-    border-radius: 0 4px 4px 0;
-  }
-
-  .tome-whisper-label {
+  .spread-cover {
     display: block;
+    width: clamp(120px, 15vw, 156px);
+    height: auto;
+    margin: 0 auto 1.3rem;
+    border-radius: 2px 5px 5px 2px;
+    box-shadow:
+      5px 7px 18px rgba(28, 16, 6, 0.45),
+      -2px 0 5px rgba(28, 16, 6, 0.3);
+  }
+
+  .spread-title {
     font-family: var(--font-family-storybook);
-    font-style: normal;
-    font-size: 0.63rem;
-    letter-spacing: 0.22em;
+    font-size: clamp(1.15rem, 2.6vw, 1.55rem);
+    line-height: 1.25;
+    margin: 0 0 0.9rem;
+    color: #32214a;
+  }
+
+  .spread-logline {
+    font-size: clamp(0.92rem, 1.9vw, 1rem);
+    font-style: italic;
+    line-height: 1.72;
+    margin: 0;
+    color: #4a3a44;
+  }
+
+  .spread-label {
+    font-family: var(--font-family-storybook);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--gold-deep);
-    margin-bottom: 0.35rem;
+    margin: 0 0 0.6rem;
   }
 
-  .tome-actions {
+  .spread-label + .spread-body {
+    margin-top: 0;
+  }
+
+  .spread-body {
+    font-size: clamp(0.93rem, 1.9vw, 1.01rem);
+    line-height: 1.8;
+    margin: 0 0 1.6rem;
+    color: #3b2f3c;
+  }
+
+  .spread-body--aside {
+    font-style: italic;
+    padding-left: 1rem;
+    border-left: 3px solid rgba(185, 131, 39, 0.55);
+    color: #52412f;
+  }
+
+  .spread-actions {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 0.7rem;
     margin-top: auto;
+    padding-top: 0.4rem;
+  }
+
+  /* One element animates, only when a book is opened */
+  .spread.is-turning {
+    animation: page-settle 0.28s ease-out;
+  }
+
+  @keyframes page-settle {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: none; }
   }
 
   /* ─── Buttons: brass plate and wax seal ───────────────────────── */
@@ -988,21 +1015,6 @@ const structuredData = {
   .btn:focus-visible {
     outline: 3px solid rgba(255, 246, 220, 0.9);
     outline-offset: 3px;
-  }
-
-  /* Compact cards for unfeatured work */
-  .tomes--compact {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  }
-
-  .tome--compact .tome-niche {
-    width: min(200px, 100%);
-    padding: 42px 18px 16px;
-    border-radius: 100px 100px 8px 8px;
-  }
-
-  .tome--compact .tome-niche img {
-    width: 140px;
   }
 
   /* ─── The reading nook ────────────────────────────────────────── */
@@ -1177,25 +1189,6 @@ const structuredData = {
     padding: 0;
   }
 
-  .quote-source {
-    display: inline-block;
-    margin-top: 1.2rem;
-    padding: 0.42em 1em;
-    font-family: var(--font-family-sans);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #2f2008;
-    background: linear-gradient(180deg, #f0d79a, #d3ab5c);
-    border: 1px solid #8a5f18;
-    border-radius: 3px;
-    box-shadow: inset 0 1px 0 rgba(255, 252, 233, 0.75);
-  }
-
-  .quote-source::before {
-    content: '— ';
-  }
-
   /* ─── Responsive ──────────────────────────────────────────────── */
   @media (max-width: 1080px) {
     /* No wall left to show glass against once the shelf fills the width. */
@@ -1253,17 +1246,27 @@ const structuredData = {
       transform: none;
     }
 
-    .tome-niche {
-      width: min(210px, 100%);
-      padding: 44px 18px 16px;
-      border-radius: 105px 105px 8px 8px;
+    .spread {
+      grid-template-columns: minmax(0, 1fr);
     }
 
-    .tome-niche img {
-      width: 150px;
+    .spread-page--left,
+    .spread-page--right {
+      background: linear-gradient(180deg, #f4ead5 0%, #e9dcc0 100%);
+      border-radius: 3px;
+      box-shadow: none;
     }
 
-    .tome-actions .btn {
+    .spread-page--left {
+      border-bottom: 1px solid rgba(139, 106, 56, 0.3);
+    }
+
+    .reader .spread::after,
+    .spread-ribbon {
+      display: none;
+    }
+
+    .spread-actions .btn {
       flex: 1 1 100%;
       text-align: center;
     }
@@ -1288,16 +1291,13 @@ const structuredData = {
       animation: none;
     }
 
-    .tome,
-    .tome-niche img,
     .quote,
     .btn {
       transition: none;
     }
 
-    .tome:hover,
-    .tome:focus-within {
-      transform: none;
+    .spread.is-turning {
+      animation: none;
     }
 
     .quote:hover {

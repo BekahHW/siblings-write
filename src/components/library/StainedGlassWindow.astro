@@ -114,7 +114,7 @@ const innerShape = 'M20,402 L20,156 C20,92 54,34 110,20 C166,34 200,92 200,156 L
     <circle cx="110" cy="118" r="78" fill={p.halo} opacity="0.55" />
 
     <!-- Rose window -->
-    <g class="glass-rose">
+    <g>
       {petals.map((deg, i) => (
         <path
           d="M0,-13 C11,-24 14,-40 0,-50 C-14,-40 -11,-24 0,-13 Z"
@@ -175,7 +175,7 @@ const innerShape = 'M20,402 L20,156 C20,92 54,34 110,20 C166,34 200,92 200,156 L
 
     <!-- Light behind the glass, then light across it -->
     <rect x="14" y="0" width="192" height="410" fill={`url(#${uid}-backlight)`} />
-    <path class="glass-sheen" d="M-40,420 L120,-20 L190,-20 L30,420 Z" fill={`url(#${uid}-sheen)`} />
+    <path d="M-40,420 L120,-20 L190,-20 L30,420 Z" fill={`url(#${uid}-sheen)`} />
   </g>
 
   <!-- Sill -->
@@ -192,30 +192,4 @@ const innerShape = 'M20,402 L20,156 C20,92 54,34 110,20 C166,34 200,92 200,156 L
       drop-shadow(0 18px 30px rgba(40, 24, 12, 0.4));
   }
 
-  .glass-rose {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: rose-breathe 14s ease-in-out infinite;
-  }
-
-  .glass-sheen {
-    animation: sheen-drift 16s ease-in-out infinite;
-  }
-
-  @keyframes rose-breathe {
-    0%, 100% { opacity: 0.9; }
-    50% { opacity: 1; }
-  }
-
-  @keyframes sheen-drift {
-    0%, 100% { transform: translateX(-14px); opacity: 0.7; }
-    50% { transform: translateX(18px); opacity: 1; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .glass-rose,
-    .glass-sheen {
-      animation: none;
-    }
-  }
 </style>

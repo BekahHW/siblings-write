@@ -36,6 +36,9 @@ const uid = `owl-${variant}-${delay}`;
     </linearGradient>
   </defs>
 
+  <!-- Shadow it casts on its own branch -->
+  <ellipse cx="62" cy="141" rx="34" ry="6" fill="#080504" opacity="0.55" />
+
   <!-- Branch the bird is standing on -->
   <path d="M2,140 C34,133 82,133 118,141" stroke="#1b1209" stroke-width="7" fill="none" stroke-linecap="round" />
 
@@ -100,13 +103,6 @@ const uid = `owl-${variant}-${delay}`;
     display: block;
     width: 100%;
     height: auto;
-    filter: drop-shadow(0 10px 16px rgba(8, 5, 3, 0.55));
-  }
-
-  .owl-body {
-    transform-box: fill-box;
-    transform-origin: 50% 94%;
-    animation: owl-shift 17s ease-in-out var(--owl-delay, 0s) infinite;
   }
 
   /* A blink is the eyes going dark for a beat, not a lid sliding down. */
@@ -119,13 +115,7 @@ const uid = `owl-${variant}-${delay}`;
     96%, 98% { opacity: 0; }
   }
 
-  @keyframes owl-shift {
-    0%, 100% { transform: rotate(-1.6deg); }
-    50% { transform: rotate(1.8deg); }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .owl-body,
     .owl-eyes {
       animation: none;
     }
