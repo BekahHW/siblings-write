@@ -1,0 +1,38 @@
+.work-archive-record {
+  margin: 0 0 1.25rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(90, 60, 30, 0.85);
+  font-weight: 600;
+}
+
+.work-detail[data-atmosphere='valley'] {
+  background: linear-gradient(180deg, rgba(240, 248, 230, 0.35) 0%, transparent 28%);
+}
+
+.work-detail[data-atmosphere='valley'] .section-title {
+  color: #2f4a2a;
+}
+
+.work-detail[data-atmosphere='island'] {
+  background: linear-gradient(180deg, rgba(210, 228, 240, 0.28) 0%, transparent 32%);
+}
+
+.work-detail[data-atmosphere='island'] .hero-overlay {
+  background: linear-gradient(180deg, rgba(20, 40, 60, 0.45), rgba(10, 24, 38, 0.75));
+}
+
+.work-detail[data-atmosphere='sandbridge'] {
+  background: linear-gradient(180deg, rgba(255, 248, 230, 0.45) 0%, transparent 30%);
+}
+
+.work-detail[data-atmosphere='sandbridge'] .cta-primary {
+  background: linear-gradient(135deg, #e8a756, #d4873f);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-atmosphere] .title-decoration {
+    animation: none !important;
+  }
+}

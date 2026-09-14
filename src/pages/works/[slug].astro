@@ -2,6 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { formatLibraryRecordLabel, resolveStoryWorld } from '../../lib/storyExperience';
+import '../../styles/work-atmosphere.css';
 
 export async function getStaticPaths() {
   const works = await getCollection('works');
@@ -12,7 +14,11 @@ export async function getStaticPaths() {
 }
 
 const { work } = Astro.props;
-const { title, description, image, headerImage, link, inspiredBy, summary, inspirationStory, spotifyPlaylist, trailerVideoId } = work.data;
+const { title, description, image, headerImage, link, inspiredBy, summary, inspirationStory, spotifyPlaylist, trailerVideoId, experience } = work.data;
+const atmosphere = resolveStoryWorld(work);
+const cinematicHero = Boolean(experience?.cinematicHero && trailerVideoId);
+const showBookshop = experience?.showBookshop !== false;
+const characterQuizHref = experience?.characterQuizHref;
 
 // Summaries may carry paragraph breaks.
 const summaryParagraphs = (summary || '')
@@ -80,11 +86,11 @@ const structuredData = {
   <BaseLayout title={pageTitle} description={description} permalink={permalink} current="works">
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-    <article class="work-detail" data-work-id={work.id}>
+    <article class="work-detail" data-work-id={work.id} data-atmosphere={atmosphere}>
       <!-- Hero Header with Image and Title -->
       <header class="hero-header">
         <div class="hero-image-container">
-          {trailerVideoId && work.id === 'battle-for-christmas' ? (
+          {cinematicHero ? (
             <>
               <div class="hero-video-background" id="heroVideoBackground">
                 <iframe
@@ -136,6 +142,12 @@ const structuredData = {
       <div class="content-container">
         <Breadcrumbs items={breadcrumbItems} />
 
+        {experience && (
+          <p class="work-archive-record" aria-label="Library archive record">
+            {formatLibraryRecordLabel(experience.recordNumber)} — {experience.location}
+          </p>
+        )}
+
         <!-- Logline, Inspired By, and Buy Button Section -->
         <section class="intro-section">
           <div class="book-cover-container">
@@ -160,7 +172,7 @@ const structuredData = {
             )}
 
             <div class="button-group">
-              {work.id !== 'the-valley-of-almost-true-things' && (
+              {showBookshop && (
                 <a
                   href="https://dub.sh/bookshop-b4c"
                   target="_blank"
@@ -251,7 +263,7 @@ const structuredData = {
         )}
 
         <!-- Quiz CTA Section (Battle for Christmas only) -->
-        {work.id === 'battle-for-christmas' && (
+        {characterQuizHref && (
           <section class="quiz-cta-section">
             <div class="quiz-cta-card">
               <div class="quiz-cta-content">
@@ -261,7 +273,7 @@ const structuredData = {
                   Take our interactive personality quiz to discover which character from <em>The Battle for Christmas</em> matches your personality!
                 </p>
                 <a
-                  href="/works/battle-for-christmas/which-character-are-you"
+                  href={characterQuizHref}
                   class="cta-button quiz-button"
                 >
                   <span class="button-text">Take the Quiz</span>
@@ -278,7 +290,7 @@ const structuredData = {
             <h3>Ready to Start Your Adventure?</h3>
             <p>Get your copy today and discover the magic for yourself!</p>
             <div class="button-group">
-              {work.id !== 'the-valley-of-almost-true-things' && (
+              {showBookshop && (
                 <a
                   href="https://dub.sh/bookshop-b4c"
                   target="_blank"
@@ -336,7 +348,7 @@ const structuredData = {
     overflow: hidden;
   }
 
-  [data-work-id="battle-for-christmas"] .hero-image-container {
+  [data-atmosphere="christmas"] .hero-image-container {
     height: 600px;
   }
 
@@ -1124,17 +1136,17 @@ const structuredData = {
   }
 
   /* Christmas Theme for Battle for Christmas Page */
-  [data-work-id="battle-for-christmas"] {
+  [data-atmosphere="christmas"] {
     background: white;
   }
 
-  [data-work-id="battle-for-christmas"] .content-container {
+  [data-atmosphere="christmas"] .content-container {
     --shadow-primary: rgba(220, 38, 38, 0.25);
     --shadow-secondary: rgba(22, 163, 74, 0.3);
     --border-color: rgba(220, 38, 38, 0.3);
   }
 
-  [data-work-id="battle-for-christmas"] .hero-overlay {
+  [data-atmosphere="christmas"] .hero-overlay {
     background: linear-gradient(
       to bottom,
       rgba(220, 38, 38, 0.35) 0%,
@@ -1142,25 +1154,25 @@ const structuredData = {
     );
   }
 
-  [data-work-id="battle-for-christmas"] .hero-title {
+  [data-atmosphere="christmas"] .hero-title {
     text-shadow: 0 4px 20px rgba(220, 38, 38, 0.9), 0 0 40px rgba(255, 215, 0, 0.7);
   }
 
-  [data-work-id="battle-for-christmas"] .intro-section {
+  [data-atmosphere="christmas"] .intro-section {
     background: white;
     border: 3px solid rgba(220, 38, 38, 0.3);
   }
 
-  [data-work-id="battle-for-christmas"] .intro-section:hover {
+  [data-atmosphere="christmas"] .intro-section:hover {
     border-color: rgba(22, 163, 74, 0.5);
   }
 
-  [data-work-id="battle-for-christmas"] .inspired-by {
+  [data-atmosphere="christmas"] .inspired-by {
     background: rgba(255, 255, 255, 0.9);
     border-left: 4px solid #dc2626;
   }
 
-  [data-work-id="battle-for-christmas"] .section-title {
+  [data-atmosphere="christmas"] .section-title {
     background: linear-gradient(90deg, #dc2626 0%, #16a34a 50%, #dc2626 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
@@ -1178,54 +1190,54 @@ const structuredData = {
     }
   }
 
-  [data-work-id="battle-for-christmas"] .cta-primary {
+  [data-atmosphere="christmas"] .cta-primary {
     background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%);
     box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
   }
 
-  [data-work-id="battle-for-christmas"] .cta-primary:hover {
+  [data-atmosphere="christmas"] .cta-primary:hover {
     box-shadow: 0 12px 35px rgba(220, 38, 38, 0.7);
   }
 
-  [data-work-id="battle-for-christmas"] .cta-secondary {
+  [data-atmosphere="christmas"] .cta-secondary {
     background: linear-gradient(135deg, #16a34a 0%, #dc2626 100%);
     box-shadow: 0 8px 25px rgba(22, 163, 74, 0.5);
   }
 
-  [data-work-id="battle-for-christmas"] .cta-secondary:hover {
+  [data-atmosphere="christmas"] .cta-secondary:hover {
     box-shadow: 0 12px 35px rgba(22, 163, 74, 0.7);
   }
 
-  [data-work-id="battle-for-christmas"] .cta-bookshop {
+  [data-atmosphere="christmas"] .cta-bookshop {
     background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
     box-shadow: 0 8px 25px rgba(139, 69, 19, 0.5);
   }
 
-  [data-work-id="battle-for-christmas"] .cta-bookshop:hover {
+  [data-atmosphere="christmas"] .cta-bookshop:hover {
     box-shadow: 0 12px 35px rgba(139, 69, 19, 0.7);
   }
 
-  [data-work-id="battle-for-christmas"] .summary-section {
+  [data-atmosphere="christmas"] .summary-section {
     background: white;
     border: 3px solid rgba(220, 38, 38, 0.3);
   }
 
-  [data-work-id="battle-for-christmas"] .inspiration-section {
+  [data-atmosphere="christmas"] .inspiration-section {
     background: white;
     border: 3px solid rgba(22, 163, 74, 0.3);
   }
 
-  [data-work-id="battle-for-christmas"] .spotify-section {
+  [data-atmosphere="christmas"] .spotify-section {
     background: white;
     border: 3px solid rgba(30, 215, 96, 0.3);
   }
 
-  [data-work-id="battle-for-christmas"] .cta-card {
+  [data-atmosphere="christmas"] .cta-card {
     background: white;
     border: 3px solid transparent;
   }
 
-  [data-work-id="battle-for-christmas"] .cta-card::before {
+  [data-atmosphere="christmas"] .cta-card::before {
     background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%);
   }
 
@@ -1300,7 +1312,7 @@ const structuredData = {
       height: 450px;
     }
 
-    [data-work-id="battle-for-christmas"] .hero-image-container {
+    [data-atmosphere="christmas"] .hero-image-container {
       height: 550px;
     }
 
@@ -1369,7 +1381,7 @@ const structuredData = {
       height: 350px;
     }
 
-    [data-work-id="battle-for-christmas"] .hero-image-container {
+    [data-atmosphere="christmas"] .hero-image-container {
       height: 450px;
     }
 
@@ -1462,7 +1474,7 @@ const structuredData = {
       height: 250px;
     }
 
-    [data-work-id="battle-for-christmas"] .hero-image-container {
+    [data-atmosphere="christmas"] .hero-image-container {
       height: 400px;
     }
 
