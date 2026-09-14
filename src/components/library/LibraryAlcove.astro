@@ -1,0 +1,33 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Bookshelf from '../Bookshelf.astro';
+import StainedGlassWindow from './StainedGlassWindow.astro';
+import StoryReader from './StoryReader.astro';
+
+interface Props {
+  works: CollectionEntry<'works'>[];
+  books: { id: string; title: string; image: string }[];
+  activeId?: string;
+  heading: string;
+}
+
+const { works, books, activeId, heading } = Astro.props;
+---
+
+<section class="alcove" aria-labelledby="bookshelf-heading">
+  <div class="lamp" aria-hidden="true"></div>
+
+  <div class="room-window room-window--left" aria-hidden="true">
+    <StainedGlassWindow variant="dawn" />
+  </div>
+  <div class="room-window room-window--right" aria-hidden="true">
+    <StainedGlassWindow variant="dusk" />
+  </div>
+
+  <div class="alcove-frame">
+    <Bookshelf books={books} activeId={activeId} heading={heading} />
+  </div>
+
+  <p class="shelf-hint">Take one down. It opens below.</p>
+  <StoryReader works={works} activeId={activeId} />
+</section>
