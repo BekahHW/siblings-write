@@ -1,0 +1,32 @@
+---
+import CoffeeMug from './CoffeeMug.astro';
+import Flourish from './Flourish.astro';
+import IvyVine from './IvyVine.astro';
+
+interface Props {
+  testimonials: string[];
+}
+
+const { testimonials } = Astro.props;
+---
+
+<section class="nook" aria-labelledby="nook-heading">
+  <div class="nook-mug" aria-hidden="true" data-animated><CoffeeMug /></div>
+  <h2 id="nook-heading" class="engraved">What Readers Are Saying</h2>
+  <p class="section-lead">Pull up the chair by the window. These came from readers.</p>
+
+  <div class="nook-vine" aria-hidden="true"><IvyVine width={1100} amplitude={16} tone="deep" /></div>
+
+  <div class="quotes">
+    {testimonials.map((testimonial) => (
+      <blockquote class="quote">
+        <span class="quote-corner quote-corner--tl" aria-hidden="true"><Flourish type="corner" /></span>
+        <span class="quote-corner quote-corner--tr" aria-hidden="true"><Flourish type="corner" /></span>
+        <span class="quote-corner quote-corner--bl" aria-hidden="true"><Flourish type="corner" /></span>
+        <span class="quote-corner quote-corner--br" aria-hidden="true"><Flourish type="corner" /></span>
+        <span class="quote-medallion" aria-hidden="true">&#10078;</span>
+        <p>{testimonial}</p>
+      </blockquote>
+    ))}
+  </div>
+</section>
