@@ -5,17 +5,22 @@ import LibraryThreshold from '../components/library/LibraryThreshold.astro';
 import LibraryAlcove from '../components/library/LibraryAlcove.astro';
 import ReadersNook from '../components/library/ReadersNook.astro';
 import { createLibraryMotes } from '../lib/works/motes';
+import { resolveStoryWorld } from '../lib/storyExperience';
+import LibraryWorldVeil from '../components/library/LibraryWorldVeil.astro';
 import { getCollection, getEntry } from 'astro:content';
+import '../styles/library-worlds.css';
 
 // Get all works and sort by order
 const allWorks = await getCollection('works');
 const sortedWorks = allWorks.sort((a, b) => a.data.order - b.data.order);
+const activeId = sortedWorks[0]?.id;
+const initialWorld = activeId ? resolveStoryWorld(sortedWorks.find((w) => w.id === activeId)!) : 'valley';
 const shelfBooks = sortedWorks.map((work) => ({
   id: work.id,
   title: work.data.title,
   image: work.data.image,
+  world: resolveStoryWorld(work),
 }));
-const activeId = shelfBooks[0]?.id;
 
 // Get page settings
 const worksSettings = await getEntry('pages', 'works');
@@ -72,8 +77,9 @@ const structuredData = {
 <BaseLayout title={title} description={description} permalink={permalink} current="work">
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-  <div class="library">
+  <div class="library" data-world={initialWorld}>
     <LibraryAmbience motes={motes} />
+    <LibraryWorldVeil />
 
     <div class="room-inner">
       <LibraryThreshold title={title} intro={intro} />

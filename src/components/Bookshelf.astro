@@ -4,7 +4,7 @@
  * in the reader below it.
  */
 export interface Props {
-  books: { id: string; title: string; image: string }[];
+  books: { id: string; title: string; image: string; world?: string }[];
   activeId?: string;
   heading?: string;
 }
@@ -43,6 +43,7 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
               aria-selected={book.id === activeId ? 'true' : 'false'}
               tabindex={book.id === activeId ? 0 : -1}
               data-book={book.id}
+              data-world={book.world}
             >
               <img
                 class="book-cover-img"

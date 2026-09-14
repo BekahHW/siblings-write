@@ -1,0 +1,211 @@
+.library {
+  --world-ambient: 1;
+  --world-lamp: #ffd88a;
+  --world-wall-warmth: 0;
+  --world-mote-speed: 1;
+  transition:
+    --world-ambient 1.2s ease,
+    --world-lamp 1.2s ease,
+    --world-wall-warmth 1.2s ease;
+}
+
+.library.is-previewing {
+  --world-ambient: 1.08;
+}
+
+.library[data-world='valley'] {
+  --world-lamp: #e8f0c8;
+  --world-wall-warmth: 0.12;
+  --world-mote-speed: 1.05;
+}
+
+.library[data-world='christmas'] {
+  --world-lamp: #ffe4b8;
+  --world-wall-warmth: 0.22;
+}
+
+.library[data-world='island'] {
+  --world-lamp: #ffe8c4;
+  --world-wall-warmth: -0.08;
+  --world-mote-speed: 0.82;
+}
+
+.library[data-world='sandbridge'] {
+  --world-lamp: #fff4d6;
+  --world-wall-warmth: 0.18;
+  --world-mote-speed: 1.1;
+}
+
+.library .lamp {
+  background: radial-gradient(circle at 50% 40%, var(--world-lamp), transparent 70%);
+  transition: background 1.2s ease;
+}
+
+.world-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.world-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+.library[data-world='valley'] .world-layer--valley-glow,
+.library[data-world='valley'] .world-layer--fireflies {
+  opacity: 1;
+}
+
+.library[data-world='christmas'] .world-layer--snow,
+.library[data-world='christmas'] .world-layer--nutcracker-shadow {
+  opacity: 1;
+}
+
+.library[data-world='island'] .world-layer--fog,
+.library[data-world='island'] .world-layer--water-shimmer {
+  opacity: 1;
+}
+
+.library[data-world='sandbridge'] .world-layer--coast-light,
+.library[data-world='sandbridge'] .world-layer--caustics,
+.library[data-world='sandbridge'] .world-layer--sand-drift {
+  opacity: 1;
+}
+
+.world-layer--valley-glow {
+  background: radial-gradient(60% 45% at 50% 28%, rgba(120, 180, 90, 0.14), transparent 70%);
+}
+
+.world-layer--fireflies span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(210, 255, 160, 0.85);
+  box-shadow: 0 0 8px rgba(180, 255, 120, 0.55);
+  animation: firefly-drift 14s ease-in-out infinite;
+}
+
+.world-layer--fireflies span:nth-child(1) { left: 18%; top: 42%; animation-delay: 0s; }
+.world-layer--fireflies span:nth-child(2) { left: 72%; top: 36%; animation-delay: 2.4s; }
+.world-layer--fireflies span:nth-child(3) { left: 44%; top: 58%; animation-delay: 4.8s; }
+.world-layer--fireflies span:nth-child(4) { left: 86%; top: 52%; animation-delay: 1.2s; }
+.world-layer--fireflies span:nth-child(5) { left: 28%; top: 28%; animation-delay: 6s; }
+
+.world-layer--paw {
+  bottom: 18%;
+  left: 12%;
+  width: 28px;
+  height: 24px;
+  opacity: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(80, 60, 40, 0.25) 0 35%, transparent 36%),
+    radial-gradient(circle at 70% 30%, rgba(80, 60, 40, 0.25) 0 35%, transparent 36%),
+    radial-gradient(ellipse at 50% 70%, rgba(80, 60, 40, 0.3) 0 55%, transparent 56%);
+  animation: paw-fade 22s ease-in-out infinite;
+}
+
+.library[data-world='valley'] .world-layer--paw {
+  opacity: 0.35;
+}
+
+.world-layer--snow span {
+  position: absolute;
+  top: -8px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  animation: snow-fall 18s linear infinite;
+}
+
+.world-layer--snow span:nth-child(1) { left: 8%; animation-delay: 0s; }
+.world-layer--snow span:nth-child(2) { left: 22%; animation-delay: 3s; }
+.world-layer--snow span:nth-child(3) { left: 41%; animation-delay: 6s; }
+.world-layer--snow span:nth-child(4) { left: 58%; animation-delay: 1.5s; }
+.world-layer--snow span:nth-child(5) { left: 71%; animation-delay: 4.5s; }
+.world-layer--snow span:nth-child(6) { left: 88%; animation-delay: 7s; }
+
+.world-layer--nutcracker-shadow {
+  background: radial-gradient(12% 18% at 92% 22%, rgba(40, 20, 10, 0.18), transparent 70%);
+  animation: shadow-pass 28s ease-in-out infinite;
+}
+
+.world-layer--fog {
+  background: linear-gradient(180deg, transparent 55%, rgba(180, 200, 220, 0.22) 100%);
+}
+
+.world-layer--water-shimmer {
+  background: linear-gradient(105deg, transparent 40%, rgba(120, 180, 200, 0.08) 50%, transparent 60%);
+  background-size: 200% 100%;
+  animation: water-shimmer 9s ease-in-out infinite;
+}
+
+.world-layer--coast-light {
+  background: radial-gradient(70% 50% at 50% 0%, rgba(255, 248, 220, 0.2), transparent 70%);
+}
+
+.world-layer--caustics {
+  background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.06) 0, transparent 40%),
+    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.05) 0, transparent 35%);
+  animation: caustics-shift 11s ease-in-out infinite;
+}
+
+.world-layer--sand-drift {
+  background: linear-gradient(90deg, transparent, rgba(230, 210, 170, 0.12), transparent);
+  animation: sand-drift 16s linear infinite;
+}
+
+@keyframes firefly-drift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.2; }
+  50% { transform: translate(12px, -18px); opacity: 0.9; }
+}
+
+@keyframes paw-fade {
+  0%, 88%, 100% { opacity: 0; }
+  92%, 96% { opacity: 0.35; }
+}
+
+@keyframes snow-fall {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  100% { transform: translateY(420px); opacity: 0; }
+}
+
+@keyframes shadow-pass {
+  0%, 92%, 100% { opacity: 0; transform: translateX(0); }
+  94%, 98% { opacity: 1; transform: translateX(-8px); }
+}
+
+@keyframes water-shimmer {
+  0%, 100% { background-position: 0% 0; }
+  50% { background-position: 100% 0; }
+}
+
+@keyframes caustics-shift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(6px, -4px); }
+}
+
+@keyframes sand-drift {
+  0% { transform: translateX(-30%); opacity: 0; }
+  20% { opacity: 0.5; }
+  100% { transform: translateX(30%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .library .world-layer,
+  .library .world-layer--fireflies span,
+  .library .world-layer--snow span {
+    animation: none !important;
+  }
+
+  .library[data-world='valley'] .world-layer--fireflies,
+  .library[data-world='christmas'] .world-layer--snow {
+    opacity: 0.35;
+  }
+}

@@ -1,3 +1,5 @@
+import { commitLibraryWorld, wireLibraryWorld } from './library-world';
+
 /**
  * Bookshelf, page-turn reader, shelf scroll, and offscreen animation pausing
  * for /works. Re-binds on astro:page-load after view transitions.
@@ -123,6 +125,8 @@ export function initWorksRoom(): void {
 
     function open(id: string, focusTab: boolean): void {
       markTabs(id, focusTab);
+      const activeTab = tabs.find((tab) => tab.dataset.book === id);
+      if (activeTab?.dataset.world) commitLibraryWorld(activeTab.dataset.world);
       settle();
 
       const next = document.getElementById(`spread-${id}`) as HTMLElement | null;
@@ -222,6 +226,7 @@ export function initWorksRoom(): void {
     pauseOffscreen();
     wireShelfScroll();
     wireShelf();
+    import('./library-world').then(({ wireLibraryWorld }) => wireLibraryWorld());
   }
 
   document.addEventListener('astro:page-load', setup);
