@@ -106,7 +106,8 @@ const structuredData = {
   </script>
 </BaseLayout>
 
-<style>
+<style is:global>
+  /* Scoped styles break when room markup lives in child components — keep library CSS global. */
   /* ═══════════════════════════════════════════════════════════════
      THE LIBRARY
      A warmer, dimmer room built from the site's own violets, roses
@@ -355,7 +356,7 @@ const structuredData = {
   /* ─── Content column ──────────────────────────────────────────── */
   .room-inner {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 clamp(1rem, 4vw, 2rem);
