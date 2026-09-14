@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { formatLibraryRecordLabel } from '../../lib/storyExperience';
 
 export interface Props {
   works: CollectionEntry<'works'>[];
@@ -52,6 +53,21 @@ const { works, activeId } = Astro.props;
         </div>
 
         <div class="spread-page spread-page--right">
+          {work.data.experience && (
+            <aside class="spread-record" aria-label="Library archive record">
+              <p class="spread-record-id">{formatLibraryRecordLabel(work.data.experience.recordNumber)}</p>
+              <p class="spread-record-title">{work.data.title}</p>
+              <p class="spread-record-location">{work.data.experience.location}</p>
+              <p class="spread-record-tags">{work.data.experience.classification.join(' · ')}</p>
+              {work.data.experience.librarianNote && (
+                <p class="spread-record-note">
+                  <span class="spread-record-note-label">Librarian's note:</span>
+                  "{work.data.experience.librarianNote}"
+                </p>
+              )}
+            </aside>
+          )}
+
           <h3 class="spread-label">The story</h3>
           <div class="spread-prose">
             {storyParagraphs.map((para) => (
