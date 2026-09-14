@@ -105,16 +105,19 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
     background: linear-gradient(180deg, #120a04 0%, #1e1008 45%, #2a1a0c 100%);
     border-radius: 10px 10px 0 0;
     box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
+    overflow: visible;
   }
 
   /* ─── Scroll wrapper — handles horizontal overflow only ─────────── */
   .shelf-scroll {
     overflow-x: auto;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     scroll-behavior: smooth;
     scroll-padding-inline: 40px;
-    padding: 40px 40px 0;
+    /* Room for lifted covers; overflow-x:auto still pairs with clip on the panel below. */
+    padding: 40px 40px 36px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -150,7 +153,7 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
     color: inherit;
     cursor: pointer;
     border-radius: 4px 6px 6px 4px;
-    overflow: hidden;
+    overflow: visible;
 
     box-shadow:
       6px 8px 20px rgba(0, 0, 0, 0.7),
@@ -218,8 +221,10 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
     display: block;
     width: 160px;
     height: 240px;
-    object-fit: cover;
-    object-position: center top;
+    object-fit: contain;
+    object-position: center center;
+    background: linear-gradient(180deg, #2a1a10 0%, #1a1008 100%);
+    border-radius: 2px 4px 4px 2px;
   }
 
   /* ─── Shelf arrows ─────────────────────────────────────────────── */
@@ -362,7 +367,7 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
   /* Tablet: trim the covers so all four still fit rather than scroll */
   @media (max-width: 1024px) {
     .shelf-scroll {
-      padding: 32px 28px 0;
+      padding: 32px 28px 32px;
       scroll-padding-inline: 28px;
     }
 
@@ -378,7 +383,7 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
 
   @media (max-width: 700px) {
     .shelf-scroll {
-      padding: 28px 20px 0;
+      padding: 28px 20px 28px;
       scroll-padding-inline: 20px;
       scroll-snap-type: x proximity;
     }
@@ -403,7 +408,7 @@ const { books, activeId = books[0]?.id, heading = 'Our books' } = Astro.props;
 
   @media (max-width: 440px) {
     .shelf-scroll {
-      padding: 24px 16px 0;
+      padding: 24px 16px 24px;
       scroll-padding-inline: 16px;
     }
 

@@ -1,16 +1,5 @@
 .library {
-  --world-ambient: 1;
   --world-lamp: #ffd88a;
-  --world-wall-warmth: 0;
-  --world-mote-speed: 1;
-  transition:
-    --world-ambient 1.2s ease,
-    --world-lamp 1.2s ease,
-    --world-wall-warmth 1.2s ease;
-}
-
-.library.is-previewing {
-  --world-ambient: 1.08;
 }
 
 .library[data-world='valley'] {
@@ -53,7 +42,12 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 1.4s ease;
+  transition: opacity 2.2s ease;
+}
+
+.library.is-turning-book .world-layer,
+.library.is-turning-book .lamp {
+  transition: none;
 }
 
 .library[data-world='valley'] .world-layer--valley-glow,

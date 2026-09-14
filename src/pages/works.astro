@@ -83,7 +83,12 @@ const structuredData = {
 <BaseLayout title={title} description={description} permalink={permalink} current="work">
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-  <div class="library" data-world={initialWorld} data-archive-secrets={JSON.stringify(archiveSecrets)}>
+  <div
+    class="library"
+    data-world={initialWorld}
+    data-world-committed={initialWorld}
+    data-archive-secrets={JSON.stringify(archiveSecrets)}
+  >
     <LibraryAmbience motes={motes} />
     <LibraryWorldVeil />
 

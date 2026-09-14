@@ -121,6 +121,7 @@ export function initWorksRoom(): void {
       }
       reader!.classList.remove('is-stacking', 'is-turning', 'is-resizing');
       reader!.style.height = '';
+      document.querySelector<HTMLElement>('.library')?.classList.remove('is-turning-book');
       spreads.forEach((spread) => {
         spread.classList.remove('is-outgoing', 'is-incoming', 'clip-right', 'clip-left');
       });
@@ -131,7 +132,7 @@ export function initWorksRoom(): void {
     function open(id: string, focusTab: boolean): void {
       markTabs(id, focusTab);
       const activeTab = tabs.find((tab) => tab.dataset.book === id);
-      if (activeTab?.dataset.world) commitLibraryWorld(activeTab.dataset.world);
+      const nextWorld = activeTab?.dataset.world;
       settle();
 
       const next = document.getElementById(`spread-${id}`) as HTMLElement | null;
@@ -141,6 +142,7 @@ export function initWorksRoom(): void {
       if (still.matches || !leaf || !face || !back || !current) {
         if (current) current.hidden = true;
         next.hidden = false;
+        if (nextWorld) commitLibraryWorld(nextWorld);
         return;
       }
 
@@ -153,8 +155,12 @@ export function initWorksRoom(): void {
       if (!liftedEl || !landedEl) {
         if (current) current.hidden = true;
         next.hidden = false;
+        if (nextWorld) commitLibraryWorld(nextWorld);
         return;
       }
+
+      const library = document.querySelector<HTMLElement>('.library');
+      library?.classList.add('is-turning-book');
 
       face.replaceChildren(liftedEl.cloneNode(true));
       back.replaceChildren(landedEl.cloneNode(true));
@@ -195,6 +201,8 @@ export function initWorksRoom(): void {
                 reader.style.height = '';
               }, 280)
             );
+            if (nextWorld) commitLibraryWorld(nextWorld);
+            library?.classList.remove('is-turning-book');
           }, TURN)
         );
       });
