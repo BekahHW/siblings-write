@@ -11,6 +11,11 @@ import {
   type LibraryWorld,
   type RareEvent,
 } from './library-state';
+import {
+  hasDiscoveredLibrarySecret,
+  readVisitedWorks,
+  rememberLibrarySecret,
+} from './library-memory';
 
 declare global {
   interface Window {
@@ -282,6 +287,63 @@ function wireShelf(
   return settlePages;
 }
 
+function restoreLibraryMemory(root: HTMLElement) {
+  const visited = new Set(readVisitedWorks());
+  root.querySelectorAll<HTMLElement>('[data-book]').forEach((book) => {
+    if (book.dataset.book && visited.has(book.dataset.book)) {
+      book.dataset.visited = 'true';
+    } else {
+      book.removeAttribute('data-visited');
+    }
+  });
+
+  const welcome = root.querySelector<HTMLElement>('[data-library-welcome]');
+  if (welcome) welcome.hidden = visited.size === 0;
+
+  const tree = root.querySelector<HTMLElement>('.tree-wrap');
+  if (tree && hasDiscoveredLibrarySecret()) {
+    tree.dataset.secretDiscovered = 'true';
+  }
+}
+
+function wireTreeSecret(root: HTMLElement, signal: AbortSignal) {
+  const trigger = root.querySelector<HTMLButtonElement>('[data-tree-secret]');
+  const panel = root.querySelector<HTMLElement>('[data-tree-archive]');
+  const closeButton = panel?.querySelector<HTMLButtonElement>('[data-tree-secret-close]');
+  const heading = panel?.querySelector<HTMLElement>('#tree-archive-title');
+  if (!trigger || !panel || !closeButton || !heading) return () => {};
+
+  const close = (returnFocus = true) => {
+    panel.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+    if (returnFocus) trigger.focus();
+  };
+  const open = () => {
+    panel.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+    trigger.closest<HTMLElement>('.tree-wrap')?.setAttribute('data-secret-discovered', 'true');
+    rememberLibrarySecret();
+    heading.focus();
+  };
+
+  trigger.addEventListener('click', () => {
+    if (trigger.getAttribute('aria-expanded') === 'true') close();
+    else open();
+  }, { signal });
+  closeButton.addEventListener('click', () => close(), { signal });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !panel.hidden) {
+      event.preventDefault();
+      close();
+    }
+  }, { signal });
+
+  return () => {
+    panel.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+  };
+}
+
 function wireVisibility(
   root: HTMLElement,
   controller: LibraryStateController,
@@ -427,9 +489,11 @@ function setup() {
   const initialWorld = isLibraryWorld(root.dataset.world) ? root.dataset.world : 'valley';
   const aborter = new AbortController();
   const controller = new LibraryStateController(root, initialWorld);
+  restoreLibraryMemory(root);
   const cleanups = [
     wireShelfScroll(aborter.signal),
     wireShelf(controller, aborter.signal),
+    wireTreeSecret(root, aborter.signal),
     wireVisibility(root, controller),
     wireVisitorAwareness(root, aborter.signal),
     wireRareEvents(root, controller, aborter.signal),

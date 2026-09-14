@@ -1523,6 +1523,18 @@ const structuredData = {
   }
 </style>
 
+<script>
+  import { markWorkVisited } from '../../scripts/library-memory';
+
+  const rememberCurrentWork = () => {
+    const detail = document.querySelector<HTMLElement>('[data-work-id]');
+    if (detail?.dataset.workId) markWorkVisited(detail.dataset.workId);
+  };
+
+  document.addEventListener('astro:page-load', rememberCurrentWork);
+  rememberCurrentWork();
+</script>
+
 <script is:inline>
   (function() {
     function initTrailerPlayer() {

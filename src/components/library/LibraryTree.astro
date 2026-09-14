@@ -7,8 +7,9 @@
  */
 export interface Props {
   class?: string;
+  secretText?: string;
 }
-const { class: className = '' } = Astro.props;
+const { class: className = '', secretText } = Astro.props;
 
 // Deterministic pseudo-random so the canopy is identical on every build.
 let seed = 20260911;
@@ -380,6 +381,35 @@ const drops = hangers.map(([x, y], i) => ({
     </g>
   ))}
 </svg>
+
+<button
+  class="tree-secret"
+  type="button"
+  aria-label="Open the concealed tree archive"
+  aria-expanded="false"
+  aria-controls="tree-archive"
+  data-tree-secret
+>
+  <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <path d="M16 3 C12 8 8 10 6 16 C10 14 13 14 16 17 C19 14 22 14 26 16 C24 10 20 8 16 3 Z" />
+    <path d="M16 17 V28 M11 22 C13 21 15 22 16 24 M21 22 C19 21 17 22 16 24" />
+  </svg>
+</button>
+
+<section
+  class="tree-archive"
+  id="tree-archive"
+  aria-labelledby="tree-archive-title"
+  hidden
+  data-tree-archive
+>
+  <button class="tree-archive-close" type="button" aria-label="Close the concealed archive" data-tree-secret-close>
+    <span aria-hidden="true">×</span>
+  </button>
+  <p class="tree-archive-kicker">Concealed archive</p>
+  <h2 id="tree-archive-title" tabindex="-1">A leaf filed out of sight</h2>
+  {secretText && <p class="tree-archive-lore">{secretText}</p>}
+</section>
 </div>
 
 <style>
@@ -389,9 +419,134 @@ const drops = hangers.map(([x, y], i) => ({
     min-width: 1000px;
   }
 
+  .tree-secret {
+    position: absolute;
+    left: 13.7%;
+    top: 69%;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 42px;
+    padding: 4px;
+    border: 0;
+    border-radius: 45% 52% 48% 42%;
+    color: rgba(214, 174, 105, 0.48);
+    background: rgba(28, 17, 8, 0.16);
+    box-shadow: inset 1px 1px 2px rgba(245, 215, 158, 0.08);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 180ms ease, background-color 180ms ease;
+  }
+
+  .tree-secret svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(1px 1px 0 rgba(5, 3, 1, 0.8));
+  }
+
+  .tree-secret:hover,
+  .tree-secret[aria-expanded='true'],
+  .tree-wrap[data-secret-discovered='true'] .tree-secret {
+    color: rgba(238, 204, 139, 0.78);
+    background: rgba(38, 22, 8, 0.34);
+  }
+
+  .tree-secret:focus-visible {
+    outline: 3px solid #ffe4a8;
+    outline-offset: 3px;
+    color: #ffe4a8;
+  }
+
+  .tree-archive {
+    position: absolute;
+    top: 73%;
+    left: max(1rem, 12%);
+    z-index: 6;
+    width: min(340px, calc(100vw - 2rem));
+    box-sizing: border-box;
+    padding: 1.25rem 1.4rem 1.35rem;
+    color: #322619;
+    background:
+      repeating-linear-gradient(180deg, transparent 0 27px, rgba(82, 106, 121, 0.16) 27px 28px),
+      #e7dcc2;
+    border: 1px solid #8b6a36;
+    border-radius: 2px;
+    box-shadow: 0 16px 36px rgba(15, 8, 3, 0.58), inset 0 0 18px rgba(91, 63, 28, 0.1);
+    pointer-events: auto;
+    transform: rotate(-0.45deg);
+  }
+
+  .tree-archive[hidden] {
+    display: none;
+  }
+
+  .tree-archive-kicker {
+    margin: 0 2rem 0.35rem 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+  }
+
+  .tree-archive h2 {
+    margin: 0 2rem 0.8rem 0;
+    font-family: var(--font-family-storybook);
+    font-size: 1.15rem;
+    line-height: 1.25;
+  }
+
+  .tree-archive h2:focus {
+    outline: none;
+  }
+
+  .tree-archive-lore {
+    margin: 0;
+    font-size: 0.93rem;
+    font-style: italic;
+    line-height: 1.65;
+  }
+
+  .tree-archive-close {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.6rem;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(70, 48, 24, 0.42);
+    border-radius: 50%;
+    color: #49331d;
+    background: rgba(244, 235, 212, 0.8);
+    font: 1.35rem/1 Georgia, serif;
+    cursor: pointer;
+  }
+
+  .tree-archive-close:focus-visible {
+    outline: 3px solid #5b3585;
+    outline-offset: 2px;
+  }
+
   @media (max-width: 700px) {
     .tree-wrap {
       min-width: 680px;
+    }
+
+    .tree-secret {
+      left: 13%;
+      top: 68%;
+      width: 40px;
+      height: 44px;
+    }
+
+    .tree-archive {
+      left: 1rem;
+      top: 74%;
     }
   }
 
@@ -422,6 +577,10 @@ const drops = hangers.map(([x, y], i) => ({
   @media (prefers-reduced-motion: reduce) {
     .bulb {
       animation: none;
+    }
+
+    .tree-secret {
+      transition: none;
     }
   }
 </style>
