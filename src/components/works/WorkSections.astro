@@ -1,0 +1,60 @@
+---
+interface Props {
+  summary?: string;
+  inspirationStory?: string;
+  spotifyPlaylist?: string;
+  quizUrl?: string;
+}
+
+const { summary, inspirationStory, spotifyPlaylist, quizUrl } = Astro.props;
+const paragraphs = (value?: string) =>
+  (value ?? '').split(/\n\n+/).map((paragraph) => paragraph.trim()).filter(Boolean);
+---
+
+{summary && (
+  <section class="story-section story-summary">
+    <h2><span aria-hidden="true">✨</span> About the Book <span aria-hidden="true">✨</span></h2>
+    <div class="prose">{paragraphs(summary).map((paragraph) => <p>{paragraph}</p>)}</div>
+  </section>
+)}
+
+{inspirationStory && (
+  <section class="story-section story-inspiration">
+    <h2><span aria-hidden="true">💫</span> The Story Behind the Story <span aria-hidden="true">💫</span></h2>
+    <div class="prose">{paragraphs(inspirationStory).map((paragraph) => <p>{paragraph}</p>)}</div>
+  </section>
+)}
+
+{spotifyPlaylist && (
+  <section class="story-section story-soundtrack">
+    <h2><span aria-hidden="true">🎵</span> Listen to the Soundtrack <span aria-hidden="true">🎵</span></h2>
+    <p class="spotify-intro">Immerse yourself in the magical atmosphere of the story with our curated Spotify playlist!</p>
+    <div class="spotify-embed">
+      <iframe
+        src={spotifyPlaylist.replace('open.spotify.com', 'open.spotify.com/embed')}
+        title="Spotify story soundtrack"
+        width="100%"
+        height="352"
+        frameborder="0"
+        allowfullscreen
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+      ></iframe>
+    </div>
+    <a href={spotifyPlaylist} target="_blank" rel="noopener noreferrer" class="spotify-link">
+      <span aria-hidden="true">🎧</span> Open in Spotify
+    </a>
+  </section>
+)}
+
+{quizUrl && (
+  <section class="story-section quiz-cta">
+    <span class="quiz-icon" aria-hidden="true">🎄</span>
+    <h2>Which Nutcracker Village Character Are You?</h2>
+    <p>
+      Take our interactive personality quiz to discover which character from
+      <em>The Battle for Christmas</em> matches your personality!
+    </p>
+    <a href={quizUrl} class="quiz-link">Take the Quiz <span aria-hidden="true">✨</span></a>
+  </section>
+)}
