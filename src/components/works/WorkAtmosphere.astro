@@ -1,0 +1,15 @@
+---
+import type { WorkWorld } from '../../content/schemas/workExperience';
+
+interface Props {
+  world: WorkWorld;
+}
+
+const { world } = Astro.props;
+---
+
+<div class="work-atmosphere" aria-hidden="true" data-atmosphere data-world-layer={world}>
+  <span class="atmosphere-light"></span>
+  <span class="atmosphere-landmark"></span>
+  <span class="atmosphere-trace"></span>
+</div>

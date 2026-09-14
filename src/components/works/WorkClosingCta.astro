@@ -1,0 +1,20 @@
+---
+import WorkPurchaseActions from './WorkPurchaseActions.astro';
+
+interface Props {
+  amazonUrl: string;
+  bookshopUrl?: string;
+}
+
+const { amazonUrl, bookshopUrl } = Astro.props;
+---
+
+<section class="work-closing">
+  <h2>Ready to Start Your Adventure?</h2>
+  <p>Get your copy today and discover the magic for yourself!</p>
+  <WorkPurchaseActions amazonUrl={amazonUrl} bookshopUrl={bookshopUrl} closing />
+</section>
+
+<nav class="work-back" aria-label="Back to works">
+  <a href="/works">← Back to All Works</a>
+</nav>

@@ -13,8 +13,16 @@ export interface Props {
   permalink: string;
   current?: string;
   hideNewsletterFooter?: boolean;
+  immersiveWork?: boolean;
 }
-const { title, description, permalink, current, hideNewsletterFooter = false } = Astro.props;
+const {
+  title,
+  description,
+  permalink,
+  current,
+  hideNewsletterFooter = false,
+  immersiveWork = false,
+} = Astro.props;
 
 // Fetch active announcements
 const announcements = await getCollection('announcements');
@@ -118,11 +126,11 @@ const siteStructuredData = {
     }
   </script>
 </head>
-<body>
+<body data-immersive-work={immersiveWork ? 'true' : undefined}>
   <!-- Reading Progress Bar -->
-  <div id="reading-progress-bar" class="progress-bar-container">
+  <div id="reading-progress-bar" class="progress-bar-container" aria-hidden="true">
     <div class="progress-bar-fill"></div>
-    <div class="progress-sparkle">✨</div>
+    <div class="progress-sparkle">{immersiveWork ? '◆' : '✨'}</div>
   </div>
 
   <div class="layout">
@@ -223,6 +231,38 @@ const siteStructuredData = {
     filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
     animation: sparkle-bounce 1s ease-in-out infinite;
     transition: left 0.1s ease-out;
+  }
+
+  body[data-immersive-work] .progress-bar-container {
+    top: 8px;
+    left: 50%;
+    width: min(92vw, 680px);
+    height: 3px;
+    border-radius: 99px;
+    background: rgba(55, 43, 28, 0.25);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+    transform: translateX(-50%);
+  }
+
+  body[data-immersive-work] .progress-bar-fill {
+    border-radius: inherit;
+    background: linear-gradient(90deg, #70502a, #d7b46a, #8a632e) !important;
+    box-shadow: 0 0 7px rgba(197, 151, 69, 0.65);
+  }
+
+  body[data-immersive-work] .progress-sparkle {
+    top: -9px;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #f0d38d;
+    border-radius: 2px 2px 7px 7px;
+    background: #8a632e;
+    color: #e9cd86;
+    font-size: 0.55rem;
+    line-height: 18px;
+    text-align: center;
+    filter: drop-shadow(0 2px 3px rgba(32, 22, 12, 0.45));
+    animation: none;
   }
 
   @keyframes sparkle-bounce {

@@ -1,0 +1,37 @@
+---
+interface Props {
+  title: string;
+  image: string;
+  trailerVideoId?: string;
+  cinematicHero: boolean;
+}
+
+const { title, image, trailerVideoId, cinematicHero } = Astro.props;
+const hasTrailer = Boolean(trailerVideoId && cinematicHero);
+---
+
+<header class="work-hero" data-parallax-surface>
+  <img src={image} alt={title} class="work-hero-image" fetchpriority="high" />
+  <div class="work-hero-shade" aria-hidden="true"></div>
+  <div class="work-hero-content">
+    <h1>{title}</h1>
+    {hasTrailer && (
+      <>
+        <p class="work-hero-tagline">Watch for the Magic</p>
+        <button
+          class="play-trailer-button"
+          type="button"
+          data-play-trailer
+          data-trailer-id={trailerVideoId}
+          aria-label={`Play trailer for ${title}`}
+        >
+          <span aria-hidden="true">▶</span>
+          Play Trailer
+        </button>
+      </>
+    )}
+  </div>
+  {hasTrailer && (
+    <div class="trailer-player" data-trailer-player data-title={`${title} trailer`} hidden></div>
+  )}
+</header>
