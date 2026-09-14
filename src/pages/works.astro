@@ -23,7 +23,7 @@ const activeWorld = shelfBooks[0]?.world ?? 'valley';
 const worksSettings = await getEntry('pages', 'works');
 const title = worksSettings?.data.title || 'Our Work';
 const description = worksSettings?.data.description || 'Discover our young adult fiction, middle grade adventures, and Christmas novels. Browse YA fiction like Escape from Browns Island, holiday stories like The Battle for Christmas, and middle grade adventures by the Hawrot siblings.';
-const permalink = `${Astro.site.href}work`;
+const permalink = new URL('/works', Astro.site).href;
 const intro = worksSettings?.data.intro || "We're passionate about creating adventurous stories, that spark your imagination and bring joy to our readers. Here's a look at some of the work we've done and what we're currently working on.";
 const featuredTitle = worksSettings?.data.featuredTitle || 'Featured Work';
 
@@ -67,7 +67,14 @@ const structuredData = {
 };
 ---
 
-<BaseLayout title={title} description={description} permalink={permalink} current="work">
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink}
+  current="works"
+  immersiveWork
+  suppressAnnouncement
+>
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
   <div

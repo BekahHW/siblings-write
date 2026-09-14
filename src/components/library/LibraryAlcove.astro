@@ -37,5 +37,6 @@ const { works, books, activeId, heading } = Astro.props;
     Welcome back. The library kept your place.
   </p>
   <p class="shelf-hint">Take one down. It opens below.</p>
+  <div class="story-transition-veil" aria-hidden="true"></div>
   <StoryReader works={works} activeId={activeId} />
 </section>

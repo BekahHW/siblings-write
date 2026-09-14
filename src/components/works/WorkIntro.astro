@@ -2,6 +2,7 @@
 import WorkPurchaseActions from './WorkPurchaseActions.astro';
 
 interface Props {
+  workId: string;
   title: string;
   description: string;
   image: string;
@@ -10,12 +11,18 @@ interface Props {
   bookshopUrl?: string;
 }
 
-const { title, description, image, inspiredBy, amazonUrl, bookshopUrl } = Astro.props;
+const { workId, title, description, image, inspiredBy, amazonUrl, bookshopUrl } = Astro.props;
 ---
 
 <section class="work-intro" aria-label={`${title} introduction`}>
   <div class="work-cover-wrap">
-    <img src={image} alt={`${title} book cover`} class="work-cover" loading="eager" />
+    <img
+      src={image}
+      alt={`${title} book cover`}
+      class="work-cover"
+      loading="eager"
+      transition:name={`story-cover-${workId}`}
+    />
   </div>
   <div class="work-intro-copy">
     <p class="work-logline">{description}</p>

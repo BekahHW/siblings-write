@@ -30,7 +30,14 @@ test.beforeEach(async ({ page }) => {
 for (const work of works) {
   test(`${work.world} world keeps its complete story-page contract`, async ({ page }) => {
     const errors: Error[] = [];
+    const consoleErrors: string[] = [];
     page.on('pageerror', (error) => errors.push(error));
+    page.on('console', (message) => {
+      if (
+        message.type() === 'error'
+        && message.text() !== 'requestStorageAccess: Permission denied.'
+      ) consoleErrors.push(message.text());
+    });
     await page.goto(`/works/${work.slug}`);
 
     const detail = page.locator('[data-work-page]');
@@ -57,6 +64,7 @@ for (const work of works) {
     });
 
     await expect.poll(() => errors).toEqual([]);
+    expect(consoleErrors).toEqual([]);
   });
 
   test(`${work.world} world is still and usable with reduced motion`, async ({ page }) => {
@@ -112,4 +120,12 @@ test('immersive progress marker is scoped to work detail pages', async ({ page }
   await page.goto('/blog');
   await expect(page.locator('body')).not.toHaveAttribute('data-immersive-work');
   await expect(page.locator('.progress-sparkle')).toHaveText('✨');
+});
+
+test('immersive work routes suppress announcements without removing them globally', async ({ page }) => {
+  await page.goto('/works/escape-from-browns-island');
+  await page.evaluate(() => sessionStorage.removeItem('announcement-shown'));
+  await page.reload();
+  await page.waitForTimeout(1100);
+  await expect(page.getByRole('button', { name: 'Close announcement' })).toHaveCount(0);
 });

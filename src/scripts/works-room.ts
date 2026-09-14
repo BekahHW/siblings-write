@@ -287,6 +287,44 @@ function wireShelf(
   return settlePages;
 }
 
+function wireStoryDeparture(root: HTMLElement, signal: AbortSignal) {
+  const reader = root.querySelector<HTMLElement>('[data-reader]');
+  if (!reader) return () => {};
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  reader.addEventListener('click', (event) => {
+    const link = event.target instanceof Element
+      ? event.target.closest<HTMLAnchorElement>('[data-story-link]')
+      : null;
+    if (
+      !link
+      || event.defaultPrevented
+      || event.button !== 0
+      || event.metaKey
+      || event.ctrlKey
+      || event.shiftKey
+      || event.altKey
+      || reducedMotion.matches
+    ) return;
+
+    const spread = link.closest<HTMLElement>('[data-spread-id]');
+    if (!spread || spread.hidden) return;
+
+    root.dataset.transitioningWork = spread.dataset.spreadId;
+    if (isLibraryWorld(spread.dataset.spreadWorld)) {
+      root.dataset.world = spread.dataset.spreadWorld;
+    }
+    spread.dataset.transitionSource = 'true';
+    root.classList.add('is-story-departing');
+  }, { signal });
+
+  return () => {
+    root.classList.remove('is-story-departing');
+    root.removeAttribute('data-transitioning-work');
+    reader.querySelector('[data-transition-source]')?.removeAttribute('data-transition-source');
+  };
+}
+
 function restoreLibraryMemory(root: HTMLElement) {
   const visited = new Set(readVisitedWorks());
   root.querySelectorAll<HTMLElement>('[data-book]').forEach((book) => {
@@ -493,6 +531,7 @@ function setup() {
   const cleanups = [
     wireShelfScroll(aborter.signal),
     wireShelf(controller, aborter.signal),
+    wireStoryDeparture(root, aborter.signal),
     wireTreeSecret(root, aborter.signal),
     wireVisibility(root, controller),
     wireVisitorAwareness(root, aborter.signal),
