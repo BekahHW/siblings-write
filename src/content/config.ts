@@ -1,5 +1,6 @@
 import { defineCollection, reference, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
+import { workExperienceSchema } from './schemas/workExperience';
 
 // Define the schema for the authors collection
 const authors = defineCollection({
@@ -52,6 +53,7 @@ const works = defineCollection({
     inspirationStory: z.string().optional(), // Full paragraphs about what inspired the book
     spotifyPlaylist: z.string().optional(), // Spotify playlist URL for book
     trailerVideoId: z.string().optional(), // YouTube video ID for book trailer
+    experience: workExperienceSchema.optional(),
   }),
 });
 
