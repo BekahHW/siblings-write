@@ -7,6 +7,16 @@ link: "https://www.amazon.com/Battle-Christmas-Reign-Nutcrackers/dp/B0DPKHMYZ1/r
 spotifyPlaylist: "https://open.spotify.com/playlist/6kfCWItecAQI4WerfMlnu1?si=kDgq4O1zR360C2vSmXt5BA"
 featured: true
 order: 1
+experience:
+  recordNumber: "002"
+  location: "The Nutcracker Realm"
+  classification:
+    - "Holiday Adventure"
+    - "Middle Grade"
+  world: christmas
+  librarianNote: "Returned with glitter in the binding. We are not asking questions."
+  cinematicHero: true
+  characterQuizHref: "/works/battle-for-christmas/which-character-are-you"
 trailerVideoId: "QNtP_LRRNTM"
 inspiredBy: "Inspired by our family's cherished Christmas traditions and the magical feeling of the holiday season that we wanted to share with readers."
 summary: "When the spirit of Christmas begins to fade from the world, young Tim discovers that the magical realm of the Nutcrackers is under siege. As darkness threatens to extinguish the joy and wonder of the holiday season forever, Tim must embark on an extraordinary journey alongside brave toy soldiers and enchanted allies. Through snow-covered landscapes and glittering palaces, he'll face challenges that test not only his courage but his belief in the magic that makes Christmas special. With the fate of Christmas hanging in the balance, Tim learns that the greatest magic comes from hope, family, and the unwavering spirit of the season."

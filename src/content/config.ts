@@ -1,4 +1,5 @@
 import { defineCollection, reference, z } from 'astro:content';
+import { storyWorldSchema } from '../lib/storyExperience';
 import { glob, file } from 'astro/loaders';
 
 // Define the schema for the authors collection
@@ -52,6 +53,19 @@ const works = defineCollection({
     inspirationStory: z.string().optional(), // Full paragraphs about what inspired the book
     spotifyPlaylist: z.string().optional(), // Spotify playlist URL for book
     trailerVideoId: z.string().optional(), // YouTube video ID for book trailer
+    experience: z
+      .object({
+        recordNumber: z.string(),
+        location: z.string(),
+        classification: z.array(z.string()).min(1),
+        world: storyWorldSchema,
+        librarianNote: z.string().optional(),
+        secretText: z.string().optional(),
+        showBookshop: z.boolean().optional(),
+        cinematicHero: z.boolean().optional(),
+        characterQuizHref: z.string().optional(),
+      })
+      .optional(),
   }),
 });
 
