@@ -18,6 +18,8 @@ const { works, activeId } = Astro.props;
 
   {works.map((work) => {
     const hasSummary = Boolean(work.data.summary);
+    const experience = work.data.experience;
+    const archiveRecord = experience?.archiveRecord.toString().padStart(3, '0');
     const storyParagraphs = (work.data.summary || work.data.description)
       .split(/\n\n+/)
       .map((paragraph) => paragraph.trim())
@@ -49,6 +51,33 @@ const { works, activeId } = Astro.props;
           <h2 class="spread-title" itemprop="name">{work.data.title}</h2>
           {hasSummary && (
             <p class="spread-logline" itemprop="description">{work.data.description}</p>
+          )}
+
+          {experience && (
+            <section class="library-record" aria-label={`Library record ${archiveRecord}`}>
+              <p class="library-record-heading">Library record · {archiveRecord}</p>
+              <dl class="library-record-fields">
+                <div>
+                  <dt>Accession</dt>
+                  <dd>{archiveRecord}</dd>
+                </div>
+                <div>
+                  <dt>Location</dt>
+                  <dd>{experience.location}</dd>
+                </div>
+                <div>
+                  <dt>Classification</dt>
+                  <dd>{experience.storyClassifications.join(' · ')}</dd>
+                </div>
+              </dl>
+            </section>
+          )}
+
+          {experience?.librarianNote && (
+            <aside class="librarian-slip" aria-label="Librarian's note">
+              <span class="librarian-slip-label">Librarian’s note</span>
+              <p>{experience.librarianNote}</p>
+            </aside>
           )}
         </div>
 

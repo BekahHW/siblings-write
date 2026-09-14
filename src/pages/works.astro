@@ -76,7 +76,10 @@ const structuredData = {
     data-library-state="committed"
     data-committed-world={activeWorld}
   >
-    <LibraryAmbience motes={generateMotes()} />
+    <LibraryAmbience
+      motes={generateMotes()}
+      secretText={sortedWorks[0]?.data.experience?.secretText}
+    />
     <LibraryAtmosphere />
 
     <div class="room-inner">

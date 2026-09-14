@@ -14,6 +14,55 @@ test('renders the library and a single open story', async ({ page }) => {
   await expect(page.locator('.spread:not([hidden])')).toHaveCount(1);
 });
 
+test('keeps book semantics and presents metadata as a library record', async ({ page }) => {
+  const spread = page.locator('.spread:not([hidden])');
+  await expect(spread).toHaveAttribute('itemtype', 'https://schema.org/Book');
+  await expect(spread.getByText('Library record · 001')).toBeVisible();
+  await expect(spread.getByText('The Ohio River Valley')).toBeVisible();
+  await expect(spread.getByLabel("Librarian's note")).toBeVisible();
+  await expect(spread.getByRole('link', { name: /Read more/ })).toBeVisible();
+  await expect(spread.getByRole('link', { name: /Buy on Amazon/ })).toBeVisible();
+});
+
+test('remembers a visited work with a welcome and physical ribbon', async ({ page }) => {
+  await page.goto('/works/escape-from-browns-island');
+  await expect(page.locator('[data-work-id="escape-from-browns-island"]')).toBeVisible();
+  await page.goto('/works');
+
+  await expect(page.getByText('Welcome back. The library kept your place.')).toBeVisible();
+  const visitedBook = page.locator('[data-book="escape-from-browns-island"]');
+  await expect(visitedBook).toHaveAttribute('data-visited', 'true');
+  await expect(visitedBook.locator('.visited-ribbon')).toBeVisible();
+  await expect(page.locator('[data-book="battle-for-christmas"]')).not.toHaveAttribute('data-visited');
+});
+
+test('opens the concealed archive with Enter and Escape returns focus', async ({ page }) => {
+  const trigger = page.getByRole('button', { name: 'Open the concealed tree archive' });
+  const archive = page.locator('#tree-archive');
+
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  await expect(archive).toBeVisible();
+  await expect(archive.getByRole('heading')).toBeFocused();
+
+  await page.keyboard.press('Escape');
+  await expect(archive).toBeHidden();
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  await expect(trigger).toBeFocused();
+});
+
+test('closes the archive by button and remembers its discovery', async ({ page }) => {
+  const trigger = page.getByRole('button', { name: 'Open the concealed tree archive' });
+  await trigger.click();
+  await page.getByRole('button', { name: 'Close the concealed archive' }).click();
+  await expect(trigger).toBeFocused();
+
+  await page.reload();
+  await expect(page.locator('.tree-wrap')).toHaveAttribute('data-secret-discovered', 'true');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+});
+
 test('passes every work world into the shelf and initial room state', async ({ page }) => {
   await expect(page.locator('.library')).toHaveAttribute('data-world', 'valley');
   await expect(page.getByRole('tab')).toHaveCount(4);

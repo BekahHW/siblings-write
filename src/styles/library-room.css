@@ -103,7 +103,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 0;
+    z-index: auto;
   }
 
   /* Doorway beam you step under */
@@ -151,6 +151,7 @@
     width: calc(100% + 140px);
     min-width: 1080px;
     opacity: 0.98;
+    z-index: 2;
   }
 
   .perch {
@@ -481,6 +482,16 @@
     text-shadow: 0 1px 6px rgba(24, 14, 6, 0.7);
   }
 
+  .library-welcome {
+    margin: 1.35rem auto -0.8rem;
+    text-align: center;
+    color: #ecd5aa;
+    font-size: clamp(0.85rem, 1.8vw, 0.96rem);
+    font-style: italic;
+    letter-spacing: 0.015em;
+    text-shadow: 0 1px 6px rgba(24, 14, 6, 0.78);
+  }
+
   .reader {
     position: relative;
     margin-bottom: 1rem;
@@ -748,6 +759,80 @@
     line-height: 1.72;
     margin: 0;
     color: #4a3a44;
+  }
+
+  .library-record {
+    margin: 1.35rem 0 0;
+    text-align: left;
+    color: #3f352d;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: clamp(0.68rem, 1.35vw, 0.76rem);
+    line-height: 1.45;
+    background: repeating-linear-gradient(
+      180deg,
+      transparent 0 1.55rem,
+      rgba(76, 101, 119, 0.2) 1.55rem calc(1.55rem + 1px)
+    );
+    border-top: 1px solid rgba(94, 69, 39, 0.5);
+    border-bottom: 1px solid rgba(94, 69, 39, 0.35);
+  }
+
+  .library-record-heading {
+    margin: 0;
+    padding: 0.48rem 0.2rem 0.4rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .library-record-fields {
+    margin: 0;
+  }
+
+  .library-record-fields > div {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, 0.32fr) 1fr;
+    gap: 0.55rem;
+    min-height: 1.55rem;
+    padding: 0.28rem 0.2rem;
+  }
+
+  .library-record dt {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .library-record dd {
+    margin: 0;
+  }
+
+  .librarian-slip {
+    width: min(88%, 290px);
+    margin: 1rem 0 0 auto;
+    padding: 0.62rem 0.72rem 0.68rem;
+    text-align: left;
+    color: #51473d;
+    background: rgba(225, 213, 185, 0.74);
+    border-left: 1px solid rgba(107, 83, 49, 0.28);
+    box-shadow: 1px 2px 4px rgba(47, 31, 15, 0.12);
+    transform: rotate(-0.7deg);
+  }
+
+  .librarian-slip-label {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-family: var(--font-family-serif);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .librarian-slip p {
+    margin: 0;
+    font-family: 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+    font-size: clamp(0.78rem, 1.45vw, 0.88rem);
+    line-height: 1.45;
   }
 
   .spread-label {
@@ -1103,6 +1188,16 @@
       border-bottom: 1px solid rgba(139, 106, 56, 0.3);
     }
 
+    .library-record {
+      max-width: 31rem;
+      margin-inline: auto;
+      margin-top: 1.35rem;
+    }
+
+    .librarian-slip {
+      margin-right: max(0.4rem, 5%);
+    }
+
     .reader .spread::after,
     .spread-ribbon {
       display: none;
@@ -1160,6 +1255,10 @@
     }
 
     .quote:hover {
+      transform: none;
+    }
+
+    .librarian-slip {
       transform: none;
     }
   }

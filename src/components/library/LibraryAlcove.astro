@@ -33,6 +33,9 @@ const { works, books, activeId, heading } = Astro.props;
     <Bookshelf books={books} activeId={activeId} heading={heading} />
   </div>
 
+  <p class="library-welcome" data-library-welcome hidden>
+    Welcome back. The library kept your place.
+  </p>
   <p class="shelf-hint">Take one down. It opens below.</p>
   <StoryReader works={works} activeId={activeId} />
 </section>

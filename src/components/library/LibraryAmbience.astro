@@ -6,26 +6,27 @@ import Owl from './Owl.astro';
 
 interface Props {
   motes: LibraryMote[];
+  secretText?: string;
 }
 
-const { motes } = Astro.props;
+const { motes, secretText } = Astro.props;
 ---
 
-<div class="room" aria-hidden="true">
-  <div class="room-lintel">
+<div class="room">
+  <div class="room-lintel" aria-hidden="true">
     <div class="room-lintel-ivy"><IvyVine width={1200} amplitude={22} tone="deep" /></div>
   </div>
 
   <div class="room-tree" data-animated>
-    <LibraryTree />
-    <div class="perch perch--one"><Owl variant="warm" delay={0} /></div>
-    <div class="perch perch--two"><Owl variant="cool" delay={2.4} /></div>
+    <LibraryTree secretText={secretText} />
+    <div class="perch perch--one" aria-hidden="true"><Owl variant="warm" delay={0} /></div>
+    <div class="perch perch--two" aria-hidden="true"><Owl variant="cool" delay={2.4} /></div>
   </div>
 
-  <div class="room-ivy room-ivy--left"><IvyVine width={900} amplitude={30} tone="bright" /></div>
-  <div class="room-ivy room-ivy--right"><IvyVine width={900} amplitude={30} tone="bright" /></div>
+  <div class="room-ivy room-ivy--left" aria-hidden="true"><IvyVine width={900} amplitude={30} tone="bright" /></div>
+  <div class="room-ivy room-ivy--right" aria-hidden="true"><IvyVine width={900} amplitude={30} tone="bright" /></div>
 
-  <div class="room-motes" data-animated>
+  <div class="room-motes" data-animated aria-hidden="true">
     {motes.map((mote) => (
       <span
         class="mote"
@@ -34,6 +35,6 @@ const { motes } = Astro.props;
     ))}
   </div>
 
-  <div class="room-grain"></div>
-  <div class="room-floor"></div>
+  <div class="room-grain" aria-hidden="true"></div>
+  <div class="room-floor" aria-hidden="true"></div>
 </div>
