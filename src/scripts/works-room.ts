@@ -1,3 +1,5 @@
+import { wireLibraryAmbientEvents } from './library-ambient-events';
+import { wireLibraryParallax } from './library-parallax';
 import { commitLibraryWorld, wireLibraryWorld } from './library-world';
 
 /**
@@ -226,7 +228,9 @@ export function initWorksRoom(): void {
     pauseOffscreen();
     wireShelfScroll();
     wireShelf();
-    import('./library-world').then(({ wireLibraryWorld }) => wireLibraryWorld());
+    wireLibraryWorld();
+    wireLibraryParallax();
+    wireLibraryAmbientEvents();
   }
 
   document.addEventListener('astro:page-load', setup);

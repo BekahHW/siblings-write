@@ -197,7 +197,61 @@
   100% { transform: translateX(30%); opacity: 0; }
 }
 
+.library .room-tree {
+  transform: translate(calc(var(--parallax-x, 0) * 1px), calc(var(--parallax-y, 0) * 0.6px));
+  transition: transform 0.1s linear;
+}
+
+.library .room-ivy--left {
+  transform: translate(calc(var(--parallax-x, 0) * 1.4px), calc(var(--parallax-y, 0) * 0.8px));
+}
+
+.library .room-ivy--right {
+  transform: translate(calc(var(--parallax-x, 0) * -1.2px), calc(var(--parallax-y, 0) * 0.7px));
+}
+
+.library .room-window {
+  filter: brightness(calc(1 + var(--parallax-x, 0) * 0.008));
+}
+
+.library.ambient-lamp-flicker .lamp {
+  opacity: 0.82;
+  transition: opacity 0.15s ease;
+}
+
+.library :global(.ambient-owl-tilt) {
+  transform: rotate(-4deg);
+  transition: transform 1.8s ease;
+}
+
+.ambient-leaf-fall {
+  position: absolute;
+  top: 12%;
+  left: 68%;
+  width: 10px;
+  height: 10px;
+  background: rgba(90, 130, 60, 0.75);
+  border-radius: 0 80% 0 80%;
+  animation: leaf-fall 7s ease-in forwards;
+}
+
+.library :global(.ambient-book-nudge) {
+  transform: translateY(-3px) rotate(-0.6deg);
+  transition: transform 0.9s ease;
+}
+
+@keyframes leaf-fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.9; }
+  100% { transform: translate(-40px, 280px) rotate(140deg); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .library .room-tree,
+  .library .room-ivy--left,
+  .library .room-ivy--right {
+    transform: none !important;
+  }
   .library .world-layer,
   .library .world-layer--fireflies span,
   .library .world-layer--snow span {
