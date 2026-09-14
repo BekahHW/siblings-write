@@ -1,0 +1,89 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  works: CollectionEntry<'works'>[];
+  activeId: string;
+}
+
+const { works, activeId } = Astro.props;
+---
+
+<div class="reader" data-reader>
+  <div class="page-leaf" aria-hidden="true" inert>
+    <div class="page-leaf-face"></div>
+    <div class="page-leaf-back"></div>
+  </div>
+  <div class="page-shade" aria-hidden="true"></div>
+
+  {works.map((work) => {
+    const hasSummary = Boolean(work.data.summary);
+    const storyParagraphs = (work.data.summary || work.data.description)
+      .split(/\n\n+/)
+      .map((para) => para.trim())
+      .filter(Boolean);
+    return (
+      <article
+        class="spread"
+        id={`spread-${work.id}`}
+        role="tabpanel"
+        aria-labelledby={`shelf-tab-${work.id}`}
+        tabindex="0"
+        hidden={work.id !== activeId}
+        itemscope
+        itemtype="https://schema.org/Book"
+      >
+        <span class="spread-ribbon" aria-hidden="true"></span>
+
+        <div class="spread-page spread-page--left">
+          <img
+            class="spread-cover"
+            src={work.data.image}
+            alt=""
+            width="150"
+            height="225"
+            itemprop="image"
+            loading="lazy"
+          />
+          <h2 class="spread-title" itemprop="name">{work.data.title}</h2>
+          {hasSummary && (
+            <p class="spread-logline" itemprop="description">{work.data.description}</p>
+          )}
+        </div>
+
+        <div class="spread-page spread-page--right">
+          <h3 class="spread-label">The story</h3>
+          <div class="spread-prose">
+            {storyParagraphs.map((para) => (
+              <p itemprop={hasSummary ? undefined : 'description'}>{para}</p>
+            ))}
+          </div>
+
+          {work.data.inspiredBy && (
+            <>
+              <h3 class="spread-label">What inspired it</h3>
+              <p class="spread-body spread-body--aside">{work.data.inspiredBy}</p>
+            </>
+          )}
+
+          <div class="spread-actions">
+            <a href={`/works/${work.id}`} class="btn btn--brass">
+              Read more
+              <span class="sr-only"> about {work.data.title}</span>
+            </a>
+            <a
+              href={work.data.link}
+              target="_blank"
+              rel="noopener"
+              class="btn btn--seal"
+              itemprop="url"
+            >
+              Buy on Amazon
+              <span class="sr-only"> — {work.data.title}</span>
+            </a>
+          </div>
+        </div>
+      </article>
+    );
+  })}
+</div>

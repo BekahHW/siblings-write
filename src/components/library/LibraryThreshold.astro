@@ -1,0 +1,25 @@
+---
+import Flourish from './Flourish.astro';
+
+export interface Props {
+  title: string;
+  intro: string;
+}
+
+const { title, intro } = Astro.props;
+---
+
+<header class="threshold">
+  <div class="threshold-crown">
+    <p class="threshold-eyebrow">The lights are always on</p>
+    <h1 class="threshold-title">{title}</h1>
+    <Flourish type="divider" class="threshold-rule" />
+  </div>
+  <div class="plaque">
+    <span class="plaque-corner plaque-corner--tl"><Flourish type="corner" /></span>
+    <span class="plaque-corner plaque-corner--tr"><Flourish type="corner" /></span>
+    <span class="plaque-corner plaque-corner--bl"><Flourish type="corner" /></span>
+    <span class="plaque-corner plaque-corner--br"><Flourish type="corner" /></span>
+    <p class="threshold-intro">{intro}</p>
+  </div>
+</header>

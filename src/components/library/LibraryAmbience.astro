@@ -1,0 +1,39 @@
+---
+import LibraryTree from './LibraryTree.astro';
+import Owl from './Owl.astro';
+import IvyVine from './IvyVine.astro';
+import type { LibraryMote } from '../../lib/works/motes';
+
+export interface Props {
+  motes: LibraryMote[];
+}
+
+const { motes } = Astro.props;
+---
+
+<div class="room" aria-hidden="true">
+  <div class="room-lintel">
+    <div class="room-lintel-ivy"><IvyVine width={1200} amplitude={22} tone="deep" /></div>
+  </div>
+
+  <div class="room-tree" data-animated>
+    <LibraryTree />
+    <div class="perch perch--one"><Owl variant="warm" delay={0} /></div>
+    <div class="perch perch--two"><Owl variant="cool" delay={2.4} /></div>
+  </div>
+
+  <div class="room-ivy room-ivy--left"><IvyVine width={900} amplitude={30} tone="bright" /></div>
+  <div class="room-ivy room-ivy--right"><IvyVine width={900} amplitude={30} tone="bright" /></div>
+
+  <div class="room-motes" data-animated>
+    {motes.map((m) => (
+      <span
+        class="mote"
+        style={`left:${m.left}%;top:${m.top}%;width:${m.size}px;height:${m.size}px;--mote-drift:${m.drift}px;--mote-delay:${m.delay}s;--mote-duration:${m.duration}s;--mote-opacity:${m.opacity}`}
+      ></span>
+    ))}
+  </div>
+
+  <div class="room-grain"></div>
+  <div class="room-floor"></div>
+</div>
