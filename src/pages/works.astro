@@ -94,7 +94,8 @@ const structuredData = {
   </script>
 </BaseLayout>
 
-<style>
+<style is:global>
+  /* Child components render room markup; library CSS must be global to apply. */
   /* ═══════════════════════════════════════════════════════════════
      THE LIBRARY
      A warmer, dimmer room built from the site's own violets, roses
