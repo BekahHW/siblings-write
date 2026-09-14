@@ -6,7 +6,12 @@ import StoryReader from './StoryReader.astro';
 
 interface Props {
   works: CollectionEntry<'works'>[];
-  books: { id: string; title: string; image: string }[];
+  books: {
+    id: string;
+    title: string;
+    image: string;
+    world: 'valley' | 'christmas' | 'island' | 'sandbridge';
+  }[];
   activeId?: string;
   heading: string;
 }

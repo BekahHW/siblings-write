@@ -26,6 +26,7 @@ const uid = `owl-${variant}-${delay}`;
   role="presentation"
   aria-hidden="true"
   focusable="false"
+  data-owl
   style={`--owl-delay:${delay}s`}
 >
   <defs>
@@ -42,7 +43,7 @@ const uid = `owl-${variant}-${delay}`;
   <!-- Branch the bird is standing on -->
   <path d="M2,140 C34,133 82,133 118,141" stroke="#1b1209" stroke-width="7" fill="none" stroke-linecap="round" />
 
-  <g class="owl-body">
+  <g class="owl-body" data-owl-body>
     <!-- Talons -->
     <g stroke={s.dark} stroke-width="3" stroke-linecap="round" fill="none">
       <path d="M48,122 L44,137 M48,122 L52,137 M48,130 L40,138" />
@@ -89,8 +90,10 @@ const uid = `owl-${variant}-${delay}`;
     <g class="owl-eyes">
       <ellipse cx="51" cy="46" rx="5.4" ry="5" fill={s.eye} opacity="0.8" />
       <ellipse cx="70" cy="46" rx="5.4" ry="5" fill={s.eye} />
-      <circle cx="52.4" cy="44.6" r="1.5" fill="#fffbe9" opacity="0.9" />
-      <circle cx="71.4" cy="44.6" r="1.5" fill="#fffbe9" />
+      <g data-owl-pupils>
+        <circle cx="52.4" cy="44.6" r="1.5" fill="#fffbe9" opacity="0.9" />
+        <circle cx="71.4" cy="44.6" r="1.5" fill="#fffbe9" />
+      </g>
     </g>
 
     <!-- Beak -->

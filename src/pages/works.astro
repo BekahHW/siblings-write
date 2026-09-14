@@ -3,6 +3,7 @@ import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LibraryAlcove from '../components/library/LibraryAlcove.astro';
 import LibraryAmbience from '../components/library/LibraryAmbience.astro';
+import LibraryAtmosphere from '../components/library/LibraryAtmosphere.astro';
 import LibraryThreshold from '../components/library/LibraryThreshold.astro';
 import ReadersNook from '../components/library/ReadersNook.astro';
 import { generateMotes } from '../utils/generateMotes';
@@ -14,8 +15,10 @@ const shelfBooks = sortedWorks.map((work) => ({
   id: work.id,
   title: work.data.title,
   image: work.data.image,
+  world: work.data.experience?.world ?? 'valley',
 }));
 const activeId = shelfBooks[0]?.id;
+const activeWorld = shelfBooks[0]?.world ?? 'valley';
 
 const worksSettings = await getEntry('pages', 'works');
 const title = worksSettings?.data.title || 'Our Work';
@@ -67,8 +70,14 @@ const structuredData = {
 <BaseLayout title={title} description={description} permalink={permalink} current="work">
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-  <div class="library">
+  <div
+    class="library"
+    data-world={activeWorld}
+    data-library-state="committed"
+    data-committed-world={activeWorld}
+  >
     <LibraryAmbience motes={generateMotes()} />
+    <LibraryAtmosphere />
 
     <div class="room-inner">
       <LibraryThreshold title={title} intro={intro} />
