@@ -1,16 +1,21 @@
 ---
 interface Props {
+  workId: string;
   title: string;
   image: string;
   trailerVideoId?: string;
   cinematicHero: boolean;
 }
 
-const { title, image, trailerVideoId, cinematicHero } = Astro.props;
+const { workId, title, image, trailerVideoId, cinematicHero } = Astro.props;
 const hasTrailer = Boolean(trailerVideoId && cinematicHero);
 ---
 
-<header class="work-hero" data-parallax-surface>
+<header
+  class="work-hero"
+  data-parallax-surface
+  transition:name={`story-world-${workId}`}
+>
   <img src={image} alt={title} class="work-hero-image" fetchpriority="high" />
   <div class="work-hero-shade" aria-hidden="true"></div>
   <div class="work-hero-content">

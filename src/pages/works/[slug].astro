@@ -79,6 +79,7 @@ const structuredData = {
   permalink={permalink}
   current="works"
   immersiveWork
+  suppressAnnouncement
 >
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   <article
@@ -90,6 +91,7 @@ const structuredData = {
   >
     <WorkAtmosphere world={experience.world} />
     <WorkHero
+      workId={work.id}
       title={title}
       image={headerImage || image}
       trailerVideoId={trailerVideoId}
@@ -98,6 +100,7 @@ const structuredData = {
     <div class="work-content">
       <Breadcrumbs items={breadcrumbItems} />
       <WorkIntro
+        workId={work.id}
         title={title}
         description={description}
         image={image}

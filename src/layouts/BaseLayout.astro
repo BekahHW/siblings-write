@@ -14,6 +14,7 @@ export interface Props {
   current?: string;
   hideNewsletterFooter?: boolean;
   immersiveWork?: boolean;
+  suppressAnnouncement?: boolean;
 }
 const {
   title,
@@ -22,6 +23,7 @@ const {
   current,
   hideNewsletterFooter = false,
   immersiveWork = false,
+  suppressAnnouncement = false,
 } = Astro.props;
 
 // Fetch active announcements
@@ -144,7 +146,7 @@ const siteStructuredData = {
   </div>
 
   <!-- Render announcement popup if one is active -->
-  {activeAnnouncement && (
+  {!suppressAnnouncement && activeAnnouncement && (
     <AnnouncementPopup
       client:load
       title={activeAnnouncement.data.title}
@@ -263,6 +265,20 @@ const siteStructuredData = {
     text-align: center;
     filter: drop-shadow(0 2px 3px rgba(32, 22, 12, 0.45));
     animation: none;
+  }
+
+  :global(body[data-immersive-work] .layout > footer) {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    margin-top: 0;
+    padding-top: clamp(3rem, 7vw, 5.5rem);
+    background:
+      linear-gradient(180deg, rgba(76, 53, 31, 0.2), rgba(255, 249, 239, 0.5) 4.5rem, transparent 11rem);
+  }
+
+  :global(body[data-immersive-work] .footer-newsletter) {
+    border-bottom-color: rgba(104, 78, 48, 0.22);
   }
 
   @keyframes sparkle-bounce {

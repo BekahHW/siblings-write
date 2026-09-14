@@ -29,12 +29,15 @@ const { works, activeId } = Astro.props;
       <article
         class="spread"
         id={`spread-${work.id}`}
+        data-spread-id={work.id}
+        data-spread-world={experience?.world}
         role="tabpanel"
         aria-labelledby={`shelf-tab-${work.id}`}
         tabindex="0"
         hidden={work.id !== activeId}
         itemscope
         itemtype="https://schema.org/Book"
+        transition:name={`story-world-${work.id}`}
       >
         <span class="spread-ribbon" aria-hidden="true"></span>
 
@@ -47,6 +50,7 @@ const { works, activeId } = Astro.props;
             height="225"
             itemprop="image"
             loading="lazy"
+            transition:name={`story-cover-${work.id}`}
           />
           <h2 class="spread-title" itemprop="name">{work.data.title}</h2>
           {hasSummary && (
@@ -55,19 +59,22 @@ const { works, activeId } = Astro.props;
 
           {experience && (
             <section class="library-record" aria-label={`Library record ${archiveRecord}`}>
-              <p class="library-record-heading">Library record · {archiveRecord}</p>
+              <p class="library-record-heading">
+                <span>Library record</span>
+                <strong>{archiveRecord}</strong>
+              </p>
               <dl class="library-record-fields">
-                <div>
-                  <dt>Accession</dt>
-                  <dd>{archiveRecord}</dd>
-                </div>
                 <div>
                   <dt>Location</dt>
                   <dd>{experience.location}</dd>
                 </div>
                 <div>
                   <dt>Classification</dt>
-                  <dd>{experience.storyClassifications.join(' · ')}</dd>
+                  <dd class="classification-terms">
+                    {experience.storyClassifications.map((classification) => (
+                      <span>{classification}</span>
+                    ))}
+                  </dd>
                 </div>
               </dl>
             </section>
@@ -97,7 +104,12 @@ const { works, activeId } = Astro.props;
           )}
 
           <div class="spread-actions">
-            <a href={`/works/${work.id}`} class="btn btn--brass">
+            <a
+              href={`/works/${work.id}`}
+              class="btn btn--brass"
+              data-story-link
+              data-story-id={work.id}
+            >
               Read more
               <span class="sr-only"> about {work.data.title}</span>
             </a>

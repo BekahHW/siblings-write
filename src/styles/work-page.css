@@ -4,6 +4,10 @@
   --world-glow: rgba(190, 224, 102, .3);
   --world-paper: rgba(247, 244, 224, .94);
   --world-deep: #13251d;
+  --world-rule: rgba(63, 91, 59, .42);
+  --world-motif:
+    radial-gradient(ellipse at 8% 14%, transparent 0 18px, rgba(55, 89, 56, .35) 19px 20px, transparent 21px),
+    linear-gradient(112deg, transparent 48%, rgba(55, 89, 56, .24) 49% 50%, transparent 51%);
   position: relative;
   isolation: isolate;
   margin: -1rem -2rem -1rem;
@@ -19,6 +23,10 @@
   --world-glow: rgba(239, 188, 92, .3);
   --world-paper: rgba(253, 246, 228, .95);
   --world-deep: #181b22;
+  --world-rule: rgba(133, 91, 39, .43);
+  --world-motif:
+    linear-gradient(30deg, transparent 46%, rgba(136, 88, 40, .24) 47% 49%, transparent 50%),
+    linear-gradient(150deg, transparent 46%, rgba(136, 88, 40, .24) 47% 49%, transparent 50%);
   background: #dcd8d0;
 }
 
@@ -28,6 +36,9 @@
   --world-glow: rgba(221, 159, 78, .3);
   --world-paper: rgba(235, 242, 237, .95);
   --world-deep: #10262d;
+  --world-rule: rgba(42, 87, 96, .43);
+  --world-motif:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(41, 87, 96, .28) 28px 29px, transparent 30px 57px);
   background: #bbcbd0;
 }
 
@@ -37,6 +48,9 @@
   --world-glow: rgba(64, 197, 208, .25);
   --world-paper: rgba(255, 249, 222, .95);
   --world-deep: #0b3c4e;
+  --world-rule: rgba(38, 121, 133, .4);
+  --world-motif:
+    repeating-radial-gradient(ellipse at 96% 5%, transparent 0 19px, rgba(39, 132, 143, .25) 20px 21px, transparent 22px 40px);
   background: #eadcae;
 }
 
@@ -188,6 +202,28 @@
   z-index: 1;
   width: min(100% - 2rem, 1050px);
   margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 3rem) 1rem;
+  background:
+    linear-gradient(90deg, rgba(88, 63, 35, .06), transparent 3.5%, transparent 96.5%, rgba(88, 63, 35, .06)),
+    var(--world-paper);
+  border-inline: 1px solid color-mix(in srgb, var(--world-accent) 36%, transparent);
+  box-shadow: 0 1.25rem 3rem rgba(17, 35, 29, .15);
+}
+
+.work-content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--world-motif);
+  background-size: 12rem 12rem;
+  opacity: .13;
+  mask-image: linear-gradient(90deg, #000, transparent 17%, transparent 83%, #000);
+}
+
+.work-content > * {
+  position: relative;
+  z-index: 1;
 }
 
 .work-hero {
@@ -303,19 +339,20 @@
 }
 
 .work-content > nav:first-child {
-  margin: 1.5rem 0;
+  margin: 0;
+  padding: 1.4rem 0 1.1rem;
+  border-bottom: 1px solid var(--world-rule);
 }
 
 .work-intro,
 .story-section,
 .work-closing {
-  margin: 0 0 2rem;
-  padding: clamp(1.3rem, 4vw, 3rem);
-  border: 1px solid color-mix(in srgb, var(--world-accent) 50%, transparent);
-  border-radius: .35rem;
-  background: var(--world-paper);
-  box-shadow: 0 1rem 2.5rem rgba(17, 35, 29, .14);
-  backdrop-filter: blur(8px);
+  margin: 0;
+  padding: clamp(2.4rem, 6vw, 4.5rem) clamp(.35rem, 3vw, 2rem);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .work-intro {
@@ -323,6 +360,7 @@
   grid-template-columns: minmax(180px, 270px) 1fr;
   gap: clamp(1.5rem, 5vw, 3.5rem);
   align-items: center;
+  min-height: 30rem;
 }
 
 .work-cover {
@@ -404,8 +442,51 @@
   text-wrap: balance;
 }
 
-.story-section h2 span {
-  color: var(--world-accent);
+.story-section {
+  border-top: 3px double var(--world-rule);
+}
+
+.story-section h2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .7rem;
+}
+
+.section-mark {
+  display: block;
+  width: 2.7rem;
+  height: .75rem;
+  border: solid var(--world-accent);
+  border-width: 1px 0;
+  transform: skewX(-18deg);
+}
+
+.work-detail[data-world="valley"] .section-mark {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-width: 1px;
+  border-radius: 80% 15% 75% 20%;
+  transform: rotate(42deg);
+}
+
+.work-detail[data-world="christmas"] .section-mark {
+  width: 1rem;
+  height: 1rem;
+  border-width: 1px;
+  transform: rotate(45deg);
+}
+
+.work-detail[data-world="island"] .section-mark {
+  border-width: 0 0 2px;
+  border-radius: 50%;
+  transform: none;
+}
+
+.work-detail[data-world="sandbridge"] .section-mark {
+  border-width: 2px 0 0;
+  border-radius: 50%;
+  transform: rotate(-4deg);
 }
 
 .prose p {
@@ -414,7 +495,7 @@
 }
 
 .story-inspiration {
-  border-left-width: 5px;
+  border-left-width: 0;
 }
 
 .story-soundtrack {
@@ -444,9 +525,15 @@
 
 .quiz-cta {
   position: relative;
+  width: min(100%, 48rem);
+  margin: 2.5rem auto;
+  padding: clamp(2rem, 5vw, 3.2rem);
   overflow: hidden;
   text-align: center;
-  box-shadow: inset 0 0 4rem rgba(218, 167, 70, .14), 0 1rem 2.5rem rgba(17, 35, 29, .14);
+  border: 1px solid var(--world-rule);
+  border-radius: .15rem;
+  background: color-mix(in srgb, var(--world-paper) 82%, #c49b55);
+  box-shadow: .25rem .4rem 0 color-mix(in srgb, var(--world-rule) 30%, transparent);
 }
 
 .quiz-cta::before,
@@ -464,9 +551,18 @@
 .quiz-cta::before { left: 3%; }
 .quiz-cta::after { right: 3%; }
 
-.quiz-icon {
-  color: #8a642a;
-  font-size: 3rem;
+.quiz-seal {
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  margin: 0 auto 1rem;
+  border: 1px solid #8a642a;
+  border-radius: 50%;
+  color: #765522;
+  font: 700 .78rem var(--font-family-display);
+  letter-spacing: .12em;
+  box-shadow: inset 0 0 0 4px color-mix(in srgb, #8a642a 14%, transparent);
 }
 
 .quiz-cta p {
@@ -481,7 +577,8 @@
 
 .work-closing {
   text-align: center;
-  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--world-accent) 30%, transparent), 0 1rem 2.5rem rgba(17, 35, 29, .14);
+  border-top: 3px double var(--world-rule);
+  box-shadow: none;
 }
 
 .work-closing p {
@@ -494,7 +591,8 @@
 }
 
 .work-back {
-  padding: .5rem 0 1rem;
+  padding: .5rem 0 1.5rem;
+  border-top: 1px solid var(--world-rule);
   text-align: center;
 }
 
@@ -526,6 +624,8 @@
 
   .work-intro {
     grid-template-columns: 1fr;
+    min-height: 0;
+    padding-top: 2rem;
   }
 
   .work-cover-wrap {
@@ -549,6 +649,70 @@
     flex-basis: auto;
     width: 100%;
   }
+
+  .work-content {
+    width: calc(100% - 1rem);
+    padding-inline: .75rem;
+  }
+
+  .story-section,
+  .work-closing {
+    padding: 2.5rem .35rem;
+  }
+
+  .quiz-cta {
+    width: calc(100% - .7rem);
+    margin-block: 1.5rem;
+    padding-inline: 1rem;
+  }
+}
+
+@supports selector(::view-transition-old(root)) {
+  ::view-transition-old(story-world-the-valley-of-almost-true-things),
+  ::view-transition-old(story-world-battle-for-christmas),
+  ::view-transition-old(story-world-escape-from-browns-island),
+  ::view-transition-old(story-world-mitch-and-the-sand-bridge) {
+    animation: story-world-old 240ms ease-in both;
+  }
+
+  ::view-transition-new(story-world-the-valley-of-almost-true-things),
+  ::view-transition-new(story-world-battle-for-christmas),
+  ::view-transition-new(story-world-escape-from-browns-island),
+  ::view-transition-new(story-world-mitch-and-the-sand-bridge) {
+    animation: story-world-new 420ms cubic-bezier(.2, .72, .25, 1) both;
+  }
+
+  ::view-transition-old(story-cover-the-valley-of-almost-true-things),
+  ::view-transition-old(story-cover-battle-for-christmas),
+  ::view-transition-old(story-cover-escape-from-browns-island),
+  ::view-transition-old(story-cover-mitch-and-the-sand-bridge) {
+    animation: story-cover-old 260ms ease-in both;
+  }
+
+  ::view-transition-new(story-cover-the-valley-of-almost-true-things),
+  ::view-transition-new(story-cover-battle-for-christmas),
+  ::view-transition-new(story-cover-escape-from-browns-island),
+  ::view-transition-new(story-cover-mitch-and-the-sand-bridge) {
+    animation: story-cover-new 440ms cubic-bezier(.2, .72, .25, 1) both;
+  }
+}
+
+@keyframes story-world-old {
+  to { opacity: 0; filter: brightness(.72); }
+}
+
+@keyframes story-world-new {
+  from { opacity: 0; filter: brightness(.78); }
+  to { opacity: 1; filter: brightness(1); }
+}
+
+@keyframes story-cover-old {
+  to { opacity: .35; transform: scale(1.025); }
+}
+
+@keyframes story-cover-new {
+  from { opacity: .25; transform: scale(.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {

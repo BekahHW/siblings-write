@@ -12,12 +12,10 @@ const { amazonUrl, bookshopUrl, closing = false } = Astro.props;
   {bookshopUrl && (
     <a href={bookshopUrl} target="_blank" rel="noopener noreferrer" class="purchase-link purchase-bookshop">
       <span>Buy Now on Bookshop</span>
-      <span aria-hidden="true">📖</span>
       <span class="purchase-tooltip">A not-for-profit that donates proceeds from book sales to indie bookstores</span>
     </a>
   )}
   <a href={amazonUrl} target="_blank" rel="noopener noreferrer" class="purchase-link purchase-amazon">
     <span>{closing ? 'Order Your Copy Now' : 'Buy Now on Amazon'}</span>
-    <span aria-hidden="true">{closing ? '🚀' : '📚'}</span>
   </a>
 </div>

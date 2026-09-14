@@ -31,6 +31,11 @@
     --ivy: #3b6b3c;
     --wood: #6b4a22;
     --lamp: #ffd88a;
+    --world-wall-wash: transparent;
+    --world-lamp-light: rgba(255, 216, 138, 0.5);
+    --world-window-light: rgba(255, 186, 96, 0.28);
+    --world-floor-wash: transparent;
+    --world-tree-filter: none;
 
     position: relative;
     width: 100vw;
@@ -43,6 +48,7 @@
     font-family: var(--font-family-serif);
 
     background:
+      var(--world-wall-wash),
       radial-gradient(150% 70% at 50% -8%, rgba(36, 24, 52, 0.97) 0%, rgba(40, 26, 58, 0.93) 16%, rgba(48, 32, 68, 0.64) 36%, rgba(54, 37, 74, 0.2) 56%, rgba(54, 37, 74, 0) 70%),
       radial-gradient(72% 40% at 50% 32%, rgba(255, 196, 116, 0.4), transparent 76%),
       radial-gradient(46% 32% at 2% 64%, rgba(176, 104, 74, 0.2), transparent 74%),
@@ -152,6 +158,8 @@
     min-width: 1080px;
     opacity: 0.98;
     z-index: 2;
+    filter: var(--world-tree-filter);
+    transition: filter var(--world-transition) ease;
   }
 
   .perch {
@@ -228,8 +236,10 @@
     bottom: 0;
     height: 210px;
     background:
+      var(--world-floor-wash),
       linear-gradient(180deg, rgba(74, 46, 22, 0) 0%, rgba(74, 46, 22, 0.24) 18%, rgba(56, 34, 15, 0.56) 58%, rgba(32, 19, 8, 0.82) 100%),
       repeating-linear-gradient(90deg, rgba(24, 14, 5, 0.16) 0 2px, transparent 2px 106px);
+    transition: background-color var(--world-transition) ease;
   }
 
   /* Baseboard where the wall meets the floor */
@@ -247,7 +257,7 @@
   /* ─── Content column ──────────────────────────────────────────── */
   .room-inner {
     position: relative;
-    z-index: 1;
+    z-index: auto;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 clamp(1rem, 4vw, 2rem);
@@ -271,6 +281,9 @@
        owl sitting in it, at every width. */
     padding-top: clamp(5.5rem, 24vw, 13rem);
     text-align: center;
+    position: relative;
+    z-index: 4;
+    pointer-events: none;
   }
 
   /* A pool of shade behind the heading so it stays readable wherever the
@@ -422,9 +435,10 @@
     width: min(760px, 86%);
     height: 260px;
     transform: translateX(-50%);
-    background: radial-gradient(50% 50% at 50% 40%, rgba(255, 216, 138, 0.5) 0%, rgba(255, 216, 138, 0.14) 52%, transparent 78%);
+    background: radial-gradient(50% 50% at 50% 40%, var(--world-lamp-light) 0%, color-mix(in srgb, var(--world-lamp-light) 28%, transparent) 52%, transparent 78%);
     pointer-events: none;
     filter: blur(6px);
+    transition: filter var(--world-transition) ease, background var(--world-transition) ease;
   }
 
   /* Glass set into the far wall, either side of the bookcase. It sits
@@ -458,14 +472,16 @@
     border-radius: 50%;
     filter: blur(28px);
     pointer-events: none;
+    background: radial-gradient(50% 50% at 50% 50%, var(--world-window-light), transparent 78%);
+    transition: background var(--world-transition) ease;
   }
 
   .room-window--left::after {
-    background: radial-gradient(50% 50% at 50% 50%, rgba(255, 186, 96, 0.34), rgba(198, 96, 118, 0.12) 58%, transparent 82%);
+    background: radial-gradient(50% 50% at 50% 50%, var(--world-window-light), rgba(198, 96, 118, 0.1) 58%, transparent 82%);
   }
 
   .room-window--right::after {
-    background: radial-gradient(50% 50% at 50% 50%, rgba(136, 106, 214, 0.3), rgba(63, 132, 126, 0.12) 58%, transparent 82%);
+    background: radial-gradient(50% 50% at 50% 50%, var(--world-window-light), rgba(63, 132, 126, 0.1) 58%, transparent 82%);
   }
 
   .alcove-frame {
@@ -496,6 +512,46 @@
     position: relative;
     margin-bottom: 1rem;
     perspective: 2200px;
+  }
+
+  .story-transition-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    background: rgba(20, 12, 28, 0.48);
+    opacity: 0;
+    transition: opacity 220ms ease-out;
+  }
+
+  .library.is-story-departing .story-transition-veil {
+    opacity: 1;
+  }
+
+  .library.is-story-departing .reader {
+    z-index: 31;
+    animation: story-spread-forward 260ms cubic-bezier(0.2, 0.75, 0.3, 1) both;
+  }
+
+  .library.is-story-departing .spread[data-transition-source='true'] {
+    box-shadow:
+      0 42px 84px rgba(10, 5, 2, 0.7),
+      0 0 54px rgba(255, 208, 126, 0.3),
+      inset 0 1px 0 rgba(255, 214, 158, 0.22);
+  }
+
+  .library.is-story-departing .spread[data-transition-source='true'] .spread-cover {
+    transform: translate3d(0, -5px, 30px) scale(1.045);
+    filter: saturate(1.08) brightness(1.04);
+  }
+
+  .library.is-story-departing .world-layer {
+    filter: saturate(1.1) brightness(1.04);
+  }
+
+  @keyframes story-spread-forward {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to { transform: translate3d(0, -5px, 0) scale(1.012); }
   }
 
   /* Held at a fixed height for the length of the turn so nothing reflows
@@ -743,6 +799,7 @@
     box-shadow:
       5px 7px 18px rgba(28, 16, 6, 0.45),
       -2px 0 5px rgba(28, 16, 6, 0.3);
+    transition: transform 220ms ease-out, filter 220ms ease-out;
   }
 
   .spread-title {
@@ -766,8 +823,8 @@
     text-align: left;
     color: #3f352d;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: clamp(0.68rem, 1.35vw, 0.76rem);
-    line-height: 1.45;
+    font-size: clamp(0.8rem, 1.45vw, 0.9rem);
+    line-height: 1.5;
     background: repeating-linear-gradient(
       180deg,
       transparent 0 1.55rem,
@@ -778,11 +835,23 @@
   }
 
   .library-record-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
     margin: 0;
-    padding: 0.48rem 0.2rem 0.4rem;
+    padding: 0.58rem 0.2rem 0.48rem;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+  }
+
+  .library-record-heading strong {
+    min-width: 3.2rem;
+    padding: 0.08rem 0.35rem;
+    border: 1px solid rgba(94, 69, 39, 0.5);
+    font-size: 1.05em;
+    text-align: center;
   }
 
   .library-record-fields {
@@ -804,6 +873,24 @@
 
   .library-record dd {
     margin: 0;
+  }
+
+  .classification-terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.5rem;
+    align-items: flex-start;
+  }
+
+  .classification-terms span {
+    padding: 0.02rem 0.28rem;
+    border: 1px solid rgba(74, 58, 43, 0.42);
+    line-height: 1.35;
+    transform: rotate(-0.35deg);
+  }
+
+  .classification-terms span:nth-child(even) {
+    transform: rotate(0.45deg);
   }
 
   .librarian-slip {
@@ -830,8 +917,8 @@
 
   .librarian-slip p {
     margin: 0;
-    font-family: 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive;
-    font-size: clamp(0.78rem, 1.45vw, 0.88rem);
+    font-family: 'Bradley Hand', 'Segoe Print', 'Noteworthy', 'Chalkboard SE', cursive;
+    font-size: clamp(0.88rem, 1.55vw, 0.98rem);
     line-height: 1.45;
   }
 
@@ -1090,24 +1177,13 @@
   }
 
   /* Reset the site-wide blockquote treatment inside the nook */
-  .quote-body {
-    margin: 0;
-    padding: 0;
-    border: 0;
+  .quote {
     border-image: none;
-    background: none;
-    border-radius: 0;
     font-size: 1rem;
     font-style: normal;
-    transition: none;
   }
 
-  .quote-body:hover {
-    transform: none;
-    box-shadow: none;
-  }
-
-  .quote-body p {
+  .quote p {
     margin: 0;
     font-size: clamp(0.98rem, 2.1vw, 1.08rem);
     font-style: italic;
@@ -1150,7 +1226,7 @@
     }
 
     .threshold {
-      padding-top: 13rem;
+      padding-top: 10.5rem;
     }
 
     .room-lintel {
@@ -1175,6 +1251,7 @@
 
     .spread {
       grid-template-columns: minmax(0, 1fr);
+      padding: 8px;
     }
 
     .spread-page--left,
@@ -1182,6 +1259,7 @@
       background: linear-gradient(180deg, #f4ead5 0%, #e9dcc0 100%);
       border-radius: 3px;
       box-shadow: none;
+      padding: 1.35rem 1.15rem;
     }
 
     .spread-page--left {
@@ -1228,6 +1306,40 @@
       flex: 1 1 100%;
       text-align: center;
     }
+
+    .spread-body,
+    .spread-prose p {
+      font-size: 1rem;
+      line-height: 1.72;
+    }
+
+    .nook {
+      margin-top: 3.5rem;
+      padding-inline: 0.85rem;
+    }
+
+    .quotes {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0.9rem;
+      margin-inline: -0.85rem;
+      padding: 1.5rem 0.85rem 0.75rem;
+      max-height: 22rem;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: inline mandatory;
+      scrollbar-width: thin;
+    }
+
+    .quote {
+      flex: 0 0 min(82vw, 24rem);
+      height: auto;
+      max-height: 20rem;
+      overflow-y: auto;
+      scroll-snap-align: center;
+      overscroll-behavior: contain;
+      padding: 1.8rem 1.25rem 1.35rem;
+    }
   }
 
   @media (max-width: 480px) {
@@ -1256,6 +1368,14 @@
 
     .quote:hover {
       transform: none;
+    }
+
+    .story-transition-veil {
+      display: none;
+    }
+
+    .library.is-story-departing .reader {
+      animation: none;
     }
 
     .librarian-slip {

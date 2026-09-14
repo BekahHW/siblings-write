@@ -4,6 +4,38 @@
   --world-transition: 700ms;
 }
 
+.library[data-world='valley'] {
+  --world-wall-wash: linear-gradient(180deg, rgba(61, 98, 57, 0.1), rgba(79, 118, 65, 0.035) 58%, transparent);
+  --world-lamp-light: rgba(238, 220, 139, 0.46);
+  --world-window-light: rgba(170, 205, 113, 0.28);
+  --world-floor-wash: linear-gradient(180deg, transparent 20%, rgba(44, 77, 47, 0.11));
+  --world-tree-filter: saturate(1.08) brightness(1.02);
+}
+
+.library[data-world='christmas'] {
+  --world-wall-wash: linear-gradient(180deg, rgba(117, 56, 42, 0.09), rgba(116, 74, 40, 0.025) 62%, transparent);
+  --world-lamp-light: rgba(255, 192, 94, 0.58);
+  --world-window-light: rgba(255, 208, 128, 0.34);
+  --world-floor-wash: linear-gradient(180deg, transparent 15%, rgba(100, 48, 34, 0.09));
+  --world-tree-filter: sepia(0.08) saturate(1.14) brightness(1.03);
+}
+
+.library[data-world='island'] {
+  --world-wall-wash: linear-gradient(180deg, rgba(41, 80, 96, 0.14), rgba(53, 100, 108, 0.045) 62%, transparent);
+  --world-lamp-light: rgba(238, 174, 87, 0.43);
+  --world-window-light: rgba(115, 172, 182, 0.3);
+  --world-floor-wash: linear-gradient(180deg, transparent 8%, rgba(43, 92, 104, 0.17));
+  --world-tree-filter: saturate(0.78) hue-rotate(10deg) brightness(0.93);
+}
+
+.library[data-world='sandbridge'] {
+  --world-wall-wash: linear-gradient(180deg, rgba(108, 186, 190, 0.1), rgba(236, 204, 136, 0.07) 60%, transparent);
+  --world-lamp-light: rgba(255, 220, 145, 0.5);
+  --world-window-light: rgba(113, 203, 205, 0.34);
+  --world-floor-wash: linear-gradient(180deg, transparent 12%, rgba(206, 169, 99, 0.14));
+  --world-tree-filter: saturate(0.9) brightness(1.1);
+}
+
 .library-atmosphere,
 .world-layer {
   position: absolute;
@@ -26,7 +58,7 @@
 .library[data-world='christmas'] .world-layer--christmas,
 .library[data-world='island'] .world-layer--island,
 .library[data-world='sandbridge'] .world-layer--sandbridge {
-  opacity: 1;
+  opacity: 0.68;
 }
 
 .library[data-world='christmas'] .tree-lights {
