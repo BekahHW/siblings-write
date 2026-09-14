@@ -156,6 +156,7 @@ const structuredData = {
               alt={`${title} book cover`}
               class="book-cover"
               loading="eager"
+              transition:name={`work-cover-${work.id}`}
             />
           </div>
 
@@ -1528,6 +1529,18 @@ const structuredData = {
     }
   }
 </style>
+
+<script>
+  import { markWorkVisited } from '../../lib/library/storage';
+
+  function noteWorkVisit() {
+    const detail = document.querySelector<HTMLElement>('.work-detail[data-work-id]');
+    if (detail?.dataset.workId) markWorkVisited(detail.dataset.workId);
+  }
+
+  document.addEventListener('astro:page-load', noteWorkVisit);
+  noteWorkVisit();
+</script>
 
 <script is:inline>
   (function() {

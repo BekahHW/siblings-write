@@ -1,3 +1,6 @@
+import { wireLibraryDeparture } from './library-departure';
+import { wireLibraryMemory } from './library-memory';
+import { wireLibraryTreeSecret } from './library-tree-secret';
 import { wireLibraryAmbientEvents } from './library-ambient-events';
 import { wireLibraryParallax } from './library-parallax';
 import { commitLibraryWorld, wireLibraryWorld } from './library-world';
@@ -231,6 +234,9 @@ export function initWorksRoom(): void {
     wireLibraryWorld();
     wireLibraryParallax();
     wireLibraryAmbientEvents();
+    wireLibraryMemory();
+    wireLibraryDeparture();
+    wireLibraryTreeSecret();
   }
 
   document.addEventListener('astro:page-load', setup);

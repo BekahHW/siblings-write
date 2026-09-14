@@ -38,6 +38,12 @@ const testimonials = [
 ];
 
 const motes = createLibraryMotes();
+const archiveSecrets = sortedWorks
+  .map((work) => work.data.experience?.secretText && {
+    title: work.data.title,
+    text: work.data.experience.secretText,
+  })
+  .filter(Boolean);
 
 // Generate structured data for all works
 const structuredData = {
@@ -77,7 +83,7 @@ const structuredData = {
 <BaseLayout title={title} description={description} permalink={permalink} current="work">
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-  <div class="library" data-world={initialWorld}>
+  <div class="library" data-world={initialWorld} data-archive-secrets={JSON.stringify(archiveSecrets)}>
     <LibraryAmbience motes={motes} />
     <LibraryWorldVeil />
 

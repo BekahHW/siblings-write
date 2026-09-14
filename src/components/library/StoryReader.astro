@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { formatLibraryRecordLabel } from '../../lib/storyExperience';
+import { formatLibraryRecordLabel, resolveStoryWorld } from '../../lib/storyExperience';
 
 export interface Props {
   works: CollectionEntry<'works'>[];
@@ -45,6 +45,7 @@ const { works, activeId } = Astro.props;
             height="225"
             itemprop="image"
             loading="lazy"
+            transition:name={`work-cover-${work.id}`}
           />
           <h2 class="spread-title" itemprop="name">{work.data.title}</h2>
           {hasSummary && (
@@ -83,7 +84,12 @@ const { works, activeId } = Astro.props;
           )}
 
           <div class="spread-actions">
-            <a href={`/works/${work.id}`} class="btn btn--brass">
+            <a
+              href={`/works/${work.id}`}
+              class="btn btn--brass"
+              data-read-more
+              data-read-world={resolveStoryWorld(work)}
+            >
               Read more
               <span class="sr-only"> about {work.data.title}</span>
             </a>

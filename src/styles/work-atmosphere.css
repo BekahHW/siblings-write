@@ -31,8 +31,28 @@
   background: linear-gradient(135deg, #e8a756, #d4873f);
 }
 
+body:has(.work-detail) .progress-sparkle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body:has(.work-detail) .progress-bar-fill::after {
+  content: '🔖';
+  position: absolute;
+  right: -0.35rem;
+  top: -0.45rem;
+  font-size: 0.65rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-atmosphere] .title-decoration {
     animation: none !important;
+  }
+
+  .library.is-departing .room-inner {
+    filter: none;
+    opacity: 1;
   }
 }
