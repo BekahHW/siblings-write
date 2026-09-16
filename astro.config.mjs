@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import mdx from '@astrojs/mdx';
+import node from '@astrojs/node';
 import sitemap from '@astrojs/sitemap';
 import remarkGfm from 'remark-gfm';
 import remarkSmartypants from 'remark-smartypants';
@@ -12,6 +13,10 @@ import sentry from "@sentry/astro";
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.siblingswrite.com/',
+  output: 'server',
+  adapter: node({
+    mode: 'standalone'
+  }),
   integrations: [
     mdx(),
     svelte(),
