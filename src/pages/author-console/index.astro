@@ -1,0 +1,556 @@
+---
+import PostHogLayout from '../../layouts/PostHogLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const title = 'Author Console';
+const description = 'Exclusive behind-the-scenes content for subscribers';
+const permalink = `${Astro.site.href}author-console`;
+
+// Get all secrets content, sorted by order and date
+const secrets = await getCollection('secrets');
+const sortedSecrets = secrets.sort((a, b) => {
+  // First sort by order
+  if (a.data.order !== b.data.order) {
+    return a.data.order - b.data.order;
+  }
+  // Then by date (newest first)
+  return new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime();
+});
+
+// Group secrets by type
+const secretsByType = {
+  lore: sortedSecrets.filter(s => s.data.type === 'lore'),
+  chapter: sortedSecrets.filter(s => s.data.type === 'chapter'),
+  'deleted-scene': sortedSecrets.filter(s => s.data.type === 'deleted-scene'),
+  'behind-the-scenes': sortedSecrets.filter(s => s.data.type === 'behind-the-scenes'),
+};
+
+const typeLabels = {
+  lore: '📜 World Lore',
+  chapter: '📖 Early Chapters',
+  'deleted-scene': '✂️ Deleted Scenes',
+  'behind-the-scenes': '🎬 Behind the Scenes',
+};
+
+const typeDescriptions = {
+  lore: 'Deep dives into the worlds we create',
+  chapter: 'Read chapters before they\'re published',
+  'deleted-scene': 'Scenes that didn\'t make the final cut',
+  'behind-the-scenes': 'Our creative process and writing journey',
+};
+---
+
+<PostHogLayout>
+  <BaseLayout title={title} description={description} permalink={permalink} hideNewsletterFooter={true}>
+    <div class="console-container">
+      <!-- Access Gate Check -->
+      <div id="access-gate" style="display: none;">
+        <div class="access-denied">
+          <h1>🔒 Access Denied</h1>
+          <p>The Author Console is exclusive to newsletter subscribers.</p>
+          <div class="access-actions">
+            <a href="/subscribe" class="btn-primary">Subscribe to Unlock</a>
+            <p class="hint">Hint: Try typing a secret word anywhere on the site... 🤫</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Console Content -->
+      <div id="console-content" style="display: none;">
+        <!-- Console Header -->
+        <div class="console-header">
+          <div class="console-title-wrapper">
+            <h1 class="console-title">
+              <span class="console-icon">✨</span>
+              Author Console
+              <span class="console-icon">✨</span>
+            </h1>
+            <p class="console-subtitle">Welcome to the secret archives, subscriber.</p>
+          </div>
+          <div class="console-status">
+            <span class="status-indicator"></span>
+            <span id="subscriber-email"></span>
+          </div>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <div class="stats-dashboard">
+          <div class="stat-card">
+            <div class="stat-number">{sortedSecrets.length}</div>
+            <div class="stat-label">Secret Items</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{secretsByType.lore.length}</div>
+            <div class="stat-label">Lore Entries</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{secretsByType.chapter.length}</div>
+            <div class="stat-label">Early Chapters</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{secretsByType['deleted-scene'].length}</div>
+            <div class="stat-label">Deleted Scenes</div>
+          </div>
+        </div>
+
+        <!-- Content Sections -->
+        {Object.entries(secretsByType).map(([type, items]) => items.length > 0 && (
+          <div class="content-section">
+            <div class="section-header">
+              <h2>{typeLabels[type]}</h2>
+              <p class="section-description">{typeDescriptions[type]}</p>
+            </div>
+            <div class="secrets-grid">
+              {items.map(secret => (
+                <article class="secret-card">
+                  <div class="secret-type-badge">{typeLabels[type].split(' ')[0]}</div>
+                  <h3>{secret.data.title}</h3>
+                  <p class="secret-description">{secret.data.description}</p>
+                  <div class="secret-meta">
+                    <time>{new Date(secret.data.publishDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+                    {secret.data.author && (
+                      <span class="author-badge">By {secret.data.author}</span>
+                    )}
+                  </div>
+                  <a href={`/author-console/${secret.id}`} class="read-more">
+                    Read More →
+                  </a>
+                </article>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {sortedSecrets.length === 0 && (
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h2>More secrets coming soon...</h2>
+            <p>We're working on exclusive content just for you. Check back soon!</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </BaseLayout>
+</PostHogLayout>
+
+<script>
+  // Check if user is a subscriber
+  function checkAccess() {
+    const isSubscriber = localStorage.getItem('siblings-write-subscriber') === 'true';
+    const subscriberEmail = localStorage.getItem('siblings-write-subscriber-email') || 'Subscriber';
+
+    const accessGate = document.getElementById('access-gate');
+    const consoleContent = document.getElementById('console-content');
+    const emailDisplay = document.getElementById('subscriber-email');
+
+    if (isSubscriber) {
+      // Show console content
+      if (accessGate) accessGate.style.display = 'none';
+      if (consoleContent) consoleContent.style.display = 'block';
+      if (emailDisplay) emailDisplay.textContent = subscriberEmail;
+
+      // Add entrance animation
+      consoleContent?.classList.add('fade-in');
+    } else {
+      // Show access denied
+      if (accessGate) accessGate.style.display = 'block';
+      if (consoleContent) consoleContent.style.display = 'none';
+
+      // Add shake animation to access gate
+      accessGate?.classList.add('shake');
+    }
+  }
+
+  // Run on page load
+  document.addEventListener('DOMContentLoaded', checkAccess);
+</script>
+
+<style>
+  .console-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2em;
+    min-height: 60vh;
+  }
+
+  /* Access Denied */
+  .access-denied {
+    text-align: center;
+    padding: 4em 2em;
+    background: linear-gradient(135deg, rgba(245, 87, 108, 0.1) 0%, rgba(240, 147, 251, 0.1) 100%);
+    border-radius: 20px;
+    border: 2px dashed #f5576c;
+  }
+
+  .access-denied h1 {
+    font-family: var(--font-family-serif);
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+    color: #f5576c;
+  }
+
+  .access-denied p {
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 2em;
+  }
+
+  .access-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5em;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-family: var(--font-family-sans);
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  .hint {
+    font-size: 0.95em;
+    color: #999;
+    font-style: italic;
+  }
+
+  /* Console Header */
+  .console-header {
+    text-align: center;
+    padding: 3em 2em;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 20px;
+    margin-bottom: 3em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .console-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: shimmer 6s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .console-title-wrapper {
+    position: relative;
+    z-index: 1;
+  }
+
+  .console-title {
+    font-family: var(--font-family-display);
+    font-size: 3em;
+    margin: 0 0 0.3em 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .console-icon {
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .console-icon:last-child {
+    animation-delay: 1.5s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .console-subtitle {
+    font-family: var(--font-family-serif);
+    font-size: 1.3em;
+    color: #666;
+    font-style: italic;
+    margin: 0;
+  }
+
+  .console-status {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    color: #666;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .status-indicator {
+    width: 10px;
+    height: 10px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Stats Dashboard */
+  .stats-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5em;
+    margin-bottom: 3em;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 2em;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+  }
+
+  .stat-number {
+    font-family: var(--font-family-sans);
+    font-size: 3em;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.2em;
+  }
+
+  .stat-label {
+    font-family: var(--font-family-serif);
+    font-size: 1em;
+    color: #666;
+  }
+
+  /* Content Sections */
+  .content-section {
+    margin-bottom: 4em;
+  }
+
+  .section-header {
+    margin-bottom: 2em;
+  }
+
+  .section-header h2 {
+    font-family: var(--font-family-serif);
+    font-size: 2em;
+    color: #333;
+    margin: 0 0 0.5em 0;
+  }
+
+  .section-description {
+    font-size: 1.1em;
+    color: #666;
+    margin: 0;
+  }
+
+  .secrets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2em;
+  }
+
+  .secret-card {
+    background: white;
+    padding: 2em;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    border: 2px solid transparent;
+  }
+
+  .secret-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+  }
+
+  .secret-type-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5em;
+  }
+
+  .secret-card h3 {
+    font-family: var(--font-family-serif);
+    font-size: 1.5em;
+    color: #333;
+    margin: 0 0 0.5em 0;
+    padding-right: 2em;
+  }
+
+  .secret-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5em;
+  }
+
+  .secret-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+    margin-bottom: 1em;
+    font-size: 0.9em;
+    color: #999;
+  }
+
+  .author-badge {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+
+  .read-more {
+    display: inline-block;
+    color: #667eea;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .read-more:hover {
+    color: #764ba2;
+    transform: translateX(5px);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4em 2em;
+  }
+
+  .empty-icon {
+    font-size: 5em;
+    margin-bottom: 0.5em;
+    opacity: 0.5;
+  }
+
+  .empty-state h2 {
+    font-family: var(--font-family-serif);
+    font-size: 2em;
+    color: #666;
+    margin-bottom: 0.5em;
+  }
+
+  .empty-state p {
+    color: #999;
+    font-size: 1.1em;
+  }
+
+  /* Animations */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+  }
+
+  .shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .console-container {
+      padding: 1em;
+    }
+
+    .console-header {
+      padding: 2em 1em;
+    }
+
+    .console-title {
+      font-size: 2em;
+    }
+
+    .console-subtitle {
+      font-size: 1.1em;
+    }
+
+    .console-status {
+      position: static;
+      margin-top: 1em;
+      justify-content: center;
+    }
+
+    .stats-dashboard {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1em;
+    }
+
+    .stat-card {
+      padding: 1.5em 1em;
+    }
+
+    .stat-number {
+      font-size: 2.5em;
+    }
+
+    .secrets-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5em;
+    }
+
+    .section-header h2 {
+      font-size: 1.6em;
+    }
+  }
+</style>
